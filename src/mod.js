@@ -141,7 +141,6 @@ class Mod {
             };
             botConfig.presetBatch["sptbear"] = config_json_1.defaultMaxBotCap;
             botConfig.presetBatch["sptusec"] = config_json_1.defaultMaxBotCap;
-            botConfig.botGenerationBatchSizePerType = config_json_1.defaultMaxBotCap;
             for (let index = 0; index < locationList.length; index++) {
                 const mapSettingsList = Object.keys(config_json_1.mapSettings);
                 const map = mapSettingsList[index];
@@ -199,8 +198,8 @@ class Mod {
                     .filter((location) => !sniperLocations.includes(location));
                 // SmarterPMCS
                 if (config_json_1.smarterPmcs) {
-                    botConfig.pmc.pmcType["sptbear"][map] = pmcTypeChance;
-                    botConfig.pmc.pmcType["sptusec"][map] = pmcTypeChance;
+                    pmcConfig.pmcType["sptbear"][map] = pmcTypeChance;
+                    pmcConfig.pmcType["sptusec"][map] = pmcTypeChance;
                 }
                 const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier, scavWaveCount, 
                 // additionalScavsPerWave ,
