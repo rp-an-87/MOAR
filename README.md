@@ -82,10 +82,6 @@ allOpenZones: true,
 
 > Pmc Spawn Control
 
-
-//If using zPOOP, you can turn this off. (Although it's fine if left on, similar to zPOOP's pmc wild logic, improves pmc brain AI)
-smarterPmcs: false,
-
 // Just SHUT UP (Feels much more like vanilla)
 preventPMCChatter: true,
 

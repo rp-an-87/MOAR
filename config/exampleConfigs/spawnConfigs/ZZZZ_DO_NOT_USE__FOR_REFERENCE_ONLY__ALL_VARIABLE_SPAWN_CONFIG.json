@@ -1,18 +1,14 @@
 {
- "enableMod": true,
+  "enableBotSpawning": true,
 
-  "scavDifficulty": 0.4,
-  "pmcDifficulty": 0.4,
-  "sniperDifficulty": 1,
-
-  "defaultScavStartWaveRatio": 0.6,
-  "defaultScavWaveMultiplier": 1,
+  "defaultScavStartWaveRatio": 0.5,
+  "defaultScavWaveMultiplier": 1.2,
 
   "defaultPmcStartWaveRatio": 0.7,
-  "defaultPmcWaveMultiplier": 1,
+  "defaultPmcWaveMultiplier": 1.2,
 
-  "defaultMaxBotCap": 25,
-  "defaultMaxBotPerZone": 5,
+  "defaultMaxBotCap": 30,
+  "defaultMaxBotPerZone": 7,
 
   "defaultGroupMaxPMC": 4,
   "defaultGroupMaxScav": 4,
@@ -23,8 +19,7 @@
   "reducedZoneDelay": true,
   "allOpenZones": true,
 
-  "smarterPmcs": false,
-  "preventPMCChatter": true,
+  "preventPMCChatter": false,
   "pmcsAlwaysHostile": true,
   "pmcsHaveEOD": true,
 
@@ -42,7 +37,7 @@
   "bossInvasion": false,
   "bossInvasionSpawnOverride": 3,
   "gradualBossInvasion": true,
-
+  
   "debug": true,
   "mapSettings": {
     "customs": {
