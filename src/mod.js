@@ -141,6 +141,7 @@ class Mod {
             };
             botConfig.presetBatch["sptbear"] = config_json_1.defaultMaxBotCap;
             botConfig.presetBatch["sptusec"] = config_json_1.defaultMaxBotCap;
+            botConfig["botGenerationBatchSizePerType"] = config_json_1.defaultMaxBotCap;
             for (let index = 0; index < locationList.length; index++) {
                 const mapSettingsList = Object.keys(config_json_1.mapSettings);
                 const map = mapSettingsList[index];
@@ -156,6 +157,12 @@ class Mod {
                         "OldSpawn": true,
                     }
                 };
+                // console.log(locationList[index].base.waves.length,
+                //     locationList[index].base.waves,
+                //     // locationList[index].base.NonWaveGroupScenario,
+                //     // locationList[index].base.BotSpawnCountStep,
+                //     // locationList[index].base.BotSpawnPeriodCheck,
+                // )
                 // locationList[index].base.BotSpawnTimeOnMin = 10
                 // locationList[index].base.BotSpawnTimeOnMax = 20
                 // locationList[index].base.BotSpawnTimeOffMin = 21
@@ -235,16 +242,13 @@ class Mod {
                 const firstHalf = pmcSpecialZones.splice(0, middleIndex);
                 const secondHalf = pmcSpecialZones.splice(-middleIndex);
                 const randomBoolean = Math.random() > 0.5;
-                const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "sptbear", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, [], //combinedPmcScavOpenZones,
-                randomBoolean ? firstHalf : secondHalf, 15, true);
-                const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "sptusec", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, [], //combinedPmcScavOpenZones,
-                randomBoolean ? secondHalf : firstHalf, 5, true);
+                const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "sptbear", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcScavOpenZones, randomBoolean ? firstHalf : secondHalf, 15, true);
+                const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "sptusec", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcScavOpenZones, randomBoolean ? secondHalf : firstHalf, 5, true);
                 // Scavs
                 const scavWaveStart = scavWaveStartRatio || config_json_1.defaultScavStartWaveRatio;
                 const scavWaveMulti = scavWaveMultiplier || config_json_1.defaultScavWaveMultiplier;
                 const scavTotalWaveCount = Math.round((scavWaveCount || scavWaveCountList[index]) * scavWaveMulti);
-                const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, [], //combinedPmcScavOpenZones,
-                scavSpecialZones);
+                const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, combinedPmcScavOpenZones, scavSpecialZones);
                 if (config_json_1.debug) {
                     let total = 0;
                     let totalscav = 0;
@@ -262,7 +266,9 @@ class Mod {
                     time_min: snipKey * 120,
                     time_max: (snipKey * 120) + 120
                 }));
+                originalMapList[index] === "factory4_day" && console.log(originalMapList[index], locationList[index].base.waves.length, locationList[index].base.waves);
                 locationList[index].base.waves = [...finalSniperWaves, ...scavWaves, ...bearWaves, ...usecWaves].sort(({ number: a }, { number: b }) => a - b);
+                originalMapList[index] === "factory4_day" && console.log(scavWaves.length, scavWaves);
             }
             // CreateBossList
             const bosses = {};
@@ -387,7 +393,7 @@ function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty
 }
 const getZone = (specialZones, combinedZones, specialOnly) => {
     if (!specialOnly && combinedZones.length)
-        return combinedZones.pop();
+        return combinedZones[Math.round((combinedZones.length - 1) * Math.random())];
     if (specialZones.length)
         return specialZones.pop();
     return "";

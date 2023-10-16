@@ -199,6 +199,7 @@ class Mod implements IPostAkiLoadMod {
 
             botConfig.presetBatch["sptbear"] = defaultMaxBotCap;
             botConfig.presetBatch["sptusec"] = defaultMaxBotCap;
+            botConfig["botGenerationBatchSizePerType"] = defaultMaxBotCap;
 
             for (let index = 0; index < locationList.length; index++) {
                 const mapSettingsList = Object.keys(mapSettings) as Array<keyof typeof mapSettings>
@@ -217,10 +218,6 @@ class Mod implements IPostAkiLoadMod {
                     }
                 }
 
-                // locationList[index].base.BotSpawnTimeOnMin = 10
-                // locationList[index].base.BotSpawnTimeOnMax = 20
-                // locationList[index].base.BotSpawnTimeOffMin = 21
-                // locationList[index].base.BotSpawnTimeOffMax = 31
                 locationList[index].base.BotStart = 0
                 if (locationList[index].base.BotStop < (locationList[index].base.EscapeTimeLimit * 60)) {
                     locationList[index].base.BotStop = locationList[index].base.EscapeTimeLimit * 60
@@ -295,7 +292,6 @@ class Mod implements IPostAkiLoadMod {
 
                 // Set per map EscapeTimeLimit
                 if (EscapeTimeLimit) {
-
                     locationList[index].base.EscapeTimeLimit = EscapeTimeLimit
                     locationList[index].base.exit_access_time = EscapeTimeLimit + 1
                 }
@@ -341,7 +337,7 @@ class Mod implements IPostAkiLoadMod {
                     pmcDifficulty,
                     true,
                     defaultGroupMaxPMC,
-                    [],//combinedPmcScavOpenZones,
+                    combinedPmcScavOpenZones,
                     randomBoolean ? firstHalf : secondHalf,
                     15,
                     true
@@ -355,7 +351,7 @@ class Mod implements IPostAkiLoadMod {
                     pmcDifficulty,
                     true,
                     defaultGroupMaxPMC,
-                    [],//combinedPmcScavOpenZones,
+                    combinedPmcScavOpenZones,
                     randomBoolean ? secondHalf : firstHalf,
                     5,
                     true
@@ -374,7 +370,7 @@ class Mod implements IPostAkiLoadMod {
                     scavDifficulty,
                     false,
                     defaultGroupMaxScav,
-                    [],//combinedPmcScavOpenZones,
+                    combinedPmcScavOpenZones,
                     scavSpecialZones
                 )
 
@@ -549,7 +545,7 @@ function waveBuilder(
 }
 
 const getZone = (specialZones, combinedZones, specialOnly) => {
-    if (!specialOnly && combinedZones.length) return combinedZones.pop()
+    if (!specialOnly && combinedZones.length) return combinedZones[Math.round((combinedZones.length - 1) * Math.random())]
     if (specialZones.length) return specialZones.pop()
     return ""
 }
