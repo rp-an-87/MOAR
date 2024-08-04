@@ -152,9 +152,7 @@ export const buildWaves = (container: DependencyContainer) => {
       keyof typeof mapSettings
     >;
     const map = mapSettingsList[index];
-    if (map === "gzLow") {
-      saveToFile(locationList[index].base.BossLocationSpawn, "/bosses.json");
-    }
+
     // Disable Bosses
     if (disableBosses && !!locationList[index].base?.BossLocationSpawn) {
       locationList[index].base.BossLocationSpawn = [];
