@@ -3,14 +3,13 @@
 === INSTALL STEPS ===
 
 1. Drag and drop this folder into your tarkov folder.
-2. Update your mods/order.json so that MOAR is last on the list.
-3. Optionally change your configuration (see below configuration options).
+2. Optionally change your configuration (see below configuration options).
 
-4. ???????
+3. ???????
 
-5. Profit!!!!
+4. Profit!!!!
 
-Example order.json with recommended mods:
+Example order.json
 {
 "order": [
 "ServerValueModifier",
@@ -100,55 +99,3 @@ gradualBossInvasion: true,
 
 The "mapSettings" are basically just overrides, and allow for map specific settings.
 
-This is for places like factory or labs for example.
-
-To turn them on, one needs to add any reference from the mapSettingsExample.json!
-
-"mapSettings": {
-"customs": {  
-​ // The following are optional per map.
-"EscapeTimeLimit": 40,
-
-      "scavWaveMultiplier": 1,
-
-      "scavWaveStartRatio": 0.5,
-
-      "scavWaveCount": 20,
-
-      "pmcWaveStartRatio": 0.9,
-
-      "pmcWaveMultiplier": 1,
-
-      "pmcCount": 12,
-
-      "maxBotCap": 13,
-
-      "maxBotPerZone": 4,
-
-      // This defineds zones that should generally have more action for SCAVS (POI)
-      //  Note: repeated values continue to add more bots to said zone (within zone allowable limits, see maxBotPerZone)
-       "scavHotZones": [
-        "ZoneDormitory"
-      ],
-
-      // This defines zones that should generally have more action for PMC's (POI)
-      //  Note: repeated values continue to add more bots to said zone (within zone allowable limits, see maxBotPerZone)
-      "pmcHotZones": [
-        "ZoneDormitory"
-      ],
-
-      "defaultBossSettings": {
-        // Boss values are only applied to default/existing bosses, look at the default config to know which you can change!​
-        "bossKnight": {
-          "BossChance": 18
-        },
-
-        "bossBully": {
-          "BossChance": 15
-        },
-
-        "sectantPriest": {
-          "BossChance": 6
-        }
-      }
-    },
