@@ -1,12 +1,8 @@
-# **Dushaoan's MOAR - TheLastSpawnMod**
-
-HUGE thanks to PreyToLive for his contributions to the modding community.
+# **DewardianDevs's MOAR - The lite spawn mod**
 
 === INSTALL STEPS ===
 
-IF YOU ARE ON "akiVersion": "3.5.0" Update this package.json to the correct version!
-
-1. Drag and drop this folder into the user/mods folder.
+1. Drag and drop this folder into your tarkov folder.
 2. Update your mods/order.json so that MOAR is last on the list.
 3. Optionally change your configuration (see below configuration options).
 
@@ -18,10 +14,8 @@ Example order.json with recommended mods:
 {
 "order": [
 "ServerValueModifier",
-"SPT-Realism-Mod",
-"zPOOP",
-"Lua-CustomSpawnPoints",
-"Dushaoan-MOAR-1.0.0"
+"DewardianDev-MOAR-2.x.x",
+"Otherstuff"
 ]
 }
 
@@ -32,24 +26,15 @@ Example order.json with recommended mods:
 // Enable or Disables the mod
 enableMod: true,
 
-// How difficult you want scav AI, values 0 - 1.5, recommended 0.5.
-"scavDifficulty": 0.3,
-
-// How difficult you want pmc AI, values 0 - 1.5, recommended 0.5.
-"pmcDifficulty": 0.3,
-
-// How difficult you want sniper AI, values 0 - 1.5, recommended 1.
-"sniperDifficulty": 1,
-
-// Default 0.5 for scav, 0.9 for PMC, valid numbers 0 to 1
+// Default 0.5 for scav, 0.8 for PMC, valid numbers 0 to 1
 // 0.7 would be 70% of all waves in the first half of the game, 30% in the last half.
 // 0.1 would be 10% of all waves in the first half of the game, 90% in the last half.
 "defaultScavStartWaveRatio": 0.5,
-"defaultPmcStartWaveRatio": 0.9,
+"defaultPmcStartWaveRatio": 0.8,
 
 //This multiplies the number of waves, I'd suggest playing with this for balance
-"defaultScavWaveMultiplier": 0.7,
-"defaultPmcWaveMultiplier": 0.5,
+"defaultScavWaveMultiplier": 1,
+"defaultPmcWaveMultiplier": 1,
 
 // To turn off, change this to false, 25 is recommended. Vanilla ranges per map.
 // This is the max spawned bots allowed at one time
@@ -58,9 +43,6 @@ defaultMaxBotCap: 25,
 // The max groupsize for PMC or Scav waves.
 "defaultGroupMaxPMC":4,
 "defaultGroupMaxScav":3,
-
-// Increase this to increase bot spawns, use this with BotWaveMultiplier for balance.
-defaultAdditionalBotsPerWave: 0,
 
 // Set to false to turn off, recommended 5 for most maps.
 defaultMaxBotPerZone: 5,
@@ -80,17 +62,6 @@ reducedZoneDelay: true,
 // This just adds a few more zones for scavs to spawn (all of the named ones in fact, including added ones via mods)
 allOpenZones: true,
 
-> Pmc Spawn Control
-
-// Just SHUT UP (Feels much more like vanilla)
-preventPMCChatter: true,
-
-// Yup, again going for that vanilla feel.
-pmcsAlwaysHostile: true,
-
-//AI Pmcs have the Edge of Darkness edition badging
-"pmcsHaveEOD":true,
-
 // Gives a chance to spawn a single group of raiders somewhere on the map
 "randomRaiderGroup": false,
 
@@ -108,30 +79,30 @@ pmcsAlwaysHostile: true,
 // Disables all bosses, ALL OF THEM.
 disableBosses: false,
 
-// Makes it so that the Main boss of a map can spawn anywhere (not Knight, or Zyrachi)
+// Makes it so that the Main boss of a map can spawn anywhere (not Goons, or Zyrachi)
 bossOpenZones: true,
 
-// Gives the main boss, which may be effected by bossOpenZones, an additional chance added to their default spawn amount.
-// This works whether bossOpenZones is on or not.
+// Gives the main boss, an additional percentage chance added to their default spawn amount.
+
 "mainBossChanceBuff": 15,
 
 > Invasion
 
-//All bosses ("bossBully", "bossTagilla", "bossGluhar", "bossKilla", "bossKojaniy", "bossSanitar") can spawn anywhere, on any map.
+//All main bosses can spawn anywhere, on any map, (excluding Zyrachi & Goons)
 bossInvasion: false,
 
-// This overrides the above bosses spawn chances if set. (false to disable)
+// This overrides the invading bosses spawn chances if set. (false or 0 to disable)
 // Otherwise bosses will have their default spawn chances. Recommended setting 5
-bossInvasionSpawnOverride: 5,
+bossInvasionSpawnChance: 5,
 
-// This spaces out bossInvasion spawning a bit, so that not all bosses will spawn at the beginning of the raid. Recommended: enabled
+// This spaces out bossInvasion spawning a bit, so that not all bosses will spawn at the beginning of the raid. Recommended for performance and spawn balance.
 gradualBossInvasion: true,
 
 The "mapSettings" are basically just overrides, and allow for map specific settings.
 
 This is for places like factory or labs for example.
 
-To turn them on, one needs to remove add the reference from the mapSettingsExample.json!
+To turn them on, one needs to add any reference from the mapSettingsExample.json!
 
 "mapSettings": {
 "customs": {  
@@ -156,13 +127,13 @@ To turn them on, one needs to remove add the reference from the mapSettingsExamp
 
       // This defineds zones that should generally have more action for SCAVS (POI)
       //  Note: repeated values continue to add more bots to said zone (within zone allowable limits, see maxBotPerZone)
-       "scavSpecialZones": [
+       "scavHotZones": [
         "ZoneDormitory"
       ],
 
-      // This defineds zones that should generally have more action for PMC's (POI)
+      // This defines zones that should generally have more action for PMC's (POI)
       //  Note: repeated values continue to add more bots to said zone (within zone allowable limits, see maxBotPerZone)
-      "pmcSpecialZones": [
+      "pmcHotZones": [
         "ZoneDormitory"
       ],
 

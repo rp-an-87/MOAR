@@ -1,8 +1,0 @@
-{
-    "enableDifficultyChanges": true,
-    "overallDifficultyModifier": 2.5,
-    "randomScavBrainChance": 0.3,
-    "randomPmcBrainChance": 0,
-    "randomMarksmanBrainChance": 0.4,
-    "debug": false
-}
