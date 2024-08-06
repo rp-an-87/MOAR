@@ -1,6 +1,9 @@
 {
   "enableBotSpawning": true,
 
+  "pmcDifficulty": 0.5,
+  "scavDifficulty": 0.3,
+
   "defaultScavStartWaveRatio": 0.5,
   "defaultScavWaveMultiplier": 1,
 
@@ -11,7 +14,7 @@
   "defaultMaxBotPerZone": 7,
 
   "defaultGroupMaxPMC": 4,
-  "defaultGroupMaxScav": 3,
+  "defaultGroupMaxScav": 4,
 
   "sniperBuddies": false,
 

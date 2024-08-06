@@ -9,7 +9,6 @@ const advancedMapSettings_json_1 = __importDefault(require("../../config/advance
 const waveConfig_json_1 = __importDefault(require("../../config/waveConfig.json"));
 const LogTextColor_1 = require("C:/snapshot/project/obj/models/spt/logging/LogTextColor");
 const ConfigTypes_1 = require("C:/snapshot/project/obj/models/enums/ConfigTypes");
-const utils_1 = require("../utils");
 const buildWaves = (container) => {
     // Get Logger
     const logger = container.resolve("WinstonLogger");
@@ -79,9 +78,6 @@ const buildWaves = (container) => {
     for (let index = 0; index < locationList.length; index++) {
         const mapSettingsList = Object.keys(advancedMapSettings_json_1.default);
         const map = mapSettingsList[index];
-        if (map === "gzLow") {
-            (0, utils_1.saveToFile)(locationList[index].base.BossLocationSpawn, "/bosses.json");
-        }
         // Disable Bosses
         if (config_json_1.disableBosses && !!locationList[index].base?.BossLocationSpawn) {
             locationList[index].base.BossLocationSpawn = [];
@@ -166,6 +162,7 @@ const buildWaves = (container) => {
         const combinedPmcScavOpenZones = shuffle([
             ...new Set([...scavZones, ...pmcZones, ...mapPulledLocations]),
         ]).filter((location) => !sniperLocations.includes(location));
+        const combinedPmcZones = combinedPmcScavOpenZones.filter((zone) => !zone.toLowerCase().includes("snipe"));
         const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier, 
         // additionalScavsPerWave ,
         pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
@@ -184,10 +181,10 @@ const buildWaves = (container) => {
         }
         // Make all zones open for scav/pmc spawns
         if (config_json_1.allOpenZones) {
-            if (combinedPmcScavOpenZones.length > 0) {
+            if (combinedPmcZones.length > 0) {
                 locationConfig.openZones[`${originalMapList[index]}`] =
-                    combinedPmcScavOpenZones;
-                locationList[index].base.OpenZones = combinedPmcScavOpenZones.join(",");
+                    combinedPmcZones;
+                locationList[index].base.OpenZones = combinedPmcZones.join(",");
             }
         }
         // Adjust botZone quantity
@@ -207,13 +204,13 @@ const buildWaves = (container) => {
         const firstHalf = pmcHotZones.splice(0, middleIndex);
         const secondHalf = pmcHotZones.splice(-middleIndex);
         const randomBoolean = Math.random() > 0.5;
-        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", 0.4, true, config_json_1.defaultGroupMaxPMC, combinedPmcScavOpenZones, randomBoolean ? firstHalf : secondHalf, 15, true);
-        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", 0.4, true, config_json_1.defaultGroupMaxPMC, combinedPmcScavOpenZones, randomBoolean ? secondHalf : firstHalf, 5, true);
+        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? firstHalf : secondHalf, 15);
+        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? secondHalf : firstHalf, 5);
         // Scavs
         const scavWaveStart = scavWaveStartRatio || config_json_1.defaultScavStartWaveRatio;
         const scavWaveMulti = scavWaveMultiplier || config_json_1.defaultScavWaveMultiplier;
         const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveMulti);
-        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", 0.4, false, config_json_1.defaultGroupMaxScav, combinedPmcScavOpenZones, scavHotZones);
+        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, combinedPmcScavOpenZones, scavHotZones);
         if (config_json_1.debug) {
             let total = 0;
             let totalscav = 0;
@@ -221,8 +218,8 @@ const buildWaves = (container) => {
             usecWaves.forEach(({ slots_max }) => (total += slots_max));
             scavWaves.forEach(({ slots_max }) => (totalscav += slots_max));
             console.log(configLocations[index]);
-            console.log("Pmcs:", total);
-            console.log("Scavs:", totalscav, "\n");
+            console.log("Pmcs:", total, "configVal", Math.round((total / pmcWaveCount) * 100) / 100, "configWaveCount", pmcWaveCount, "waveCount", bearWaves.length + usecWaves.length);
+            console.log("Scavs:", totalscav, "configVal", Math.round((totalscav / scavWaveCount) * 100) / 100, "configWaveCount", scavWaveCount, "waveCount", scavWaves.length, "\n");
         }
         const finalSniperWaves = snipers?.map(({ ...rest }, snipKey) => ({
             ...rest,
@@ -299,6 +296,7 @@ const buildWaves = (container) => {
             location.base.BossLocationSpawn.push(rogueWave);
         }
     }
+    console.log(bosses["bossBoarSniper"]);
     if (config_json_1.bossInvasion && !config_json_1.disableBosses) {
         if (config_json_1.bossInvasionSpawnChance) {
             bossList.forEach((bossName) => {
@@ -357,21 +355,22 @@ function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty
     const secondHalf = Math.round(averageTime * (1 + waveStart));
     let timeStart = offset || 0;
     const waves = [];
-    // console.log(wildSpawnType, "\n");
-    while (waves.length < totalWaves || specialZones.length > 0) {
-        // console.log(timeStart);
+    let maxSlotsReached = Math.round(1.3 * totalWaves);
+    while (totalWaves > 0 &&
+        (waves.length < totalWaves || specialZones.length > 0)) {
         const accelerate = totalWaves > 5 && waves.length < totalWaves / 3;
         const stage = Math.round(waves.length < Math.round(totalWaves * 0.5)
             ? accelerate
                 ? firstHalf / 3
                 : firstHalf
             : secondHalf);
-        // console.log(stage, accelerate);
         const min = !offset && waves.length < 1 ? 0 : timeStart;
         const max = !offset && waves.length < 1 ? 0 : timeStart + 10;
         if (waves.length >= 1 || offset)
             timeStart = timeStart + stage;
         const BotPreset = getDifficulty(difficulty);
+        // console.log(wildSpawnType, BotPreset);
+        // Math.round((1 - waves.length / totalWaves) * maxSlots) || 1;
         const slotMax = Math.round((moreGroups ? Math.random() : Math.random() * Math.random()) * maxSlots) || 1;
         waves.push({
             BotPreset,
@@ -385,6 +384,10 @@ function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty
             WildSpawnType: wildSpawnType,
             number: waves.length,
         });
+        maxSlotsReached -= slotMax;
+        // if (wildSpawnType === "assault") console.log(slotMax, maxSlotsReached);
+        if (maxSlotsReached <= 0)
+            break;
     }
     return waves;
 }
