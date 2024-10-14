@@ -296,7 +296,6 @@ const buildWaves = (container) => {
             location.base.BossLocationSpawn.push(rogueWave);
         }
     }
-    console.log(bosses["bossBoarSniper"]);
     if (config_json_1.bossInvasion && !config_json_1.disableBosses) {
         if (config_json_1.bossInvasionSpawnChance) {
             bossList.forEach((bossName) => {
