@@ -124,7 +124,7 @@ const buildWaves = (container) => {
             }));
         }
         // Snipers
-        const snipers = shuffle(locationList[index].base.waves
+        let snipers = shuffle(locationList[index].base.waves
             .filter(({ WildSpawnType: type }) => type === "marksman")
             .map((wave) => ({
             ...wave,
@@ -159,10 +159,16 @@ const buildWaves = (container) => {
         const sniperLocations = [
             ...new Set(snipers.map(({ SpawnPoints }) => SpawnPoints)),
         ];
-        const combinedPmcScavOpenZones = shuffle([
+        let combinedPmcScavOpenZones = shuffle([
             ...new Set([...scavZones, ...pmcZones, ...mapPulledLocations]),
         ]).filter((location) => !sniperLocations.includes(location));
-        const combinedPmcZones = combinedPmcScavOpenZones.filter((zone) => !zone.toLowerCase().includes("snipe"));
+        let combinedPmcZones = combinedPmcScavOpenZones.filter((zone) => !zone.toLowerCase().includes("snipe"));
+        if (map === "tarkovstreets") {
+            const sniperZones = shuffle(combinedPmcScavOpenZones.filter((zone) => zone.toLowerCase().includes("snipe")));
+            combinedPmcScavOpenZones = [];
+            combinedPmcZones = [];
+            snipers = waveBuilder(sniperZones.length, locationList[index].base.EscapeTimeLimit * 10, 1, "marksman", 0.8, false, 2, [], sniperZones, 0, true);
+        }
         const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier, 
         // additionalScavsPerWave ,
         pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
@@ -210,7 +216,7 @@ const buildWaves = (container) => {
         const scavWaveStart = scavWaveStartRatio || config_json_1.defaultScavStartWaveRatio;
         const scavWaveMulti = scavWaveMultiplier || config_json_1.defaultScavWaveMultiplier;
         const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveMulti);
-        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, combinedPmcScavOpenZones, scavHotZones);
+        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, map === "gzHigh" ? [] : combinedPmcScavOpenZones, scavHotZones);
         if (config_json_1.debug) {
             let total = 0;
             let totalscav = 0;

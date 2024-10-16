@@ -213,7 +213,7 @@ export const buildWaves = (container: DependencyContainer) => {
     }
 
     // Snipers
-    const snipers = shuffle<Wave[]>(
+    let snipers = shuffle<Wave[]>(
       locationList[index].base.waves
         .filter(({ WildSpawnType: type }) => type === "marksman")
         .map((wave) => ({
@@ -269,13 +269,37 @@ export const buildWaves = (container: DependencyContainer) => {
       ...new Set(snipers.map(({ SpawnPoints }) => SpawnPoints)),
     ];
 
-    const combinedPmcScavOpenZones = shuffle<string[]>([
+    let combinedPmcScavOpenZones = shuffle<string[]>([
       ...new Set([...scavZones, ...pmcZones, ...mapPulledLocations]),
     ]).filter((location) => !sniperLocations.includes(location));
 
-    const combinedPmcZones = combinedPmcScavOpenZones.filter(
+    let combinedPmcZones = combinedPmcScavOpenZones.filter(
       (zone) => !zone.toLowerCase().includes("snipe")
     );
+
+    if (map === "tarkovstreets") {
+      const sniperZones = shuffle(
+        combinedPmcScavOpenZones.filter((zone) =>
+          zone.toLowerCase().includes("snipe")
+        )
+      ) as string[];
+      combinedPmcScavOpenZones = [];
+      combinedPmcZones = [];
+
+      snipers = waveBuilder(
+        sniperZones.length,
+        locationList[index].base.EscapeTimeLimit * 10,
+        1,
+        "marksman",
+        0.8,
+        false,
+        2,
+        [],
+        sniperZones,
+        0,
+        true
+      );
+    }
 
     const {
       EscapeTimeLimit,
@@ -376,7 +400,7 @@ export const buildWaves = (container: DependencyContainer) => {
       scavDifficulty,
       false,
       defaultGroupMaxScav,
-      combinedPmcScavOpenZones,
+      map === "gzHigh" ? [] : combinedPmcScavOpenZones,
       scavHotZones
     );
 
@@ -467,6 +491,7 @@ export const buildWaves = (container: DependencyContainer) => {
     const filteredBosses = location.base.BossLocationSpawn?.filter(
       ({ BossName }) => bossList.includes(BossName)
     );
+    
 
     if (!disableBosses && (bossOpenZones || mainBossChanceBuff)) {
       location.base?.BossLocationSpawn?.forEach((boss, key) => {
