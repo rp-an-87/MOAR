@@ -49,6 +49,7 @@ const buildWaves = (container) => {
         gzLow,
         gzHigh,
     ];
+
     const configLocations = [
         "customs",
         "factoryDay",
@@ -127,10 +128,10 @@ const buildWaves = (container) => {
         let snipers = shuffle(locationList[index].base.waves
             .filter(({ WildSpawnType: type }) => type === "marksman")
             .map((wave) => ({
-            ...wave,
-            slots_min: 0,
-            ...(config_json_1.sniperBuddies && wave.slots_max < 2 ? { slots_max: 2 } : {}),
-        })));
+                ...wave,
+                slots_min: 0,
+                ...(config_json_1.sniperBuddies && wave.slots_max < 2 ? { slots_max: 2 } : {}),
+            })));
         if (snipers.length) {
             locationList[index].base.MinMaxBots = [
                 {
@@ -143,9 +144,9 @@ const buildWaves = (container) => {
         const scavZones = [
             ...new Set([...locationList[index].base.SpawnPointParams]
                 .filter(({ Categories, Sides, BotZoneName }) => !!BotZoneName &&
-                Sides.includes("Savage") &&
-                Categories.includes("Bot") &&
-                !Categories.includes("Boss"))
+                    Sides.includes("Savage") &&
+                    Categories.includes("Bot") &&
+                    !Categories.includes("Boss"))
                 .map(({ BotZoneName }) => BotZoneName)),
         ];
         const pmcZones = [
@@ -169,9 +170,9 @@ const buildWaves = (container) => {
             combinedPmcZones = [];
             snipers = waveBuilder(sniperZones.length, locationList[index].base.EscapeTimeLimit * 10, 1, "marksman", 0.8, false, 2, [], sniperZones, 0, true);
         }
-        const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier, 
-        // additionalScavsPerWave ,
-        pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
+        const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier,
+            // additionalScavsPerWave ,
+            pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
         // Set per map EscapeTimeLimit
         if (EscapeTimeLimit) {
             locationList[index].base.EscapeTimeLimit = EscapeTimeLimit;
@@ -196,7 +197,7 @@ const buildWaves = (container) => {
         // Adjust botZone quantity
         if ((maxBotPerZone || config_json_1.defaultMaxBotPerZone) &&
             locationList[index].base.MaxBotPerZone <
-                (maxBotPerZone || config_json_1.defaultMaxBotPerZone)) {
+            (maxBotPerZone || config_json_1.defaultMaxBotPerZone)) {
             locationList[index].base.MaxBotPerZone =
                 maxBotPerZone || config_json_1.defaultMaxBotPerZone;
         }
@@ -247,6 +248,11 @@ const buildWaves = (container) => {
     const bosses = {};
     for (let indx = 0; indx < locationList.length; indx++) {
         const location = locationList[indx];
+        // cull weird boss names
+        if (location?.base?.BossLocationSpawn) {
+            const cullList = ["skier", "peacemaker"];
+            location.base.BossLocationSpawn = location.base.BossLocationSpawn.filter((boss) => !cullList.includes(boss.BossName));
+        }
         const defaultBossSettings = advancedMapSettings_json_1.default?.[configLocations[indx]]?.defaultBossSettings;
         // Sets bosses spawn chance from settings
         if (location?.base?.BossLocationSpawn &&
@@ -268,17 +274,21 @@ const buildWaves = (container) => {
         const filteredBosses = location.base.BossLocationSpawn?.filter(({ BossName }) => bossList.includes(BossName));
         if (!config_json_1.disableBosses && (config_json_1.bossOpenZones || config_json_1.mainBossChanceBuff)) {
             location.base?.BossLocationSpawn?.forEach((boss, key) => {
-                if (locationList[indx].base.OpenZones &&
-                    bossList.includes(boss.BossName)) {
-                    location.base.BossLocationSpawn[key] = {
-                        ...boss,
-                        ...(config_json_1.bossOpenZones
-                            ? { BossZone: locationList[indx].base.OpenZones }
-                            : {}),
-                        ...(boss.BossChance !== 0
-                            ? { BossChance: Math.round(boss.BossChance + config_json_1.mainBossChanceBuff) }
-                            : {}),
-                    };
+                if (bossList.includes(boss.BossName)) {
+                    if (config_json_1.bossOpenZones && locationList[indx].base.OpenZones) {
+                        location.base.BossLocationSpawn[key] = {
+                            ...location.base.BossLocationSpawn[key],
+                            BossZone: locationList[indx].base.OpenZones,
+                        };
+                    }
+                    if (!!boss.BossChance && config_json_1.mainBossChanceBuff > 0) {
+                        location.base.BossLocationSpawn[key] = {
+                            ...location.base.BossLocationSpawn[key],
+                            BossChance: boss.BossChance + config_json_1.mainBossChanceBuff > 100
+                                ? 100
+                                : Math.round(boss.BossChance + config_json_1.mainBossChanceBuff),
+                        };
+                    }
                 }
             });
         }
@@ -316,10 +326,10 @@ const buildWaves = (container) => {
             const bossesToAdd = shuffle(Object.values(bosses))
                 .filter(({ BossName }) => !duplicateBosses.includes(BossName))
                 .map((boss, j) => ({
-                ...boss,
-                BossZone: locationList[key].base.OpenZones,
-                ...(config_json_1.gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
-            }));
+                    ...boss,
+                    BossZone: locationList[key].base.OpenZones,
+                    ...(config_json_1.gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
+                }));
             // UpdateBosses
             locationList[key].base.BossLocationSpawn = [
                 ...locationList[key].base.BossLocationSpawn,
@@ -352,6 +362,10 @@ const buildWaves = (container) => {
                 logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor_1.LogTextColor.WHITE);
         }
     }
+    // saveToFile(
+    //   locationList[0].base.BossLocationSpawn,
+    //   "location.base2.BossLocationSpawnAfter.json"
+    // );
 };
 exports.buildWaves = buildWaves;
 function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty, isPlayer, maxSlots, combinedZones = [], specialZones = [], offset, moreGroups) {

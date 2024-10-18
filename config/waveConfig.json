@@ -29,7 +29,7 @@
   },
   "shoreline": {
     "pmcWaveCount": 7,
-    "scavWaveCount": 2
+    "scavWaveCount": 22
   },
   "tarkovstreets": {
     "pmcWaveCount": 7,
@@ -41,10 +41,10 @@
   },
   "gzLow": {
     "pmcWaveCount": 5,
-    "scavWaveCount": 13
+    "scavWaveCount": 14
   },
   "gzHigh": {
     "pmcWaveCount": 6,
-    "scavWaveCount": 20
+    "scavWaveCount": 16
   }
 }

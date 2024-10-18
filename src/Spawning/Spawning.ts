@@ -461,6 +461,14 @@ export const buildWaves = (container: DependencyContainer) => {
   for (let indx = 0; indx < locationList.length; indx++) {
     const location = locationList[indx];
 
+    // cull weird boss names
+    if (location?.base?.BossLocationSpawn) {
+      const cullList = ["skier", "peacemaker"];
+      location.base.BossLocationSpawn = location.base.BossLocationSpawn.filter(
+        (boss) => !cullList.includes(boss.BossName)
+      );
+    }
+
     const defaultBossSettings =
       mapSettings?.[configLocations[indx]]?.defaultBossSettings;
 
@@ -491,23 +499,26 @@ export const buildWaves = (container: DependencyContainer) => {
     const filteredBosses = location.base.BossLocationSpawn?.filter(
       ({ BossName }) => bossList.includes(BossName)
     );
-    
 
     if (!disableBosses && (bossOpenZones || mainBossChanceBuff)) {
       location.base?.BossLocationSpawn?.forEach((boss, key) => {
-        if (
-          locationList[indx].base.OpenZones &&
-          bossList.includes(boss.BossName)
-        ) {
-          location.base.BossLocationSpawn[key] = {
-            ...boss,
-            ...(bossOpenZones
-              ? { BossZone: locationList[indx].base.OpenZones }
-              : {}),
-            ...(boss.BossChance !== 0
-              ? { BossChance: Math.round(boss.BossChance + mainBossChanceBuff) }
-              : {}),
-          };
+        if (bossList.includes(boss.BossName)) {
+          if (bossOpenZones && locationList[indx].base.OpenZones) {
+            location.base.BossLocationSpawn[key] = {
+              ...location.base.BossLocationSpawn[key],
+              BossZone: locationList[indx].base.OpenZones,
+            };
+          }
+
+          if (!!boss.BossChance && mainBossChanceBuff > 0) {
+            location.base.BossLocationSpawn[key] = {
+              ...location.base.BossLocationSpawn[key],
+              BossChance:
+                boss.BossChance + mainBossChanceBuff > 100
+                  ? 100
+                  : Math.round(boss.BossChance + mainBossChanceBuff),
+            };
+          }
         }
       });
     }
