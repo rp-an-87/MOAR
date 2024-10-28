@@ -1,4 +1,3 @@
-import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 import {
   Wave,
   BossLocationSpawn,
@@ -7,59 +6,74 @@ import { IBotConfig } from "@spt/models/spt/config/IBotConfig.d";
 import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig.d";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
-import {
-  randomRaiderGroup,
-  randomRaiderGroupChance,
-  randomRogueGroup,
-  randomRogueGroupChance,
-  mainBossChanceBuff,
-  debug,
-  allOpenZones,
-  defaultMaxBotCap,
-  defaultScavWaveMultiplier,
-  defaultScavStartWaveRatio,
-  sniperBuddies,
-  noZoneDelay,
-  bossInvasion,
-  bossInvasionSpawnChance,
-  disableBosses,
-  reducedZoneDelay,
-  bossOpenZones,
-  gradualBossInvasion,
-  defaultMaxBotPerZone,
-  defaultPmcStartWaveRatio,
-  defaultPmcWaveMultiplier,
-  defaultGroupMaxPMC,
-  defaultGroupMaxScav,
-  pmcDifficulty,
-  scavDifficulty,
-} from "../../config/config.json";
-import mapSettings from "../../config/advancedMapSettings.json";
-import waveConfig from "../../config/waveConfig.json";
+import mapSettings from "../../config/advanced/advancedMapSettings.json";
+import waveConfig from "../../config/advanced/waveConfig.json";
 import { ConfigServer } from "@spt/servers/ConfigServer";
-import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
-import { saveToFile } from "../utils";
+import { globalValues } from "../GlobalValues";
+import { cloneDeep, getRandomPreset } from "../utils";
 
 export const buildWaves = (container: DependencyContainer) => {
-  // Get Logger
-  const logger = container.resolve<ILogger>("WinstonLogger");
-  logger.info(
-    "MOAR: Successfully enabled, may the bots ever be in your favour!"
-  );
-
   const configServer = container.resolve<ConfigServer>("ConfigServer");
   const pmcConfig = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
   const botConfig = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
-  const locationConfig = configServer.getConfig<ILocationConfig>(
-    ConfigTypes.LOCATION
-  );
+  const logger = container.resolve<ILogger>("WinstonLogger");
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
   // Get all the in-memory json found in /assets/database
-  const { bots, locations } = databaseServer.getTables();
+
+  let config = cloneDeep(globalValues.baseConfig);
+
+  // This resets all locations to original state
+  if (!globalValues.baseLocations) {
+    globalValues.baseLocations = cloneDeep(
+      databaseServer.getTables().locations
+    );
+  } else {
+    databaseServer.getTables().locations = cloneDeep(
+      globalValues.baseLocations
+    );
+  }
+
+  const preset = getRandomPreset(logger);
+
+  // Set from preset
+  Object.keys(preset).forEach((key) => {
+    // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
+    config[key] = preset[key];
+  });
+
+  let {
+    randomRaiderGroup,
+    randomRaiderGroupChance,
+    randomRogueGroup,
+    randomRogueGroupChance,
+    mainBossChanceBuff,
+    debug,
+    defaultMaxBotCap,
+    defaultScavWaveMultiplier,
+    defaultScavStartWaveRatio,
+    sniperBuddies,
+    noZoneDelay,
+    bossInvasion,
+    bossInvasionSpawnChance,
+    disableBosses,
+    reducedZoneDelay,
+    bossOpenZones,
+    gradualBossInvasion,
+    defaultMaxBotPerZone,
+    defaultPmcStartWaveRatio,
+    defaultPmcWaveMultiplier,
+    defaultGroupMaxPMC,
+    defaultGroupMaxScav,
+    pmcDifficulty,
+    scavDifficulty,
+    startingPmcs,
+    moreScavGroups,
+    morePmcGroups,
+  } = config;
 
   const {
     bigmap: customs,
@@ -74,7 +88,7 @@ export const buildWaves = (container: DependencyContainer) => {
     woods,
     sandbox: gzLow,
     sandbox_high: gzHigh,
-  } = locations;
+  } = databaseServer.getTables().locations;
 
   const originalMapList = [
     "bigmap",
@@ -135,7 +149,7 @@ export const buildWaves = (container: DependencyContainer) => {
     pmcHotZones?: string[];
     scavHotZones?: string[];
   }
-  // console.log(botConfig.botRolesWithDogTags);
+
   pmcConfig.convertIntoPmcChance = {
     assault: { min: 0, max: 1 },
     cursedassault: { min: 0, max: 0 },
@@ -169,14 +183,8 @@ export const buildWaves = (container: DependencyContainer) => {
         OfflineOldSpawn: true,
         OldSpawn: true,
         BotSpawnCountStep: 0,
-        // BotSpawnPeriodCheck: 15,
-        // BotSpawnTimeOffMax: 0,
-        // BotSpawnTimeOffMin: 0,
-        // BotSpawnTimeOnMax: 0,
-        // BotSpawnTimeOnMin: 0,
       },
     };
-    // saveToFile(locationList[index].base, "refDBS/" + map + ".json");
 
     locationList[index].base.NonWaveGroupScenario.Enabled = false;
     locationList[index].base.NonWaveGroupScenario.Chance = 0;
@@ -297,6 +305,7 @@ export const buildWaves = (container: DependencyContainer) => {
         [],
         sniperZones,
         0,
+        false,
         true
       );
     }
@@ -330,14 +339,14 @@ export const buildWaves = (container: DependencyContainer) => {
       botConfig.maxBotCap[originalMapList[index]] = capToSet;
     }
 
-    // Make all zones open for scav/pmc spawns
-    if (allOpenZones) {
-      if (combinedPmcZones.length > 0) {
-        locationConfig.openZones[`${originalMapList[index]}`] =
-          combinedPmcZones;
-        locationList[index].base.OpenZones = combinedPmcZones.join(",");
-      }
-    }
+    // // Make all zones open for scav/pmc spawns
+    // if (allOpenZones) {
+    //   if (combinedPmcZones.length > 0) {
+    //     locationConfig.openZones[`${originalMapList[index]}`] =
+    //       combinedPmcZones;
+    //     locationList[index].base.OpenZones = combinedPmcZones.join(",");
+    //   }
+    // }
 
     // Adjust botZone quantity
     if (
@@ -371,7 +380,9 @@ export const buildWaves = (container: DependencyContainer) => {
       defaultGroupMaxPMC,
       combinedPmcZones,
       randomBoolean ? firstHalf : secondHalf,
-      15
+      1,
+      startingPmcs,
+      morePmcGroups
     );
 
     const usecWaves = waveBuilder(
@@ -384,8 +395,12 @@ export const buildWaves = (container: DependencyContainer) => {
       defaultGroupMaxPMC,
       combinedPmcZones,
       randomBoolean ? secondHalf : firstHalf,
-      5
+      5,
+      startingPmcs,
+      morePmcGroups
     );
+
+    // if (map === "customs") saveToFile({ usecWaves }, "usecWaves.json");
 
     // Scavs
     const scavWaveStart = scavWaveStartRatio || defaultScavStartWaveRatio;
@@ -401,7 +416,8 @@ export const buildWaves = (container: DependencyContainer) => {
       false,
       defaultGroupMaxScav,
       map === "gzHigh" ? [] : combinedPmcScavOpenZones,
-      scavHotZones
+      scavHotZones,
+      moreScavGroups
     );
 
     if (debug) {
@@ -593,30 +609,28 @@ export const buildWaves = (container: DependencyContainer) => {
     }
   }
 
-  if (debug) {
-    sniperBuddies &&
-      logger.logWithColor("sniperBuddies: Enabled", LogTextColor.WHITE);
-    noZoneDelay &&
-      logger.logWithColor("noZoneDelay: Enabled", LogTextColor.WHITE);
-    reducedZoneDelay &&
-      logger.logWithColor("reducedZoneDelay: Enabled", LogTextColor.WHITE);
-    allOpenZones &&
-      logger.logWithColor("allOpenZones: Enabled", LogTextColor.WHITE);
-    randomRaiderGroup &&
-      logger.logWithColor("randomRaiderGroup: Enabled", LogTextColor.WHITE);
-    randomRogueGroup &&
-      logger.logWithColor("randomRogueGroup: Enabled", LogTextColor.WHITE);
-    if (disableBosses) {
-      logger.logWithColor("disableBosses: Enabled", LogTextColor.WHITE);
-    } else {
-      bossOpenZones &&
-        logger.logWithColor("bossOpenZones: Enabled", LogTextColor.WHITE);
-      bossInvasion &&
-        logger.logWithColor("bossInvasion: Enabled", LogTextColor.WHITE);
-      gradualBossInvasion &&
-        logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor.WHITE);
-    }
-  }
+  // if (debug) {
+  //   sniperBuddies &&
+  //     logger.logWithColor("sniperBuddies: Enabled", LogTextColor.WHITE);
+  //   noZoneDelay &&
+  //     logger.logWithColor("noZoneDelay: Enabled", LogTextColor.WHITE);
+  //   reducedZoneDelay &&
+  //     logger.logWithColor("reducedZoneDelay: Enabled", LogTextColor.WHITE);
+  //   randomRaiderGroup &&
+  //     logger.logWithColor("randomRaiderGroup: Enabled", LogTextColor.WHITE);
+  //   randomRogueGroup &&
+  //     logger.logWithColor("randomRogueGroup: Enabled", LogTextColor.WHITE);
+  //   if (disableBosses) {
+  //     logger.logWithColor("disableBosses: Enabled", LogTextColor.WHITE);
+  //   } else {
+  //     bossOpenZones &&
+  //       logger.logWithColor("bossOpenZones: Enabled", LogTextColor.WHITE);
+  //     bossInvasion &&
+  //       logger.logWithColor("bossInvasion: Enabled", LogTextColor.WHITE);
+  //     gradualBossInvasion &&
+  //       logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor.WHITE);
+  //   }
+  // }
 };
 
 function waveBuilder(
@@ -630,6 +644,7 @@ function waveBuilder(
   combinedZones: string[] = [],
   specialZones: string[] = [],
   offset?: number,
+  starting?: boolean,
   moreGroups?: boolean
 ): Wave[] {
   const averageTime = timeLimit / totalWaves;
@@ -674,8 +689,8 @@ function waveBuilder(
       isPlayers: isPlayer,
       slots_max: slotMax,
       slots_min: 0,
-      time_min: min,
-      time_max: max,
+      time_min: starting ? -1 : min,
+      time_max: starting ? -1 : max,
       WildSpawnType: wildSpawnType,
       number: waves.length,
     });

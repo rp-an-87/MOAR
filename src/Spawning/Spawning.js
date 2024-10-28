@@ -4,23 +4,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildWaves = void 0;
-const config_json_1 = require("../../config/config.json");
-const advancedMapSettings_json_1 = __importDefault(require("../../config/advancedMapSettings.json"));
-const waveConfig_json_1 = __importDefault(require("../../config/waveConfig.json"));
-const LogTextColor_1 = require("C:/snapshot/project/obj/models/spt/logging/LogTextColor");
+const advancedMapSettings_json_1 = __importDefault(require("../../config/advanced/advancedMapSettings.json"));
+const waveConfig_json_1 = __importDefault(require("../../config/advanced/waveConfig.json"));
 const ConfigTypes_1 = require("C:/snapshot/project/obj/models/enums/ConfigTypes");
+const GlobalValues_1 = require("../GlobalValues");
+const utils_1 = require("../utils");
 const buildWaves = (container) => {
-    // Get Logger
-    const logger = container.resolve("WinstonLogger");
-    logger.info("MOAR: Successfully enabled, may the bots ever be in your favour!");
     const configServer = container.resolve("ConfigServer");
     const pmcConfig = configServer.getConfig(ConfigTypes_1.ConfigTypes.PMC);
     const botConfig = configServer.getConfig(ConfigTypes_1.ConfigTypes.BOT);
-    const locationConfig = configServer.getConfig(ConfigTypes_1.ConfigTypes.LOCATION);
+    const logger = container.resolve("WinstonLogger");
     const databaseServer = container.resolve("DatabaseServer");
     // Get all the in-memory json found in /assets/database
-    const { bots, locations } = databaseServer.getTables();
-    const { bigmap: customs, factory4_day: factoryDay, factory4_night: factoryNight, interchange, laboratory, lighthouse, rezervbase, shoreline, tarkovstreets, woods, sandbox: gzLow, sandbox_high: gzHigh, } = locations;
+    let config = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseConfig);
+    // This resets all locations to original state
+    if (!GlobalValues_1.globalValues.baseLocations) {
+        GlobalValues_1.globalValues.baseLocations = (0, utils_1.cloneDeep)(databaseServer.getTables().locations);
+    }
+    else {
+        databaseServer.getTables().locations = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseLocations);
+    }
+    const preset = (0, utils_1.getRandomPreset)(logger);
+    // Set from preset
+    Object.keys(preset).forEach((key) => {
+        // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
+        config[key] = preset[key];
+    });
+    let { randomRaiderGroup, randomRaiderGroupChance, randomRogueGroup, randomRogueGroupChance, mainBossChanceBuff, debug, defaultMaxBotCap, defaultScavWaveMultiplier, defaultScavStartWaveRatio, sniperBuddies, noZoneDelay, bossInvasion, bossInvasionSpawnChance, disableBosses, reducedZoneDelay, bossOpenZones, gradualBossInvasion, defaultMaxBotPerZone, defaultPmcStartWaveRatio, defaultPmcWaveMultiplier, defaultGroupMaxPMC, defaultGroupMaxScav, pmcDifficulty, scavDifficulty, startingPmcs, moreScavGroups, morePmcGroups, } = config;
+    const { bigmap: customs, factory4_day: factoryDay, factory4_night: factoryNight, interchange, laboratory, lighthouse, rezervbase, shoreline, tarkovstreets, woods, sandbox: gzLow, sandbox_high: gzHigh, } = databaseServer.getTables().locations;
     const originalMapList = [
         "bigmap",
         "factory4_day",
@@ -49,7 +60,6 @@ const buildWaves = (container) => {
         gzLow,
         gzHigh,
     ];
-
     const configLocations = [
         "customs",
         "factoryDay",
@@ -64,7 +74,6 @@ const buildWaves = (container) => {
         "gzLow",
         "gzHigh",
     ];
-    // console.log(botConfig.botRolesWithDogTags);
     pmcConfig.convertIntoPmcChance = {
         assault: { min: 0, max: 1 },
         cursedassault: { min: 0, max: 0 },
@@ -74,13 +83,13 @@ const buildWaves = (container) => {
         arenafighterevent: { min: 0, max: 0 },
         crazyassaultevent: { min: 0, max: 0 },
     };
-    botConfig.presetBatch["pmcBEAR"] = config_json_1.defaultMaxBotCap;
-    botConfig.presetBatch["pmcUSEC"] = config_json_1.defaultMaxBotCap;
+    botConfig.presetBatch["pmcBEAR"] = defaultMaxBotCap;
+    botConfig.presetBatch["pmcUSEC"] = defaultMaxBotCap;
     for (let index = 0; index < locationList.length; index++) {
         const mapSettingsList = Object.keys(advancedMapSettings_json_1.default);
         const map = mapSettingsList[index];
         // Disable Bosses
-        if (config_json_1.disableBosses && !!locationList[index].base?.BossLocationSpawn) {
+        if (disableBosses && !!locationList[index].base?.BossLocationSpawn) {
             locationList[index].base.BossLocationSpawn = [];
         }
         locationList[index].base = {
@@ -92,14 +101,8 @@ const buildWaves = (container) => {
                 OfflineOldSpawn: true,
                 OldSpawn: true,
                 BotSpawnCountStep: 0,
-                // BotSpawnPeriodCheck: 15,
-                // BotSpawnTimeOffMax: 0,
-                // BotSpawnTimeOffMin: 0,
-                // BotSpawnTimeOnMax: 0,
-                // BotSpawnTimeOnMin: 0,
             },
         };
-        // saveToFile(locationList[index].base, "refDBS/" + map + ".json");
         locationList[index].base.NonWaveGroupScenario.Enabled = false;
         locationList[index].base.NonWaveGroupScenario.Chance = 0;
         locationList[index].base["BotStartPlayer"] = 0;
@@ -109,14 +112,14 @@ const buildWaves = (container) => {
                 locationList[index].base.EscapeTimeLimit * 60;
         }
         // No Zone Delay
-        if (config_json_1.noZoneDelay) {
+        if (noZoneDelay) {
             locationList[index].base.SpawnPointParams = locationList[index].base.SpawnPointParams.map((spawn) => ({
                 ...spawn,
                 DelayToCanSpawnSec: 4,
             }));
         }
         // Reduced Zone Delay
-        if (!config_json_1.noZoneDelay && config_json_1.reducedZoneDelay) {
+        if (!noZoneDelay && reducedZoneDelay) {
             locationList[index].base.SpawnPointParams = locationList[index].base.SpawnPointParams.map((spawn) => ({
                 ...spawn,
                 DelayToCanSpawnSec: spawn.DelayToCanSpawnSec > 20
@@ -128,10 +131,10 @@ const buildWaves = (container) => {
         let snipers = shuffle(locationList[index].base.waves
             .filter(({ WildSpawnType: type }) => type === "marksman")
             .map((wave) => ({
-                ...wave,
-                slots_min: 0,
-                ...(config_json_1.sniperBuddies && wave.slots_max < 2 ? { slots_max: 2 } : {}),
-            })));
+            ...wave,
+            slots_min: 0,
+            ...(sniperBuddies && wave.slots_max < 2 ? { slots_max: 2 } : {}),
+        })));
         if (snipers.length) {
             locationList[index].base.MinMaxBots = [
                 {
@@ -144,9 +147,9 @@ const buildWaves = (container) => {
         const scavZones = [
             ...new Set([...locationList[index].base.SpawnPointParams]
                 .filter(({ Categories, Sides, BotZoneName }) => !!BotZoneName &&
-                    Sides.includes("Savage") &&
-                    Categories.includes("Bot") &&
-                    !Categories.includes("Boss"))
+                Sides.includes("Savage") &&
+                Categories.includes("Bot") &&
+                !Categories.includes("Boss"))
                 .map(({ BotZoneName }) => BotZoneName)),
         ];
         const pmcZones = [
@@ -168,57 +171,58 @@ const buildWaves = (container) => {
             const sniperZones = shuffle(combinedPmcScavOpenZones.filter((zone) => zone.toLowerCase().includes("snipe")));
             combinedPmcScavOpenZones = [];
             combinedPmcZones = [];
-            snipers = waveBuilder(sniperZones.length, locationList[index].base.EscapeTimeLimit * 10, 1, "marksman", 0.8, false, 2, [], sniperZones, 0, true);
+            snipers = waveBuilder(sniperZones.length, locationList[index].base.EscapeTimeLimit * 10, 1, "marksman", 0.8, false, 2, [], sniperZones, 0, false, true);
         }
-        const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier,
-            // additionalScavsPerWave ,
-            pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
+        const { EscapeTimeLimit, maxBotCap, scavWaveStartRatio, scavWaveMultiplier, 
+        // additionalScavsPerWave ,
+        pmcWaveStartRatio, pmcWaveMultiplier, maxBotPerZone, pmcHotZones = [], scavHotZones, } = advancedMapSettings_json_1.default?.[map] || {};
         // Set per map EscapeTimeLimit
         if (EscapeTimeLimit) {
             locationList[index].base.EscapeTimeLimit = EscapeTimeLimit;
             locationList[index].base.exit_access_time = EscapeTimeLimit + 1;
         }
         // Set default or per map maxBotCap
-        if (config_json_1.defaultMaxBotCap || maxBotCap) {
-            const capToSet = maxBotCap || config_json_1.defaultMaxBotCap;
+        if (defaultMaxBotCap || maxBotCap) {
+            const capToSet = maxBotCap || defaultMaxBotCap;
             locationList[index].base.BotMax = capToSet;
             locationList[index].base.BotMaxPvE = capToSet;
             // console.log(botConfig.maxBotCap[originalMapList[index]], capToSet);
             botConfig.maxBotCap[originalMapList[index]] = capToSet;
         }
-        // Make all zones open for scav/pmc spawns
-        if (config_json_1.allOpenZones) {
-            if (combinedPmcZones.length > 0) {
-                locationConfig.openZones[`${originalMapList[index]}`] =
-                    combinedPmcZones;
-                locationList[index].base.OpenZones = combinedPmcZones.join(",");
-            }
-        }
+        // // Make all zones open for scav/pmc spawns
+        // if (allOpenZones) {
+        //   if (combinedPmcZones.length > 0) {
+        //     locationConfig.openZones[`${originalMapList[index]}`] =
+        //       combinedPmcZones;
+        //     locationList[index].base.OpenZones = combinedPmcZones.join(",");
+        //   }
+        // }
         // Adjust botZone quantity
-        if ((maxBotPerZone || config_json_1.defaultMaxBotPerZone) &&
+        if ((maxBotPerZone || defaultMaxBotPerZone) &&
             locationList[index].base.MaxBotPerZone <
-            (maxBotPerZone || config_json_1.defaultMaxBotPerZone)) {
+                (maxBotPerZone || defaultMaxBotPerZone)) {
             locationList[index].base.MaxBotPerZone =
-                maxBotPerZone || config_json_1.defaultMaxBotPerZone;
+                maxBotPerZone || defaultMaxBotPerZone;
         }
         const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
         const { pmcWaveCount, scavWaveCount } = waveConfig_json_1.default[map];
         // Pmcs
-        const pmcWaveStart = pmcWaveStartRatio || config_json_1.defaultPmcStartWaveRatio;
-        const pmcWaveMulti = pmcWaveMultiplier || config_json_1.defaultPmcWaveMultiplier;
+        const pmcWaveStart = pmcWaveStartRatio || defaultPmcStartWaveRatio;
+        const pmcWaveMulti = pmcWaveMultiplier || defaultPmcWaveMultiplier;
         const pmcCountPerSide = Math.round((pmcWaveCount * pmcWaveMulti) / 2);
         const middleIndex = Math.ceil(pmcHotZones.length / 2);
         const firstHalf = pmcHotZones.splice(0, middleIndex);
         const secondHalf = pmcHotZones.splice(-middleIndex);
         const randomBoolean = Math.random() > 0.5;
-        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? firstHalf : secondHalf, 15);
-        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", config_json_1.pmcDifficulty, true, config_json_1.defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? secondHalf : firstHalf, 5);
+        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? firstHalf : secondHalf, 1, startingPmcs, morePmcGroups);
+        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? secondHalf : firstHalf, 5, startingPmcs, morePmcGroups);
+        // if (map === "customs") saveToFile({ usecWaves }, "usecWaves.json");
         // Scavs
-        const scavWaveStart = scavWaveStartRatio || config_json_1.defaultScavStartWaveRatio;
-        const scavWaveMulti = scavWaveMultiplier || config_json_1.defaultScavWaveMultiplier;
+        const scavWaveStart = scavWaveStartRatio || defaultScavStartWaveRatio;
+        const scavWaveMulti = scavWaveMultiplier || defaultScavWaveMultiplier;
         const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveMulti);
-        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", config_json_1.scavDifficulty, false, config_json_1.defaultGroupMaxScav, map === "gzHigh" ? [] : combinedPmcScavOpenZones, scavHotZones);
-        if (config_json_1.debug) {
+        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", scavDifficulty, false, defaultGroupMaxScav, map === "gzHigh" ? [] : combinedPmcScavOpenZones, scavHotZones, moreScavGroups);
+        if (debug) {
             let total = 0;
             let totalscav = 0;
             bearWaves.forEach(({ slots_max }) => (total += slots_max));
@@ -256,7 +260,7 @@ const buildWaves = (container) => {
         const defaultBossSettings = advancedMapSettings_json_1.default?.[configLocations[indx]]?.defaultBossSettings;
         // Sets bosses spawn chance from settings
         if (location?.base?.BossLocationSpawn &&
-            !config_json_1.disableBosses &&
+            !disableBosses &&
             defaultBossSettings &&
             Object.keys(defaultBossSettings)?.length) {
             const filteredBossList = Object.keys(defaultBossSettings).filter((name) => defaultBossSettings[name]?.BossChance !== undefined);
@@ -272,28 +276,28 @@ const buildWaves = (container) => {
             }
         }
         const filteredBosses = location.base.BossLocationSpawn?.filter(({ BossName }) => bossList.includes(BossName));
-        if (!config_json_1.disableBosses && (config_json_1.bossOpenZones || config_json_1.mainBossChanceBuff)) {
+        if (!disableBosses && (bossOpenZones || mainBossChanceBuff)) {
             location.base?.BossLocationSpawn?.forEach((boss, key) => {
                 if (bossList.includes(boss.BossName)) {
-                    if (config_json_1.bossOpenZones && locationList[indx].base.OpenZones) {
+                    if (bossOpenZones && locationList[indx].base.OpenZones) {
                         location.base.BossLocationSpawn[key] = {
                             ...location.base.BossLocationSpawn[key],
                             BossZone: locationList[indx].base.OpenZones,
                         };
                     }
-                    if (!!boss.BossChance && config_json_1.mainBossChanceBuff > 0) {
+                    if (!!boss.BossChance && mainBossChanceBuff > 0) {
                         location.base.BossLocationSpawn[key] = {
                             ...location.base.BossLocationSpawn[key],
-                            BossChance: boss.BossChance + config_json_1.mainBossChanceBuff > 100
+                            BossChance: boss.BossChance + mainBossChanceBuff > 100
                                 ? 100
-                                : Math.round(boss.BossChance + config_json_1.mainBossChanceBuff),
+                                : Math.round(boss.BossChance + mainBossChanceBuff),
                         };
                     }
                 }
             });
         }
         //Add each boss from each map to bosses object
-        if (!config_json_1.disableBosses && filteredBosses?.length) {
+        if (!disableBosses && filteredBosses?.length) {
             for (let index = 0; index < filteredBosses.length; index++) {
                 const boss = filteredBosses[index];
                 if (!bosses[boss.BossName] ||
@@ -303,20 +307,20 @@ const buildWaves = (container) => {
                 }
             }
         }
-        if (config_json_1.randomRaiderGroup) {
-            const raiderWave = buildBossBasedWave(config_json_1.randomRaiderGroupChance, "1,2,2,2,3", "pmcBot", "pmcBot", locationList[indx].base.OpenZones, locationList[indx].base.EscapeTimeLimit);
+        if (randomRaiderGroup) {
+            const raiderWave = buildBossBasedWave(randomRaiderGroupChance, "1,2,2,2,3", "pmcBot", "pmcBot", locationList[indx].base.OpenZones, locationList[indx].base.EscapeTimeLimit);
             location.base.BossLocationSpawn.push(raiderWave);
         }
-        if (config_json_1.randomRogueGroup) {
-            const rogueWave = buildBossBasedWave(config_json_1.randomRogueGroupChance, "1,2,2,2,3", "exUsec", "exUsec", locationList[indx].base.OpenZones, locationList[indx].base.EscapeTimeLimit);
+        if (randomRogueGroup) {
+            const rogueWave = buildBossBasedWave(randomRogueGroupChance, "1,2,2,2,3", "exUsec", "exUsec", locationList[indx].base.OpenZones, locationList[indx].base.EscapeTimeLimit);
             location.base.BossLocationSpawn.push(rogueWave);
         }
     }
-    if (config_json_1.bossInvasion && !config_json_1.disableBosses) {
-        if (config_json_1.bossInvasionSpawnChance) {
+    if (bossInvasion && !disableBosses) {
+        if (bossInvasionSpawnChance) {
             bossList.forEach((bossName) => {
                 bosses[bossName].IgnoreMaxBots = true;
-                bosses[bossName].BossChance = config_json_1.bossInvasionSpawnChance;
+                bosses[bossName].BossChance = bossInvasionSpawnChance;
             });
         }
         for (let key = 0; key < locationList.length; key++) {
@@ -326,10 +330,10 @@ const buildWaves = (container) => {
             const bossesToAdd = shuffle(Object.values(bosses))
                 .filter(({ BossName }) => !duplicateBosses.includes(BossName))
                 .map((boss, j) => ({
-                    ...boss,
-                    BossZone: locationList[key].base.OpenZones,
-                    ...(config_json_1.gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
-                }));
+                ...boss,
+                BossZone: locationList[key].base.OpenZones,
+                ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
+            }));
             // UpdateBosses
             locationList[key].base.BossLocationSpawn = [
                 ...locationList[key].base.BossLocationSpawn,
@@ -337,38 +341,31 @@ const buildWaves = (container) => {
             ];
         }
     }
-    if (config_json_1.debug) {
-        config_json_1.sniperBuddies &&
-            logger.logWithColor("sniperBuddies: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        config_json_1.noZoneDelay &&
-            logger.logWithColor("noZoneDelay: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        config_json_1.reducedZoneDelay &&
-            logger.logWithColor("reducedZoneDelay: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        config_json_1.allOpenZones &&
-            logger.logWithColor("allOpenZones: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        config_json_1.randomRaiderGroup &&
-            logger.logWithColor("randomRaiderGroup: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        config_json_1.randomRogueGroup &&
-            logger.logWithColor("randomRogueGroup: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        if (config_json_1.disableBosses) {
-            logger.logWithColor("disableBosses: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        }
-        else {
-            config_json_1.bossOpenZones &&
-                logger.logWithColor("bossOpenZones: Enabled", LogTextColor_1.LogTextColor.WHITE);
-            config_json_1.bossInvasion &&
-                logger.logWithColor("bossInvasion: Enabled", LogTextColor_1.LogTextColor.WHITE);
-            config_json_1.gradualBossInvasion &&
-                logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor_1.LogTextColor.WHITE);
-        }
-    }
-    // saveToFile(
-    //   locationList[0].base.BossLocationSpawn,
-    //   "location.base2.BossLocationSpawnAfter.json"
-    // );
+    // if (debug) {
+    //   sniperBuddies &&
+    //     logger.logWithColor("sniperBuddies: Enabled", LogTextColor.WHITE);
+    //   noZoneDelay &&
+    //     logger.logWithColor("noZoneDelay: Enabled", LogTextColor.WHITE);
+    //   reducedZoneDelay &&
+    //     logger.logWithColor("reducedZoneDelay: Enabled", LogTextColor.WHITE);
+    //   randomRaiderGroup &&
+    //     logger.logWithColor("randomRaiderGroup: Enabled", LogTextColor.WHITE);
+    //   randomRogueGroup &&
+    //     logger.logWithColor("randomRogueGroup: Enabled", LogTextColor.WHITE);
+    //   if (disableBosses) {
+    //     logger.logWithColor("disableBosses: Enabled", LogTextColor.WHITE);
+    //   } else {
+    //     bossOpenZones &&
+    //       logger.logWithColor("bossOpenZones: Enabled", LogTextColor.WHITE);
+    //     bossInvasion &&
+    //       logger.logWithColor("bossInvasion: Enabled", LogTextColor.WHITE);
+    //     gradualBossInvasion &&
+    //       logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor.WHITE);
+    //   }
+    // }
 };
 exports.buildWaves = buildWaves;
-function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty, isPlayer, maxSlots, combinedZones = [], specialZones = [], offset, moreGroups) {
+function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty, isPlayer, maxSlots, combinedZones = [], specialZones = [], offset, starting, moreGroups) {
     const averageTime = timeLimit / totalWaves;
     const firstHalf = Math.round(averageTime * (1 - waveStart));
     const secondHalf = Math.round(averageTime * (1 + waveStart));
@@ -398,8 +395,8 @@ function waveBuilder(totalWaves, timeLimit, waveStart, wildSpawnType, difficulty
             isPlayers: isPlayer,
             slots_max: slotMax,
             slots_min: 0,
-            time_min: min,
-            time_max: max,
+            time_min: starting ? -1 : min,
+            time_max: starting ? -1 : max,
             WildSpawnType: wildSpawnType,
             number: waves.length,
         });

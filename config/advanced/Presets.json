@@ -1,0 +1,55 @@
+{
+  "live-like": {},
+  "morescavs": {
+    "moreScavGroups": true,
+    "defaultGroupMaxScav": 5,
+    "defaultScavWaveMultiplier": 1.2
+  },
+  "morepmcs": {
+    "morePmcGroups": true,
+    "defaultGroupMaxPMC": 5,
+    "defaultPmcWaveMultiplier": 1.2
+  },
+  "moreEverything": {
+    "defaultMaxBotCap": 30,
+    "moreScavGroups": true,
+    "defaultGroupMaxScav": 5,
+    "morePmcGroups": true,
+    "defaultGroupMaxPMC": 5,
+    "defaultScavWaveMultiplier": 1.2,
+    "defaultPmcWaveMultiplier": 1.2,
+    "mainBossChanceBuff": 25
+  },
+  "starting-pmcs-only-live-like": {
+    "startingPmcs": true
+  },
+  "starting-pmcs-only-morescavs": {
+    "startingPmcs": true,
+    "moreScavGroups": true,
+    "defaultGroupMaxScav": 5,
+    "defaultScavWaveMultiplier": 1.2
+  },
+  "starting-pmcs-only-morepmcs": {
+    "startingPmcs": true,
+    "morePmcGroups": true,
+    "defaultGroupMaxPMC": 5,
+    "defaultPmcWaveMultiplier": 1.2
+  },
+  "starting-pmcs-only-moreEverything": {
+    "startingPmcs": true,
+    "defaultMaxBotCap": 30,
+    "moreScavGroups": true,
+    "defaultGroupMaxScav": 5,
+    "morePmcGroups": true,
+    "defaultGroupMaxPMC": 5,
+    "defaultScavWaveMultiplier": 1.2,
+    "defaultPmcWaveMultiplier": 1.2,
+    "mainBossChanceBuff": 25
+  },
+  "boss-invasion": {
+    "bossInvasion": true,
+    "bossInvasionSpawnChance": 15,
+    "mainBossChanceBuff": 25,
+    "gradualBossInvasion": true
+  }
+}

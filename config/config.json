@@ -7,12 +7,15 @@
   "defaultScavStartWaveRatio": 0.5,
   "defaultScavWaveMultiplier": 1,
 
+  "startingPmcs": false,
   "defaultPmcStartWaveRatio": 0.8,
   "defaultPmcWaveMultiplier": 1,
 
   "defaultMaxBotCap": 25,
   "defaultMaxBotPerZone": 7,
 
+  "moreScavGroups": false,
+  "morePmcGroups": false,
   "defaultGroupMaxPMC": 4,
   "defaultGroupMaxScav": 4,
 
@@ -20,7 +23,6 @@
 
   "noZoneDelay": false,
   "reducedZoneDelay": true,
-  "allOpenZones": false,
   "bossOpenZones": false,
 
   "randomRaiderGroup": false,
