@@ -1,11 +1,11 @@
 {
-  "live-like": 1,
-  "morescavs": 1,
-  "morepmcs": 1,
+  "live-like": 30,
+  "morescavs": 4,
+  "morepmcs": 4,
   "moreEverything": 1,
-  "starting-pmcs-only-live-like": 1,
-  "starting-pmcs-only-morescavs": 1,
-  "starting-pmcs-only-morepmcs": 1,
+  "starting-pmcs-only-live-like": 10,
+  "starting-pmcs-only-morescavs": 2,
+  "starting-pmcs-only-morepmcs": 2,
   "starting-pmcs-only-moreEverything": 1,
   "boss-invasion": 1
 }

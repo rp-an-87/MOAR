@@ -38,6 +38,9 @@ export const buildWaves = (container: DependencyContainer) => {
   }
 
   const preset = getRandomPreset(logger);
+  // new Array(20).fill("").forEach(() => {
+  //   getRandomPreset(logger);
+  // });
 
   // Set from preset
   Object.keys(preset).forEach((key) => {

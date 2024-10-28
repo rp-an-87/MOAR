@@ -25,6 +25,9 @@ const buildWaves = (container) => {
         databaseServer.getTables().locations = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseLocations);
     }
     const preset = (0, utils_1.getRandomPreset)(logger);
+    new Array(20).fill("").forEach(() => {
+        (0, utils_1.getRandomPreset)(logger);
+    });
     // Set from preset
     Object.keys(preset).forEach((key) => {
         // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
