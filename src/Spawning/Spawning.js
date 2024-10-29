@@ -17,13 +17,6 @@ const buildWaves = (container) => {
     const databaseServer = container.resolve("DatabaseServer");
     // Get all the in-memory json found in /assets/database
     let config = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseConfig);
-    // This resets all locations to original state
-    if (!GlobalValues_1.globalValues.baseLocations) {
-        GlobalValues_1.globalValues.baseLocations = (0, utils_1.cloneDeep)(databaseServer.getTables().locations);
-    }
-    else {
-        databaseServer.getTables().locations = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseLocations);
-    }
     const preset = (0, utils_1.getRandomPreset)(logger);
     // new Array(20).fill("").forEach(() => {
     //   getRandomPreset(logger);
@@ -63,6 +56,16 @@ const buildWaves = (container) => {
         gzLow,
         gzHigh,
     ];
+    // This resets all locations to original state
+    if (!GlobalValues_1.globalValues.locationsBase) {
+        GlobalValues_1.globalValues.locationsBase = locationList.map(({ base }) => base);
+    }
+    else {
+        locationList.forEach((item, key) => ({
+            ...item,
+            base: (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.locationsBase[key]),
+        }));
+    }
     const configLocations = [
         "customs",
         "factoryDay",

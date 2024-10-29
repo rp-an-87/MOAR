@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRandomPreset = exports.cloneDeep = exports.saveToFile = void 0;
 const PresetWeightings_json_1 = __importDefault(require("../config/PresetWeightings.json"));
 const Presets_json_1 = __importDefault(require("../config/advanced/Presets.json"));
-const LogTextColor_1 = require("C:/snapshot/project/obj/models/spt/logging/LogTextColor");
 const saveToFile = (data, filePath) => {
     var fs = require("fs");
     let dir = __dirname;
@@ -29,7 +28,7 @@ const getRandomPreset = (logger) => {
         }
     }
     const preset = all[Math.round(Math.random() * (all.length - 1))];
-    logger.logWithColor(`[MOAR] Bot preset set to: ${preset.toUpperCase()}`, LogTextColor_1.LogTextColor.CYAN);
+    console.log(`[MOAR] Bot preset set to: ${preset.toUpperCase()}`);
     return Presets_json_1.default[preset];
 };
 exports.getRandomPreset = getRandomPreset;

@@ -1,7 +1,7 @@
-import { ILocations } from "@spt/models/spt/server/ILocations";
 import config from "../config/config.json";
+import { ILocationBase } from "@spt/models/eft/common/ILocationBase";
 
 export class globalValues {
   public static baseConfig: typeof config = undefined;
-  public static baseLocations: ILocations = undefined;
+  public static locationsBase: ILocationBase[] = undefined;
 }

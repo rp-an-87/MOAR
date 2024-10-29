@@ -26,17 +26,6 @@ export const buildWaves = (container: DependencyContainer) => {
 
   let config = cloneDeep(globalValues.baseConfig);
 
-  // This resets all locations to original state
-  if (!globalValues.baseLocations) {
-    globalValues.baseLocations = cloneDeep(
-      databaseServer.getTables().locations
-    );
-  } else {
-    databaseServer.getTables().locations = cloneDeep(
-      globalValues.baseLocations
-    );
-  }
-
   const preset = getRandomPreset(logger);
   // new Array(20).fill("").forEach(() => {
   //   getRandomPreset(logger);
@@ -122,6 +111,16 @@ export const buildWaves = (container: DependencyContainer) => {
     gzLow,
     gzHigh,
   ];
+
+  // This resets all locations to original state
+  if (!globalValues.locationsBase) {
+    globalValues.locationsBase = locationList.map(({ base }) => base);
+  } else {
+    locationList.forEach((item, key) => ({
+      ...item,
+      base: cloneDeep(globalValues.locationsBase[key]),
+    }));
+  }
 
   const configLocations = [
     "customs",

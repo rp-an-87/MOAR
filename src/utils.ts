@@ -34,9 +34,8 @@ export const getRandomPreset = (logger: ILogger) => {
   }
 
   const preset: string = all[Math.round(Math.random() * (all.length - 1))];
-  logger.logWithColor(
-    `[MOAR] Bot preset set to: ${preset.toUpperCase()}`,
-    LogTextColor.CYAN
+  console.log(
+    `[MOAR] Bot preset set to: ${preset.toUpperCase()}`
   );
   return Presets[preset];
 };

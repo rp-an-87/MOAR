@@ -12,10 +12,10 @@
     }
   },
   "factoryDay": {
-    "maxBotPerZone": 8
+    "maxBotPerZone": 10
   },
   "factoryNight": {
-    "maxBotPerZone": 8
+    "maxBotPerZone": 10
   },
   "interchange": {
     "scavHotZones": ["ZoneCenterBot"],
