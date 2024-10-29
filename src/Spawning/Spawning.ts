@@ -12,7 +12,7 @@ import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
-import { cloneDeep, getRandomPreset } from "../utils";
+import { cloneDeep, getRandomPreset, saveToFile } from "../utils";
 
 export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
@@ -384,8 +384,8 @@ export const buildWaves = (container: DependencyContainer) => {
       combinedPmcZones,
       randomBoolean ? firstHalf : secondHalf,
       1,
-      startingPmcs,
-      morePmcGroups
+      !!startingPmcs,
+      !!morePmcGroups
     );
 
     const usecWaves = waveBuilder(
@@ -399,11 +399,9 @@ export const buildWaves = (container: DependencyContainer) => {
       combinedPmcZones,
       randomBoolean ? secondHalf : firstHalf,
       5,
-      startingPmcs,
-      morePmcGroups
+      !!startingPmcs,
+      !!morePmcGroups
     );
-
-    // if (map === "customs") saveToFile({ usecWaves }, "usecWaves.json");
 
     // Scavs
     const scavWaveStart = scavWaveStartRatio || defaultScavStartWaveRatio;
@@ -420,7 +418,9 @@ export const buildWaves = (container: DependencyContainer) => {
       defaultGroupMaxScav,
       map === "gzHigh" ? [] : combinedPmcScavOpenZones,
       scavHotZones,
-      moreScavGroups
+      0,
+      false,
+      !!moreScavGroups
     );
 
     if (debug) {
@@ -460,7 +460,7 @@ export const buildWaves = (container: DependencyContainer) => {
       time_min: snipKey * 120,
       time_max: snipKey * 120 + 120,
     }));
-
+    // if (map === "customs") saveToFile({ scavWaves }, "scavWaves.json");
     locationList[index].base.waves = [
       ...finalSniperWaves,
       ...scavWaves,

@@ -25,9 +25,9 @@ const buildWaves = (container) => {
         databaseServer.getTables().locations = (0, utils_1.cloneDeep)(GlobalValues_1.globalValues.baseLocations);
     }
     const preset = (0, utils_1.getRandomPreset)(logger);
-    new Array(20).fill("").forEach(() => {
-        (0, utils_1.getRandomPreset)(logger);
-    });
+    // new Array(20).fill("").forEach(() => {
+    //   getRandomPreset(logger);
+    // });
     // Set from preset
     Object.keys(preset).forEach((key) => {
         // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
@@ -217,14 +217,13 @@ const buildWaves = (container) => {
         const firstHalf = pmcHotZones.splice(0, middleIndex);
         const secondHalf = pmcHotZones.splice(-middleIndex);
         const randomBoolean = Math.random() > 0.5;
-        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? firstHalf : secondHalf, 1, startingPmcs, morePmcGroups);
-        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? secondHalf : firstHalf, 5, startingPmcs, morePmcGroups);
-        // if (map === "customs") saveToFile({ usecWaves }, "usecWaves.json");
+        const bearWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcBEAR", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? firstHalf : secondHalf, 1, !!startingPmcs, !!morePmcGroups);
+        const usecWaves = waveBuilder(pmcCountPerSide, timeLimit, pmcWaveStart, "pmcUSEC", pmcDifficulty, true, defaultGroupMaxPMC, combinedPmcZones, randomBoolean ? secondHalf : firstHalf, 5, !!startingPmcs, !!morePmcGroups);
         // Scavs
         const scavWaveStart = scavWaveStartRatio || defaultScavStartWaveRatio;
         const scavWaveMulti = scavWaveMultiplier || defaultScavWaveMultiplier;
         const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveMulti);
-        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", scavDifficulty, false, defaultGroupMaxScav, map === "gzHigh" ? [] : combinedPmcScavOpenZones, scavHotZones, moreScavGroups);
+        const scavWaves = waveBuilder(scavTotalWaveCount, timeLimit, scavWaveStart, "assault", scavDifficulty, false, defaultGroupMaxScav, map === "gzHigh" ? [] : combinedPmcScavOpenZones, scavHotZones, 0, false, !!moreScavGroups);
         if (debug) {
             let total = 0;
             let totalscav = 0;
@@ -241,6 +240,7 @@ const buildWaves = (container) => {
             time_min: snipKey * 120,
             time_max: snipKey * 120 + 120,
         }));
+        // if (map === "customs") saveToFile({ scavWaves }, "scavWaves.json");
         locationList[index].base.waves = [
             ...finalSniperWaves,
             ...scavWaves,
