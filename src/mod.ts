@@ -7,6 +7,7 @@ import { buildWaves } from "./Spawning/Spawning";
 import config from "../config/config.json";
 import { globalValues } from "./GlobalValues";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
+import { setupRoutes } from "./Routes/routes";
 
 class Moar implements IPostSptLoadMod, IPreSptLoadMod {
   postSptLoad(container: DependencyContainer): void {
@@ -14,28 +15,12 @@ class Moar implements IPostSptLoadMod, IPreSptLoadMod {
       globalValues.baseConfig = config;
       const logger = container.resolve<ILogger>("WinstonLogger");
       logger.info("\nMOAR: Starting up, may the bots ever be in your favour!");
-      enableBotSpawning && buildWaves(container);
+      buildWaves(container);
     }
   }
 
   preSptLoad(container: DependencyContainer): void {
-    const staticRouterModService = container.resolve<StaticRouterModService>(
-      "StaticRouterModService"
-    );
-
-    staticRouterModService.registerStaticRouter(
-      `MOAR-Updater`,
-      [
-        {
-          url: "/client/match/offline/end",
-          action: async (_url, info, sessionId, output) => {
-            buildWaves(container);
-            return output;
-          },
-        },
-      ],
-      "aki"
-    );
+    if (enableBotSpawning) setupRoutes(container);
   }
 }
 

@@ -26,7 +26,7 @@ export const buildWaves = (container: DependencyContainer) => {
 
   let config = cloneDeep(globalValues.baseConfig);
 
-  const preset = getRandomPreset(logger);
+  const preset = getRandomPreset();
   // new Array(20).fill("").forEach(() => {
   //   getRandomPreset(logger);
   // });

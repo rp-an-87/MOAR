@@ -110,7 +110,7 @@ fs.copySync(currentDir, path.normalize(`${currentDir}/../~${modName}`), {
 //temp folder path (only used with BuildZip enabled in build.json)
 const tempPath = path.normalize(`${currentDir}/temp`);
 const serverModPath = path.normalize(
-  `${currentDir}/${config.BuildDir}/user/mods/${modName}`
+  `${currentDir}\\../../user/mods/${modName}`
 );
 if (config.BuildZip) {
   //Creating a temp folder with the mod

@@ -2,6 +2,7 @@ import { ILogger } from "@spt/models/spt/utils/ILogger";
 import PresetWeightings from "../config/PresetWeightings.json";
 import Presets from "../config/advanced/Presets.json";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
+import { globalValues } from "./GlobalValues";
 
 export const saveToFile = (data, filePath) => {
   var fs = require("fs");
@@ -22,7 +23,7 @@ export const saveToFile = (data, filePath) => {
 export const cloneDeep = (objectToClone: any) =>
   JSON.parse(JSON.stringify(objectToClone));
 
-export const getRandomPreset = (logger: ILogger) => {
+export const getRandomPreset = () => {
   const all = [];
 
   const itemKeys = Object.keys(PresetWeightings);
@@ -34,8 +35,13 @@ export const getRandomPreset = (logger: ILogger) => {
   }
 
   const preset: string = all[Math.round(Math.random() * (all.length - 1))];
-  console.log(
-    `[MOAR] Bot preset set to: ${preset.toUpperCase()}`
-  );
+  console.log(`[MOAR] Bot preset set to: ${preset.toUpperCase()}`);
+  globalValues.currentPreset = preset;
   return Presets[preset];
 };
+
+export const kebabToTitle = (str: string): string =>
+  str
+    .split("-")
+    .map((word) => word.slice(0, 1).toUpperCase() + word.slice(1))
+    .join(" ");
