@@ -23,7 +23,11 @@ export const saveToFile = (data, filePath) => {
 export const cloneDeep = (objectToClone: any) =>
   JSON.parse(JSON.stringify(objectToClone));
 
-export const getRandomPreset = () => {
+export const getRandomPreset = (forcedPreset?: string) => {
+  if (forcedPreset) {
+    globalValues.currentPreset = forcedPreset;
+    return Presets[forcedPreset];
+  }
   const all = [];
 
   const itemKeys = Object.keys(PresetWeightings);
@@ -35,7 +39,6 @@ export const getRandomPreset = () => {
   }
 
   const preset: string = all[Math.round(Math.random() * (all.length - 1))];
-  console.log(`[MOAR] Bot preset set to: ${preset.toUpperCase()}`);
   globalValues.currentPreset = preset;
   return Presets[preset];
 };

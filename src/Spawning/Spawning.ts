@@ -4,36 +4,43 @@ import {
 } from "@spt/models/eft/common/ILocationBase.d";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig.d";
 import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig.d";
-import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import mapSettings from "../../config/advanced/advancedMapSettings.json";
 import waveConfig from "../../config/advanced/waveConfig.json";
+import BASECONFIG from "../../config/config.json";
 import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
 import { cloneDeep, getRandomPreset, saveToFile } from "../utils";
 
-export const buildWaves = (container: DependencyContainer) => {
+type CONFIG = typeof BASECONFIG;
+interface Overrides extends Partial<CONFIG> {
+  forcedPreset?: string;
+}
+
+export const buildWaves = (
+  container: DependencyContainer,
+  overrides: Overrides = {}
+) => {
+  const { forcedPreset = "", ...configOverrides } = overrides;
   const configServer = container.resolve<ConfigServer>("ConfigServer");
   const pmcConfig = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
   const botConfig = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
-  const logger = container.resolve<ILogger>("WinstonLogger");
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
-  // Get all the in-memory json found in /assets/database
-
   let config = cloneDeep(globalValues.baseConfig);
 
-  const preset = getRandomPreset();
-  // new Array(20).fill("").forEach(() => {
-  //   getRandomPreset(logger);
-  // });
+  const preset = getRandomPreset(forcedPreset);
 
   // Set from preset
   Object.keys(preset).forEach((key) => {
     // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
+    config[key] = preset[key];
+  });
+
+  Object.keys(configOverrides).forEach((key) => {
     config[key] = preset[key];
   });
 
