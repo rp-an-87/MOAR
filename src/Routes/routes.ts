@@ -99,12 +99,6 @@ export const setupRoutes = (container: DependencyContainer) => {
           sessionID,
           output
         ) => {
-          console.log(
-            overrideConfig,
-            overrideConfig.pmcDifficulty,
-            overrideConfig.scavDifficulty,
-            "------"
-          );
           globalValues.overrideConfig = overrideConfig;
 
           buildWaves(container);
@@ -144,8 +138,6 @@ export const setupRoutes = (container: DependencyContainer) => {
       {
         url: "/moar/setPreset",
         action: async (url: string, { Preset }, sessionID, output) => {
-          console.log(Preset, "------");
-
           globalValues.forcedPreset = Preset === "random" ? "" : Preset;
           buildWaves(container);
 

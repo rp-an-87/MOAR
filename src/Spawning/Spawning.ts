@@ -26,17 +26,19 @@ export const buildWaves = (container: DependencyContainer) => {
   const preset = getRandomPreset();
 
   Object.keys(globalValues.overrideConfig).forEach((key) => {
-    console.log(
-      `[MOAR] overrideConfig ${key} changed from ${config[key]} to ${globalValues.overrideConfig[key]}`
-    );
+    config.debug &&
+      console.log(
+        `[MOAR] overrideConfig ${key} changed from ${config[key]} to ${globalValues.overrideConfig[key]}`
+      );
     config[key] = globalValues.overrideConfig[key];
   });
 
   // Set from preset
   Object.keys(preset).forEach((key) => {
-    console.log(
-      `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
-    );
+    config.debug &&
+      console.log(
+        `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
+      );
     config[key] = preset[key];
   });
 
