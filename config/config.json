@@ -38,5 +38,5 @@
   "bossInvasionSpawnChance": 5,
   "gradualBossInvasion": true,
 
-  "debug": false
+  "debug": true
 }

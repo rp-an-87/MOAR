@@ -23,11 +23,18 @@ export const saveToFile = (data, filePath) => {
 export const cloneDeep = (objectToClone: any) =>
   JSON.parse(JSON.stringify(objectToClone));
 
-export const getRandomPreset = (forcedPreset?: string) => {
-  if (forcedPreset) {
-    globalValues.currentPreset = forcedPreset;
-    return Presets[forcedPreset];
+export const getRandomPreset = () => {
+  switch (true) {
+    case !globalValues.forcedPreset:
+      break;
+
+    case globalValues.forcedPreset === "custom":
+      return {};
+
+    default:
+      return Presets[globalValues.forcedPreset];
   }
+
   const all = [];
 
   const itemKeys = Object.keys(PresetWeightings);

@@ -36,26 +36,85 @@ export const setupRoutes = (container: DependencyContainer) => {
       {
         url: "/moar/currentPreset",
         action: async () => {
-          return `Current Preset: ${kebabToTitle(globalValues.currentPreset)}`;
+          return globalValues.forcedPreset || "random";
         },
       },
     ],
     "moarGetCurrentPreset"
   );
 
-  // staticRouterModService.registerStaticRouter(
-  //   `moarRerollPreset`,
-  //   [
-  //     {
-  //       url: "/moar/rerollPreset",
-  //       action: async () => {
-  //         buildWaves(container);
-  //         return `Current Preset: ${kebabToTitle(globalValues.currentPreset)}`;
-  //       },
-  //     },
-  //   ],
-  //   "moarGetCurrentPreset"
-  // );
+  staticRouterModService.registerStaticRouter(
+    `getDefaultConfig`,
+    [
+      {
+        url: "/moar/getDefaultConfig",
+        action: async () => {
+          return JSON.stringify(globalValues.baseConfig);
+        },
+      },
+    ],
+    "getDefaultConfig"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `getServerConfigWithOverrides`,
+    [
+      {
+        url: "/moar/getServerConfigWithOverrides",
+        action: async () => {
+          return JSON.stringify({
+            ...(globalValues.baseConfig || {}),
+            ...(globalValues.overrideConfig || {}),
+          });
+        },
+      },
+    ],
+    "getServerConfigWithOverrides"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `getServerConfigWithOverrides`,
+    [
+      {
+        url: "/moar/getServerConfigWithOverrides",
+        action: async () => {
+          return JSON.stringify({
+            ...globalValues.baseConfig,
+            ...globalValues.overrideConfig,
+          });
+        },
+      },
+    ],
+    "getServerConfigWithOverrides"
+  );
+
+  dynamicRouterModService.registerDynamicRouter(
+    "setOverrideConfig",
+    [
+      {
+        url: "/moar/setOverrideConfig",
+        action: async (
+          url: string,
+          overrideConfig: typeof globalValues.overrideConfig = {},
+          sessionID,
+          output
+        ) => {
+          console.log(
+            overrideConfig,
+            overrideConfig.pmcDifficulty,
+            overrideConfig.scavDifficulty,
+            "------"
+          );
+          globalValues.overrideConfig = overrideConfig;
+
+          buildWaves(container);
+
+          return "Success";
+        },
+      },
+    ],
+    "setOverrideConfig"
+  );
 
   staticRouterModService.registerStaticRouter(
     `moarGetPresetsList`,
@@ -65,13 +124,14 @@ export const setupRoutes = (container: DependencyContainer) => {
         action: async () => {
           let result = [
             ...Object.keys(PresetWeightingsConfig).map((preset) => ({
-              name: preset,
-              value: kebabToTitle(preset),
+              Name: kebabToTitle(preset),
+              Label: preset,
             })),
-            { name: "Random", value: "" },
+            { Name: "Random", Label: "random" },
+            { Name: "Custom", Label: "custom" },
           ];
-          console.log(result);
-          return JSON.stringify(result);
+
+          return JSON.stringify({ data: result });
         },
       },
     ],
@@ -83,12 +143,15 @@ export const setupRoutes = (container: DependencyContainer) => {
     [
       {
         url: "/moar/setPreset",
-        action: async (url: string, info, sessionID, output) => {
-          console.log(info, output);
-          // const splitUrl = url.split("/");
-          // const preset = splitUrl[splitUrl.length - 1];
-          // buildWaves(container, { forcedPreset: preset });
-          return `Current Preset: ${kebabToTitle(globalValues.currentPreset)}`;
+        action: async (url: string, { Preset }, sessionID, output) => {
+          console.log(Preset, "------");
+
+          globalValues.forcedPreset = Preset === "random" ? "" : Preset;
+          buildWaves(container);
+
+          return `Current Preset: ${kebabToTitle(
+            globalValues.forcedPreset || "Random"
+          )}`;
         },
       },
     ],

@@ -13,6 +13,7 @@ class Moar implements IPostSptLoadMod, IPreSptLoadMod {
   postSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
       globalValues.baseConfig = config;
+      globalValues.overrideConfig = {};
       const logger = container.resolve<ILogger>("WinstonLogger");
       logger.info("\nMOAR: Starting up, may the bots ever be in your favour!");
       buildWaves(container);

@@ -14,16 +14,7 @@ import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
 import { cloneDeep, getRandomPreset, saveToFile } from "../utils";
 
-type CONFIG = typeof BASECONFIG;
-interface Overrides extends Partial<CONFIG> {
-  forcedPreset?: string;
-}
-
-export const buildWaves = (
-  container: DependencyContainer,
-  overrides: Overrides = {}
-) => {
-  const { forcedPreset = "", ...configOverrides } = overrides;
+export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
   const pmcConfig = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
   const botConfig = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
@@ -32,17 +23,24 @@ export const buildWaves = (
 
   let config = cloneDeep(globalValues.baseConfig);
 
-  const preset = getRandomPreset(forcedPreset);
+  const preset = getRandomPreset();
+
+  Object.keys(globalValues.overrideConfig).forEach((key) => {
+    console.log(
+      `[MOAR] overrideConfig ${key} changed from ${config[key]} to ${globalValues.overrideConfig[key]}`
+    );
+    config[key] = globalValues.overrideConfig[key];
+  });
 
   // Set from preset
   Object.keys(preset).forEach((key) => {
-    // logger.info(`[MOAR] ${key} changed from ${config[key]} to ${preset[key]}`);
+    console.log(
+      `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
+    );
     config[key] = preset[key];
   });
 
-  Object.keys(configOverrides).forEach((key) => {
-    config[key] = preset[key];
-  });
+  console.log(globalValues.forcedPreset || globalValues.currentPreset);
 
   let {
     randomRaiderGroup,
