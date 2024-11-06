@@ -7,17 +7,26 @@ import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig.d";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import mapSettings from "../../config/advanced/advancedMapSettings.json";
 import waveConfig from "../../config/advanced/waveConfig.json";
-import BASECONFIG from "../../config/config.json";
 import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
 import { cloneDeep, getRandomPreset, saveToFile } from "../utils";
+import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 
 export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
   const pmcConfig = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
   const botConfig = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
+
+  const locationConfig = configServer.getConfig<ILocationConfig>(
+    ConfigTypes.LOCATION
+  );
+
+  locationConfig.rogueLighthouseSpawnTimeSettings.waitTimeSeconds = 60;
+  locationConfig.enableBotTypeLimits = false;
+  locationConfig.fitLootIntoContainerAttempts = 1;
+  locationConfig.addCustomBotWavesToMaps = false;
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
@@ -42,7 +51,8 @@ export const buildWaves = (container: DependencyContainer) => {
     config[key] = preset[key];
   });
 
-  console.log(globalValues.forcedPreset || globalValues.currentPreset);
+  config.debug &&
+    console.log(globalValues.forcedPreset || globalValues.currentPreset);
 
   let {
     randomRaiderGroup,
@@ -169,9 +179,6 @@ export const buildWaves = (container: DependencyContainer) => {
     crazyassaultevent: { min: 0, max: 0 },
   };
 
-  botConfig.presetBatch["pmcBEAR"] = defaultMaxBotCap;
-  botConfig.presetBatch["pmcUSEC"] = defaultMaxBotCap;
-
   for (let index = 0; index < locationList.length; index++) {
     const mapSettingsList = Object.keys(mapSettings) as Array<
       keyof typeof mapSettings
@@ -196,7 +203,6 @@ export const buildWaves = (container: DependencyContainer) => {
     };
 
     locationList[index].base.NonWaveGroupScenario.Enabled = false;
-    locationList[index].base.NonWaveGroupScenario.Chance = 0;
     locationList[index].base["BotStartPlayer"] = 0;
     if (
       locationList[index].base.BotStop <
@@ -477,22 +483,17 @@ export const buildWaves = (container: DependencyContainer) => {
       .map((wave, i) => ({ ...wave, number: i + 1 }));
   }
 
+  // BOSS RELATED STUFF!
+
   const bossList = [...botConfig.bosses].filter(
-    (bossName) => !["bossZryachiy", "bossKnight"].includes(bossName)
+    (bossName) =>
+      !["bossZryachiy", "bossKnight", "bossBoarSniper"].includes(bossName)
   );
 
   // CreateBossList
   const bosses: object = {};
   for (let indx = 0; indx < locationList.length; indx++) {
     const location = locationList[indx];
-
-    // cull weird boss names
-    if (location?.base?.BossLocationSpawn) {
-      const cullList = ["skier", "peacemaker"];
-      location.base.BossLocationSpawn = location.base.BossLocationSpawn.filter(
-        (boss) => !cullList.includes(boss.BossName)
-      );
-    }
 
     const defaultBossSettings =
       mapSettings?.[configLocations[indx]]?.defaultBossSettings;
@@ -590,23 +591,34 @@ export const buildWaves = (container: DependencyContainer) => {
   if (bossInvasion && !disableBosses) {
     if (bossInvasionSpawnChance) {
       bossList.forEach((bossName) => {
-        bosses[bossName].IgnoreMaxBots = true;
         bosses[bossName].BossChance = bossInvasionSpawnChance;
       });
     }
 
     for (let key = 0; key < locationList.length; key++) {
       //Gather bosses to avoid duplicating.
+      let bossLocations = "";
       const duplicateBosses = locationList[key].base.BossLocationSpawn.filter(
-        ({ BossName }) => bossList.includes(BossName)
+        ({ BossName, BossZone }) => {
+          bossLocations += BossZone + ",";
+          return bossList.includes(BossName);
+        }
       ).map(({ BossName }) => BossName);
-
+      const uniqueBossZones = [
+        ...new Set(
+          bossLocations
+            .split(",")
+            .filter((zone) => !!zone && !zone.toLowerCase().includes("snipe"))
+        ),
+      ].join(",");
       //Build bosses to add
       const bossesToAdd = shuffle<BossLocationSpawn[]>(Object.values(bosses))
         .filter(({ BossName }) => !duplicateBosses.includes(BossName))
         .map((boss, j) => ({
           ...boss,
-          BossZone: locationList[key].base.OpenZones,
+          BossZone: uniqueBossZones,
+          BossEscortAmount:
+            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1,1,2",
           ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
         }));
 
@@ -617,29 +629,6 @@ export const buildWaves = (container: DependencyContainer) => {
       ];
     }
   }
-
-  // if (debug) {
-  //   sniperBuddies &&
-  //     logger.logWithColor("sniperBuddies: Enabled", LogTextColor.WHITE);
-  //   noZoneDelay &&
-  //     logger.logWithColor("noZoneDelay: Enabled", LogTextColor.WHITE);
-  //   reducedZoneDelay &&
-  //     logger.logWithColor("reducedZoneDelay: Enabled", LogTextColor.WHITE);
-  //   randomRaiderGroup &&
-  //     logger.logWithColor("randomRaiderGroup: Enabled", LogTextColor.WHITE);
-  //   randomRogueGroup &&
-  //     logger.logWithColor("randomRogueGroup: Enabled", LogTextColor.WHITE);
-  //   if (disableBosses) {
-  //     logger.logWithColor("disableBosses: Enabled", LogTextColor.WHITE);
-  //   } else {
-  //     bossOpenZones &&
-  //       logger.logWithColor("bossOpenZones: Enabled", LogTextColor.WHITE);
-  //     bossInvasion &&
-  //       logger.logWithColor("bossInvasion: Enabled", LogTextColor.WHITE);
-  //     gradualBossInvasion &&
-  //       logger.logWithColor("gradualBossInvasion: Enabled", LogTextColor.WHITE);
-  //   }
-  // }
 };
 
 function waveBuilder(
@@ -760,7 +749,7 @@ function buildBossBasedWave(
   BossEscortType: string,
   BossName: string,
   BossZone: string,
-  raidTime: number
+  raidTime?: number
 ): BossLocationSpawn {
   return {
     BossChance,
@@ -771,13 +760,15 @@ function buildBossBasedWave(
     BossName,
     BossPlayer: false,
     BossZone,
+    Delay: 0,
+    ForceSpawn: false,
+    IgnoreMaxBots: true,
     RandomTimeSpawn: false,
-    Time: Math.round(Math.random() * (raidTime * 5)),
+    Time: raidTime ? Math.round(Math.random() * (raidTime * 5)) : -1,
     Supports: null,
     TriggerId: "",
     TriggerName: "",
-    IgnoreMaxBots: true,
-    spawnMode: [],
+    spawnMode: ["regular", "pve"],
   };
 
   //   BossChance: number;
