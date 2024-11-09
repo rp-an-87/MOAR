@@ -36,12 +36,24 @@ export const setupRoutes = (container: DependencyContainer) => {
       {
         url: "/moar/currentPreset",
         action: async () => {
-          if (globalValues.forcedPreset === "custom") return "custom";
-          return globalValues.forcedPreset || globalValues.currentPreset;
+          return globalValues.forcedPreset || "random";
         },
       },
     ],
     "moarGetCurrentPreset"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `moarGetAnnouncePreset`,
+    [
+      {
+        url: "/moar/announcePreset",
+        action: async () => {
+          return globalValues.forcedPreset || globalValues.currentPreset;
+        },
+      },
+    ],
+    "moarGetAnnouncePreset"
   );
 
   staticRouterModService.registerStaticRouter(

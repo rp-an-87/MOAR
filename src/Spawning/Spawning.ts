@@ -114,7 +114,7 @@ export const buildWaves = (container: DependencyContainer) => {
     "sandbox_high",
   ];
 
-  const locationList = [
+  let locationList = [
     customs,
     factoryDay,
     factoryNight,
@@ -131,9 +131,11 @@ export const buildWaves = (container: DependencyContainer) => {
 
   // This resets all locations to original state
   if (!globalValues.locationsBase) {
-    globalValues.locationsBase = locationList.map(({ base }) => base);
+    globalValues.locationsBase = locationList.map(({ base }) =>
+      cloneDeep(base)
+    );
   } else {
-    locationList.forEach((item, key) => ({
+    locationList = locationList.map((item, key) => ({
       ...item,
       base: cloneDeep(globalValues.locationsBase[key]),
     }));
