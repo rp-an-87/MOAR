@@ -1,8 +1,8 @@
 {
   "enableBotSpawning": true,
 
-  "pmcDifficulty": 0.5,
-  "scavDifficulty": 0.3,
+  "pmcDifficulty": 0.7,
+  "scavDifficulty": 0.5,
 
   "defaultScavStartWaveRatio": 0.5,
   "defaultScavWaveMultiplier": 1,

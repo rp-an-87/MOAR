@@ -529,10 +529,10 @@ export const buildWaves = (container: DependencyContainer) => {
     if (!disableBosses && (bossOpenZones || mainBossChanceBuff)) {
       location.base?.BossLocationSpawn?.forEach((boss, key) => {
         if (bossList.includes(boss.BossName)) {
-          if (bossOpenZones && locationList[indx].base.OpenZones) {
+          if (bossOpenZones) {
             location.base.BossLocationSpawn[key] = {
               ...location.base.BossLocationSpawn[key],
-              BossZone: locationList[indx].base.OpenZones,
+              BossZone: "",
             };
           }
 
@@ -569,7 +569,7 @@ export const buildWaves = (container: DependencyContainer) => {
         "1,2,2,2,3",
         "pmcBot",
         "pmcBot",
-        locationList[indx].base.OpenZones,
+        "",
         locationList[indx].base.EscapeTimeLimit
       );
       location.base.BossLocationSpawn.push(raiderWave);
@@ -581,7 +581,7 @@ export const buildWaves = (container: DependencyContainer) => {
         "1,2,2,2,3",
         "exUsec",
         "exUsec",
-        locationList[indx].base.OpenZones,
+        "",
         locationList[indx].base.EscapeTimeLimit
       );
       location.base.BossLocationSpawn.push(rogueWave);
@@ -604,13 +604,17 @@ export const buildWaves = (container: DependencyContainer) => {
           return bossList.includes(BossName);
         }
       ).map(({ BossName }) => BossName);
-      const uniqueBossZones = [
-        ...new Set(
-          bossLocations
-            .split(",")
-            .filter((zone) => !!zone && !zone.toLowerCase().includes("snipe"))
-        ),
-      ].join(",");
+      const uniqueBossZones = bossOpenZones
+        ? ""
+        : [
+            ...new Set(
+              bossLocations
+                .split(",")
+                .filter(
+                  (zone) => !!zone && !zone.toLowerCase().includes("snipe")
+                )
+            ),
+          ].join(",");
       //Build bosses to add
       const bossesToAdd = shuffle<BossLocationSpawn[]>(Object.values(bosses))
         .filter(({ BossName }) => !duplicateBosses.includes(BossName))
@@ -618,7 +622,7 @@ export const buildWaves = (container: DependencyContainer) => {
           ...boss,
           BossZone: uniqueBossZones,
           BossEscortAmount:
-            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1,1,2",
+            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "0,1",
           ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
         }));
 
