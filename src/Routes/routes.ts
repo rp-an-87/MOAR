@@ -49,6 +49,9 @@ export const setupRoutes = (container: DependencyContainer) => {
       {
         url: "/moar/announcePreset",
         action: async () => {
+          if (globalValues.forcedPreset?.toLowerCase() === "random") {
+            return globalValues.currentPreset;
+          }
           return globalValues.forcedPreset || globalValues.currentPreset;
         },
       },

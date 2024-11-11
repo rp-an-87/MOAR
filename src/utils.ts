@@ -28,7 +28,7 @@ export const getRandomPreset = () => {
     case !globalValues.forcedPreset:
       break;
 
-    case globalValues.forcedPreset === "custom":
+    case globalValues.forcedPreset.toLowerCase() === "custom":
       return {};
 
     default:

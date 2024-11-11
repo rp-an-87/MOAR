@@ -33,7 +33,7 @@ export const buildWaves = (container: DependencyContainer) => {
   let config = cloneDeep(globalValues.baseConfig);
 
   const preset = getRandomPreset();
-
+  // console.log(globalValues.forcedPreset, globalValues.currentPreset);
   Object.keys(globalValues.overrideConfig).forEach((key) => {
     config.debug &&
       console.log(
@@ -43,13 +43,14 @@ export const buildWaves = (container: DependencyContainer) => {
   });
 
   // Set from preset
-  Object.keys(preset).forEach((key) => {
-    config.debug &&
-      console.log(
-        `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
-      );
-    config[key] = preset[key];
-  });
+  if (globalValues.forcedPreset.toLowerCase() !== "custom")
+    Object.keys(preset).forEach((key) => {
+      config.debug &&
+        console.log(
+          `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
+        );
+      config[key] = preset[key];
+    });
 
   config.debug &&
     console.log(globalValues.forcedPreset || globalValues.currentPreset);
@@ -301,6 +302,12 @@ export const buildWaves = (container: DependencyContainer) => {
     let combinedPmcZones = combinedPmcScavOpenZones.filter(
       (zone) => !zone.toLowerCase().includes("snipe")
     );
+
+    // if (map === "customs") {
+    //   combinedPmcScavOpenZones = globalValues.addedMapZones["bigmap"];
+
+    //   console.log(combinedPmcScavOpenZones);
+    // }
 
     if (map === "tarkovstreets") {
       const sniperZones = shuffle(
