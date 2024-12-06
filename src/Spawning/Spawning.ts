@@ -1,6 +1,6 @@
 import {
-  Wave,
-  BossLocationSpawn,
+  IWave,
+  IBossLocationSpawn,
 } from "@spt/models/eft/common/ILocationBase.d";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig.d";
 import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig.d";
@@ -172,15 +172,16 @@ export const buildWaves = (container: DependencyContainer) => {
     scavHotZones?: string[];
   }
 
-  pmcConfig.convertIntoPmcChance = {
-    assault: { min: 0, max: 1 },
-    cursedassault: { min: 0, max: 0 },
-    pmcbot: { min: 0, max: 0 },
-    exusec: { min: 0, max: 0 },
-    arenafighter: { min: 0, max: 0 },
-    arenafighterevent: { min: 0, max: 0 },
-    crazyassaultevent: { min: 0, max: 0 },
-  };
+  // TODO:
+  // pmcConfig.convertIntoPmcChance = {
+  //   assault: { min: 0, max: 1 },
+  //   cursedassault: { min: 0, max: 0 },
+  //   pmcbot: { min: 0, max: 0 },
+  //   exusec: { min: 0, max: 0 },
+  //   arenafighter: { min: 0, max: 0 },
+  //   arenafighterevent: { min: 0, max: 0 },
+  //   crazyassaultevent: { min: 0, max: 0 },
+  // };
 
   for (let index = 0; index < locationList.length; index++) {
     const mapSettingsList = Object.keys(mapSettings) as Array<
@@ -239,7 +240,7 @@ export const buildWaves = (container: DependencyContainer) => {
     }
 
     // Snipers
-    let snipers = shuffle<Wave[]>(
+    let snipers = shuffle<IWave[]>(
       locationList[index].base.waves
         .filter(({ WildSpawnType: type }) => type === "marksman")
         .map((wave) => ({
@@ -363,15 +364,6 @@ export const buildWaves = (container: DependencyContainer) => {
       botConfig.maxBotCap[originalMapList[index]] = capToSet;
     }
 
-    // // Make all zones open for scav/pmc spawns
-    // if (allOpenZones) {
-    //   if (combinedPmcZones.length > 0) {
-    //     locationConfig.openZones[`${originalMapList[index]}`] =
-    //       combinedPmcZones;
-    //     locationList[index].base.OpenZones = combinedPmcZones.join(",");
-    //   }
-    // }
-
     // Adjust botZone quantity
     if (
       (maxBotPerZone || defaultMaxBotPerZone) &&
@@ -394,6 +386,12 @@ export const buildWaves = (container: DependencyContainer) => {
     const secondHalf = pmcHotZones.splice(-middleIndex);
     const randomBoolean = Math.random() > 0.5;
 
+    if (map === "laboratory") {
+      combinedPmcZones = combinedPmcZones.filter(
+        (zone) => zone !== "BotZoneGate1"
+      );
+    }
+
     const bearWaves = waveBuilder(
       pmcCountPerSide,
       timeLimit,
@@ -402,7 +400,7 @@ export const buildWaves = (container: DependencyContainer) => {
       pmcDifficulty,
       true,
       defaultGroupMaxPMC,
-      combinedPmcZones,
+      map === "gzHigh" ? [] : combinedPmcZones,
       randomBoolean ? firstHalf : secondHalf,
       1,
       !!startingPmcs,
@@ -417,7 +415,7 @@ export const buildWaves = (container: DependencyContainer) => {
       pmcDifficulty,
       true,
       defaultGroupMaxPMC,
-      combinedPmcZones,
+      map === "gzHigh" ? [] : combinedPmcZones,
       randomBoolean ? secondHalf : firstHalf,
       5,
       !!startingPmcs,
@@ -625,7 +623,7 @@ export const buildWaves = (container: DependencyContainer) => {
             ),
           ].join(",");
       //Build bosses to add
-      const bossesToAdd = shuffle<BossLocationSpawn[]>(Object.values(bosses))
+      const bossesToAdd = shuffle<IBossLocationSpawn[]>(Object.values(bosses))
         .filter(({ BossName }) => !duplicateBosses.includes(BossName))
         .map((boss, j) => ({
           ...boss,
@@ -657,7 +655,7 @@ function waveBuilder(
   offset?: number,
   starting?: boolean,
   moreGroups?: boolean
-): Wave[] {
+): IWave[] {
   const averageTime = timeLimit / totalWaves;
   const firstHalf = Math.round(averageTime * (1 - waveStart));
   const secondHalf = Math.round(averageTime * (1 + waveStart));
@@ -763,7 +761,7 @@ function buildBossBasedWave(
   BossName: string,
   BossZone: string,
   raidTime?: number
-): BossLocationSpawn {
+): IBossLocationSpawn {
   return {
     BossChance,
     BossDifficult: "normal",

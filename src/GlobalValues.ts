@@ -7,4 +7,5 @@ export class globalValues {
   public static locationsBase: ILocationBase[] = undefined;
   public static currentPreset: string = "random";
   public static forcedPreset: string = "";
+  public static addedMapZones: Record<string, string[]> = {};
 }
