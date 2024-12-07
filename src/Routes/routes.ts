@@ -20,7 +20,7 @@ export const setupRoutes = (container: DependencyContainer) => {
     `moarUpdater`,
     [
       {
-        url: "/client/match/offline/end",
+        url: "/client/match/local/end",
         action: async (_url, info, sessionId, output) => {
           buildWaves(container);
           return output;
@@ -104,28 +104,6 @@ export const setupRoutes = (container: DependencyContainer) => {
     "getServerConfigWithOverrides"
   );
 
-  dynamicRouterModService.registerDynamicRouter(
-    "setOverrideConfig",
-    [
-      {
-        url: "/moar/setOverrideConfig",
-        action: async (
-          url: string,
-          overrideConfig: typeof globalValues.overrideConfig = {},
-          sessionID,
-          output
-        ) => {
-          globalValues.overrideConfig = overrideConfig;
-
-          buildWaves(container);
-
-          return "Success";
-        },
-      },
-    ],
-    "setOverrideConfig"
-  );
-
   staticRouterModService.registerStaticRouter(
     `moarGetPresetsList`,
     [
@@ -148,13 +126,35 @@ export const setupRoutes = (container: DependencyContainer) => {
     "moarGetPresetsList"
   );
 
-  dynamicRouterModService.registerDynamicRouter(
+  staticRouterModService.registerStaticRouter(
+    "setOverrideConfig",
+    [
+      {
+        url: "/moar/setOverrideConfig",
+        action: async (
+          url: string,
+          overrideConfig: typeof globalValues.overrideConfig = {},
+          sessionID,
+          output
+        ) => {
+          globalValues.overrideConfig = overrideConfig;
+
+          buildWaves(container);
+
+          return "Success";
+        },
+      },
+    ],
+    "setOverrideConfig"
+  );
+
+  staticRouterModService.registerStaticRouter(
     "moarSetPreset",
     [
       {
         url: "/moar/setPreset",
         action: async (url: string, { Preset }, sessionID, output) => {
-          globalValues.forcedPreset = Preset === "random" ? "" : Preset;
+          globalValues.forcedPreset = Preset;
           buildWaves(container);
 
           return `Current Preset: ${kebabToTitle(

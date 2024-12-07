@@ -23,13 +23,15 @@ export const saveToFile = (data, filePath) => {
 export const cloneDeep = (objectToClone: any) =>
   JSON.parse(JSON.stringify(objectToClone));
 
-export const getRandomPreset = () => {
+export const getRandomPresetOrCurrentlySelectedPreset = () => {
   switch (true) {
-    case !globalValues.forcedPreset:
-      break;
-
     case globalValues.forcedPreset.toLowerCase() === "custom":
       return {};
+    case !globalValues.forcedPreset:
+      globalValues.forcedPreset = "random";
+      break;
+    case globalValues.forcedPreset === "random":
+      break;
 
     default:
       return Presets[globalValues.forcedPreset];

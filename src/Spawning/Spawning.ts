@@ -11,7 +11,11 @@ import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
-import { cloneDeep, getRandomPreset, saveToFile } from "../utils";
+import {
+  cloneDeep,
+  getRandomPresetOrCurrentlySelectedPreset,
+  saveToFile,
+} from "../utils";
 import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 
 export const buildWaves = (container: DependencyContainer) => {
@@ -30,30 +34,39 @@ export const buildWaves = (container: DependencyContainer) => {
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
+  const { locations } = databaseServer.getTables();
+
   let config = cloneDeep(globalValues.baseConfig);
 
-  const preset = getRandomPreset();
-  // console.log(globalValues.forcedPreset, globalValues.currentPreset);
-  Object.keys(globalValues.overrideConfig).forEach((key) => {
-    config.debug &&
-      console.log(
-        `[MOAR] overrideConfig ${key} changed from ${config[key]} to ${globalValues.overrideConfig[key]}`
-      );
-    config[key] = globalValues.overrideConfig[key];
-  });
+  const preset = getRandomPresetOrCurrentlySelectedPreset();
 
-  // Set from preset
-  if (globalValues.forcedPreset.toLowerCase() !== "custom")
-    Object.keys(preset).forEach((key) => {
+  Object.keys(globalValues.overrideConfig).forEach((key) => {
+    if (config[key] !== globalValues.overrideConfig[key]) {
       config.debug &&
         console.log(
-          `[MOAR] preset ${key} changed from ${config[key]} to ${preset[key]}`
+          `[MOAR] overrideConfig ${key} changed from ${config[key]} to ${globalValues.overrideConfig[key]}`
+        );
+      config[key] = globalValues.overrideConfig[key];
+    }
+  });
+
+  // Set from preset if preset above is not empty
+  Object.keys(preset).forEach((key) => {
+    if (config[key] !== preset[key]) {
+      config.debug &&
+        console.log(
+          `[MOAR]  preset ${globalValues.currentPreset}:  ${key} changed from ${config[key]} to ${preset[key]}`
         );
       config[key] = preset[key];
-    });
+    }
+  });
 
   config.debug &&
-    console.log(globalValues.forcedPreset || globalValues.currentPreset);
+    console.log(
+      globalValues.forcedPreset === "custom"
+        ? "custom"
+        : globalValues.currentPreset
+    );
 
   let {
     randomRaiderGroup,
@@ -98,7 +111,7 @@ export const buildWaves = (container: DependencyContainer) => {
     woods,
     sandbox: gzLow,
     sandbox_high: gzHigh,
-  } = databaseServer.getTables().locations;
+  } = locations;
 
   const originalMapList = [
     "bigmap",
@@ -172,16 +185,20 @@ export const buildWaves = (container: DependencyContainer) => {
     scavHotZones?: string[];
   }
 
-  // TODO:
-  // pmcConfig.convertIntoPmcChance = {
-  //   assault: { min: 0, max: 1 },
-  //   cursedassault: { min: 0, max: 0 },
-  //   pmcbot: { min: 0, max: 0 },
-  //   exusec: { min: 0, max: 0 },
-  //   arenafighter: { min: 0, max: 0 },
-  //   arenafighterevent: { min: 0, max: 0 },
-  //   crazyassaultevent: { min: 0, max: 0 },
-  // };
+  pmcConfig.convertIntoPmcChance = {
+    default: {
+      assault: { min: 0, max: 0 },
+      cursedassault: { min: 0, max: 0 },
+      pmcbot: { min: 0, max: 0 },
+      exusec: { min: 0, max: 0 },
+      arenafighter: { min: 0, max: 0 },
+      arenafighterevent: { min: 0, max: 0 },
+      crazyassaultevent: { min: 0, max: 0 },
+    },
+    factory4_day: { assault: { min: 0, max: 0 } },
+    laboratory: { pmcbot: { min: 0, max: 0 } },
+    rezervbase: { pmcbot: { min: 0, max: 0 } },
+  };
 
   for (let index = 0; index < locationList.length; index++) {
     const mapSettingsList = Object.keys(mapSettings) as Array<
@@ -629,7 +646,7 @@ export const buildWaves = (container: DependencyContainer) => {
           ...boss,
           BossZone: uniqueBossZones,
           BossEscortAmount:
-            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "0,1",
+            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1",
           ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
         }));
 
@@ -640,6 +657,14 @@ export const buildWaves = (container: DependencyContainer) => {
       ];
     }
   }
+
+  originalMapList.forEach((name, index) => {
+    if (!locations[name]) {
+      console.log("[MOAR] OH CRAP we have a problem!", name);
+    } else {
+      locations[name] = locationList[index];
+    }
+  });
 };
 
 function waveBuilder(
