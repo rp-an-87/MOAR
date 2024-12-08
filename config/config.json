@@ -12,9 +12,10 @@
   "pmcWaveDistribution": 0.8,
   "pmcWaveQuantity": 1,
 
-  "zombiesEnabled": true,
+  "zombiesEnabled": false,
   "zombieWaveDistribution": 0.5,
   "zombieWaveQuantity": 1,
+  "zombieHealth": 1,
 
   "maxBotCap": 25,
   "maxBotPerZone": 7,

@@ -2,13 +2,27 @@ import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { configLocations } from "./constants";
-import { buildZombie } from "./utils";
+import {
+  buildZombie,
+  getHealthBodyPartsByPercentage,
+  zombieTypes,
+} from "./utils";
+import { IBots } from "@spt/models/spt/bots/IBots";
 
 export default function buildZombieWaves(
   config: typeof _config,
-  locationList: ILocation[]
+  locationList: ILocation[],
+  bots: IBots
 ) {
-  let { zombieWaveDistribution, zombieWaveQuantity } = config;
+  let { debug, zombieWaveDistribution, zombieWaveQuantity, zombieHealth } =
+    config;
+
+  const zombieBodyParts = getHealthBodyPartsByPercentage(zombieHealth);
+  zombieTypes.forEach((type) => {
+    bots.types?.[type]?.health?.BodyParts?.forEach((_, index) => {
+      bots.types[type].health.BodyParts[index] = zombieBodyParts;
+    });
+  });
 
   for (let indx = 0; indx < locationList.length; indx++) {
     const location = locationList[indx].base;
@@ -25,8 +39,16 @@ export default function buildZombieWaves(
       zombieTotalWaveCount,
       location.EscapeTimeLimit,
       zombieWaveDistribution,
-      100
+      9999
     );
+
+    debug &&
+      console.log(
+        configLocations[indx],
+        " generated ",
+        zombieWaves.length,
+        "Zombies"
+      );
 
     location.BossLocationSpawn.push(...zombieWaves);
 

@@ -1,13 +1,14 @@
 import {
   IBossLocationSpawn,
   IWave,
+  WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
 
 export const waveBuilder = (
   totalWaves: number,
   timeLimit: number,
   waveDistribution: number,
-  wildSpawnType: string,
+  wildSpawnType: "marksman" | "assault" | "pmcBEAR" | "pmcUSEC",
   difficulty: number,
   isPlayer: boolean,
   maxSlots: number,
@@ -17,6 +18,9 @@ export const waveBuilder = (
   starting?: boolean,
   moreGroups?: boolean
 ): IWave[] => {
+  if (totalWaves === 0) return [];
+  const BotSide = getBotSide(wildSpawnType);
+
   const averageTime = timeLimit / totalWaves;
   const firstHalf = Math.round(averageTime * (1 - waveDistribution));
   const secondHalf = Math.round(averageTime * (1 + waveDistribution));
@@ -48,9 +52,11 @@ export const waveBuilder = (
         (moreGroups ? Math.random() : Math.random() * Math.random()) * maxSlots
       ) || 1;
 
+    const slotMin = (Math.round(Math.random() * slotMax) || 1) - 1;
+
     waves.push({
       BotPreset,
-      BotSide: "Savage",
+      BotSide,
       SpawnPoints: getZone(
         specialZones,
         combinedZones,
@@ -58,17 +64,18 @@ export const waveBuilder = (
       ),
       isPlayers: isPlayer,
       slots_max: slotMax,
-      slots_min: 0,
-      time_min: starting ? -1 : min,
-      time_max: starting ? -1 : max,
+      slots_min: slotMin,
+      time_min: starting || !max ? -1 : min,
+      time_max: starting || !max ? -1 : max,
       WildSpawnType: wildSpawnType,
       number: waves.length,
+      SpawnMode: ["regular", "pve"],
     });
     maxSlotsReached -= slotMax;
     // if (wildSpawnType === "assault") console.log(slotMax, maxSlotsReached);
     if (maxSlotsReached <= 0) break;
   }
-
+  console.log(waves[0]);
   return waves;
 };
 
@@ -115,6 +122,19 @@ export const shuffle = <n>(array: any): n => {
   return array;
 };
 
+const getBotSide = (
+  spawnType: "marksman" | "assault" | "pmcBEAR" | "pmcUSEC"
+) => {
+  switch (spawnType) {
+    case "pmcBEAR":
+      return "Bear";
+    case "pmcUSEC":
+      return "Usec";
+    default:
+      return "Savage";
+  }
+};
+
 export const buildBossBasedWave = (
   BossChance: number,
   BossEscortAmount: string,
@@ -144,9 +164,9 @@ export const buildBossBasedWave = (
   };
 };
 
-const zombieTypes = [
+export const zombieTypes = [
   "infectedAssault",
-  // "infectedTagilla",
+  "infectedPmc",
   "infectedLaborant",
   "infectedCivil",
 ];
@@ -196,7 +216,7 @@ export const buildZombie = (
       RandomTimeSpawn: false,
       Time: timeStart,
       Supports: new Array(
-        Math.round(Math.random() * Math.random() * 4) /* <= 4 AddthistoConfig */
+        Math.round(Math.random() * 4) /* <= 4 AddthistoConfig */
       )
         .fill("")
         .map(() => ({
@@ -225,3 +245,40 @@ export interface MapSettings {
   scavWaveCount: number;
   zombieWaveCount: number;
 }
+
+export const getHealthBodyPartsByPercentage = (num: number) => {
+  const num35 = Math.round(35 * num);
+  const num100 = Math.round(100 * num);
+  const num70 = Math.round(70 * num);
+  const num80 = Math.round(80 * num);
+  return {
+    Head: {
+      min: num35,
+      max: num35,
+    },
+    Chest: {
+      min: num100,
+      max: num100,
+    },
+    Stomach: {
+      min: num100,
+      max: num100,
+    },
+    LeftArm: {
+      min: num70,
+      max: num70,
+    },
+    RightArm: {
+      min: num70,
+      max: num70,
+    },
+    LeftLeg: {
+      min: num80,
+      max: num80,
+    },
+    RightLeg: {
+      min: num80,
+      max: num80,
+    },
+  };
+};

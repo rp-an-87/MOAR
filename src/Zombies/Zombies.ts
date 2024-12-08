@@ -81,6 +81,5 @@ export const setUpZombies = (container: DependencyContainer) => {
   // eventConfig.eventBossSpawns = {
   //   zombies: eventConfig.eventBossSpawns.halloweenzombies,
   // };
-
-  eventConfig.eventGear[baseZombieSettings.name] = {};
+  eventConfig.eventGear[eventConfig.events[0].name] = {};
 };

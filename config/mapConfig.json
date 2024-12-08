@@ -10,7 +10,7 @@
     "maxBotPerZoneOverride": 10,
     "pmcWaveCount": 4,
     "scavWaveCount": 6,
-    "zombieWaveCount": 20
+    "zombieWaveCount": 6
   },
   "factoryNight": {
     "maxBotPerZoneOverride": 10,

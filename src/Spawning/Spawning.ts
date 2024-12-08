@@ -30,7 +30,7 @@ export const buildWaves = (container: DependencyContainer) => {
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
-  const { locations } = databaseServer.getTables();
+  const { locations, bots } = databaseServer.getTables();
 
   let config = cloneDeep(globalValues.baseConfig) as typeof _config;
 
@@ -135,7 +135,7 @@ export const buildWaves = (container: DependencyContainer) => {
   );
 
   if (config.zombiesEnabled) {
-    buildZombieWaves(config, locationList);
+    buildZombieWaves(config, locationList, bots);
   }
 
   // buildZombie
