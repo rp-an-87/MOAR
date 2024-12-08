@@ -28,26 +28,26 @@ enableMod: true,
 // Default 0.5 for scav, 0.8 for PMC, valid numbers 0 to 1
 // 0.7 would be 70% of all waves in the first half of the game, 30% in the last half.
 // 0.1 would be 10% of all waves in the first half of the game, 90% in the last half.
-"defaultScavStartWaveRatio": 0.5,
-"defaultPmcStartWaveRatio": 0.8,
+"scavWaveDistribution": 0.5,
+"pmcWaveDistribution": 0.8,
 
 //This multiplies the number of waves, I'd suggest playing with this for balance
-"defaultScavWaveMultiplier": 1,
-"defaultPmcWaveMultiplier": 1,
+"scavWaveQuantity": 1,
+"pmcWaveQuantity": 1,
 
 // To turn off, change this to false, 25 is recommended. Vanilla ranges per map.
 // This is the max spawned bots allowed at one time
-defaultMaxBotCap: 25,
+maxBotCap: 25,
 
 // The max groupsize for PMC or Scav waves.
-"defaultGroupMaxPMC":4,
-"defaultGroupMaxScav":3,
+"pmcMaxGroupSize":4,
+"scavMaxGroupSize":3,
 
 // Set to false to turn off, recommended 5 for most maps.
-defaultMaxBotPerZone: 5,
+maxBotPerZone: 5,
 
 // This gives snipers a chance to spawn with a buddy
-sniperBuddies: false,
+snipersHaveFriends: false,
 
 > Zone Changes
 

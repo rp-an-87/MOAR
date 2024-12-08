@@ -4,22 +4,27 @@
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
 
-  "defaultScavStartWaveRatio": 0.5,
-  "defaultScavWaveMultiplier": 1,
+  "scavWaveDistribution": 0.5,
+  "scavWaveQuantity": 1,
 
   "startingPmcs": false,
-  "defaultPmcStartWaveRatio": 0.8,
-  "defaultPmcWaveMultiplier": 1,
 
-  "defaultMaxBotCap": 25,
-  "defaultMaxBotPerZone": 7,
+  "pmcWaveDistribution": 0.8,
+  "pmcWaveQuantity": 1,
+
+  "zombiesEnabled": true,
+  "zombieWaveDistribution": 0.5,
+  "zombieWaveQuantity": 1,
+
+  "maxBotCap": 25,
+  "maxBotPerZone": 7,
 
   "moreScavGroups": false,
   "morePmcGroups": false,
-  "defaultGroupMaxPMC": 4,
-  "defaultGroupMaxScav": 4,
+  "pmcMaxGroupSize": 4,
+  "scavMaxGroupSize": 4,
 
-  "sniperBuddies": false,
+  "snipersHaveFriends": false,
 
   "noZoneDelay": false,
   "reducedZoneDelay": true,

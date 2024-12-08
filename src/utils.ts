@@ -1,7 +1,6 @@
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import PresetWeightings from "../config/PresetWeightings.json";
-import Presets from "../config/advanced/Presets.json";
-import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
+import Presets from "../config/Presets.json";
 import { globalValues } from "./GlobalValues";
 
 export const saveToFile = (data, filePath) => {

@@ -1,19 +1,19 @@
 {
   "enableBotSpawning": true,
 
-  "defaultScavStartWaveRatio": 0.5,
-  "defaultScavWaveMultiplier": 2.5,
+  "scavWaveDistribution": 0.5,
+  "scavWaveQuantity": 2.5,
 
-  "defaultPmcStartWaveRatio": 0.7,
-  "defaultPmcWaveMultiplier": 2.5,
+  "pmcWaveDistribution": 0.7,
+  "pmcWaveQuantity": 2.5,
 
-  "defaultMaxBotCap": 35,
-  "defaultMaxBotPerZone": 9,
+  "maxBotCap": 35,
+  "maxBotPerZone": 9,
 
-  "defaultGroupMaxPMC": 5,
-  "defaultGroupMaxScav": 5,
+  "pmcMaxGroupSize": 5,
+  "scavMaxGroupSize": 5,
 
-  "sniperBuddies": false,
+  "snipersHaveFriends": false,
 
   "noZoneDelay": false,
   "reducedZoneDelay": true,
