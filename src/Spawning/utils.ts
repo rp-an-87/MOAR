@@ -75,7 +75,7 @@ export const waveBuilder = (
     // if (wildSpawnType === "assault") console.log(slotMax, maxSlotsReached);
     if (maxSlotsReached <= 0) break;
   }
-  console.log(waves[0]);
+  // console.log(waves.map(({ slots_min }) => slots_min));
   return waves;
 };
 

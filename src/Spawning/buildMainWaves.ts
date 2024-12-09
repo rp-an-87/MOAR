@@ -40,7 +40,10 @@ export default function buildMainWaves(
       keyof typeof mapConfig
     >;
     const map = mapSettingsList[index];
-
+    // if (locationList[index].base.Events?.Halloween2024) {
+    //   delete locationList[index].base.Events.Halloween2024;
+    // }
+    // console.log(locationList[index].base.Events);
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 

@@ -4,6 +4,7 @@ export const defaultHostility = [
       "assault",
       "marksman",
       "pmcUSEC",
+      "pmcBEAR",
       "pmcBot",
       "exUsec",
       "pmcBot",
@@ -40,7 +41,9 @@ export const defaultHostility = [
     AlwaysEnemies: [
       "assault",
       "marksman",
+      "pmcUSEC",
       "pmcBEAR",
+      "pmcBot",
       "exUsec",
       "pmcBot",
       "bossBully",

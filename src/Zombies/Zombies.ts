@@ -24,16 +24,16 @@ export const baseZombieSettings = (enabled: boolean, count: number) =>
       zombieSettings: {
         enabled: true,
         mapInfectionAmount: {
-          Interchange: count,
-          Lighthouse: count,
-          RezervBase: count,
-          Sandbox: count,
-          Shoreline: count,
-          TarkovStreets: count,
-          Woods: count,
-          bigmap: count,
-          factory4: count,
-          laboratory: count,
+          Interchange: count === -1 ? randomNumber100() : count,
+          Lighthouse: count === -1 ? randomNumber100() : count,
+          RezervBase: count === -1 ? randomNumber100() : count,
+          Sandbox: count === -1 ? randomNumber100() : count,
+          Shoreline: count === -1 ? randomNumber100() : count,
+          TarkovStreets: count === -1 ? randomNumber100() : count,
+          Woods: count === -1 ? randomNumber100() : count,
+          bigmap: count === -1 ? randomNumber100() : count,
+          factory4: count === -1 ? randomNumber100() : count,
+          laboratory: count === -1 ? randomNumber100() : count,
         },
         disableBosses: [],
         disableWaves: [],
@@ -41,17 +41,20 @@ export const baseZombieSettings = (enabled: boolean, count: number) =>
     },
   } as unknown as ISeasonalEvent);
 
+const randomNumber100 = () => Math.round(Math.random() * 100);
+
 export const resetCurrentEvents = (
   container: DependencyContainer,
   enabled: boolean,
-  zombieWaveQuantity: number
+  zombieWaveQuantity: number,
+  random: boolean = false
 ) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
   const eventConfig = configServer.getConfig<ISeasonalEventConfig>(
     ConfigTypes.SEASONAL_EVENT
   );
 
-  let percentToShow = Math.round(zombieWaveQuantity * 100);
+  let percentToShow = random ? -1 : Math.round(zombieWaveQuantity * 100);
   if (percentToShow > 100) percentToShow = 100;
 
   eventConfig.events = [baseZombieSettings(enabled, percentToShow)];

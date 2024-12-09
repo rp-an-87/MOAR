@@ -29,6 +29,13 @@ export default function buildZombieWaves(
 
     const { zombieWaveCount } = mapConfig?.[configLocations[indx]];
 
+    if (location.Events?.Halloween2024?.MaxCrowdAttackSpawnLimit)
+      location.Events.Halloween2024.MaxCrowdAttackSpawnLimit = 100;
+    if (location.Events?.Halloween2024?.CrowdCooldownPerPlayerSec)
+      location.Events.Halloween2024.CrowdCooldownPerPlayerSec = 60;
+    if (location.Events?.Halloween2024?.CrowdCooldownPerPlayerSec)
+      location.Events.Halloween2024.CrowdsLimit = 10;
+
     if (!zombieWaveCount) return;
 
     const zombieTotalWaveCount = Math.round(
