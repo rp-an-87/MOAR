@@ -8,9 +8,5 @@
   "boss-invasion": 2,
   "rogue-invasion": 0,
   "raider-invasion": 0,
-  "insanity": 0,
-  "starting-pmcs-only-live-like": 0,
-  "starting-pmcs-only-more-scavs": 0,
-  "starting-pmcs-only-more-pmcs": 0,
-  "starting-pmcs-only-more-scavs-and-pmcs": 0
+  "insanity": 0
 }

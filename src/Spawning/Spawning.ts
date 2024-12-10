@@ -9,10 +9,11 @@ import { globalValues } from "../GlobalValues";
 import { cloneDeep, getRandomPresetOrCurrentlySelectedPreset } from "../utils";
 import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 import { resetCurrentEvents } from "../Zombies/Zombies";
-import buildMainWaves from "./buildMainWaves";
 import { originalMapList } from "./constants";
 import { buildBossWaves } from "./buildBossWaves";
 import buildZombieWaves from "./buildZombieWaves";
+import buildScavMarksmanWaves from "./buildScavMarksmanWaves";
+import buildPmcs from "./buildPmcs";
 
 export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
@@ -27,10 +28,11 @@ export const buildWaves = (container: DependencyContainer) => {
   locationConfig.enableBotTypeLimits = false;
   locationConfig.fitLootIntoContainerAttempts = 1;
   locationConfig.addCustomBotWavesToMaps = false;
+  locationConfig.customWaves = { boss: {}, normal: {} };
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
-  const { locations, bots } = databaseServer.getTables();
+  const { locations, bots, globals } = databaseServer.getTables();
 
   let config = cloneDeep(globalValues.baseConfig) as typeof _config;
 
@@ -122,22 +124,28 @@ export const buildWaves = (container: DependencyContainer) => {
   };
 
   // Make main waves
-  buildMainWaves(config, locationList, botConfig);
+  buildScavMarksmanWaves(config, locationList, botConfig);
+  buildPmcs(config, locationList, botConfig);
 
   // BOSS RELATED STUFF!
   buildBossWaves(config, locationList, botConfig);
 
   //Zombies
+  if (config.zombiesEnabled) {
+    buildZombieWaves(config, locationList, bots);
+  }
+
+  // console.log(gzHigh.base.BossLocationSpawn);
+  globals.config.SeasonActivity.InfectionHalloween.Enabled =
+    config.zombiesEnabled;
+  globals.config.SeasonActivity.InfectionHalloween.DisplayUIEnabled =
+    config.zombiesEnabled;
+
   resetCurrentEvents(
     container,
     config.zombiesEnabled,
     config.zombieWaveQuantity
   );
-
-  if (config.zombiesEnabled) {
-    buildZombieWaves(config, locationList, bots);
-  }
-
   // buildZombie
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {

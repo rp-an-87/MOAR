@@ -7,6 +7,7 @@ import {
 import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { SeasonalEventService } from "@spt/services/SeasonalEventService";
+import { zombieTypesCaps } from "../Spawning/utils";
 
 export const baseZombieSettings = (enabled: boolean, count: number) =>
   ({
@@ -20,7 +21,7 @@ export const baseZombieSettings = (enabled: boolean, count: number) =>
     settings: {
       enableSummoning: false,
       removeEntryRequirement: [],
-      replaceBotHostility: false,
+      replaceBotHostility: true,
       zombieSettings: {
         enabled: true,
         mapInfectionAmount: {
@@ -85,4 +86,76 @@ export const setUpZombies = (container: DependencyContainer) => {
   //   zombies: eventConfig.eventBossSpawns.halloweenzombies,
   // };
   eventConfig.eventGear[eventConfig.events[0].name] = {};
+  eventConfig.hostilitySettingsForEvent.zombies.default =
+    eventConfig.hostilitySettingsForEvent.zombies.default
+      .filter(({ BotRole }) => !["pmcBEAR", "pmcUSEC"].includes(BotRole))
+      .map((host) => ({
+        ...host,
+        AlwaysEnemies: [
+          "infectedAssault",
+          "infectedPmc",
+          "infectedCivil",
+          "infectedLaborant",
+          "infectedTagilla",
+          "pmcBEAR",
+          "pmcUSEC",
+        ],
+        AlwaysNeutral: [
+          "marksman",
+          "assault",
+          "bossTest",
+          "bossBully",
+          "followerTest",
+          "bossKilla",
+          "bossKojaniy",
+          "followerKojaniy",
+          "pmcBot",
+          "cursedAssault",
+          "bossGluhar",
+          "followerGluharAssault",
+          "followerGluharSecurity",
+          "followerGluharScout",
+          "followerGluharSnipe",
+          "followerSanitar",
+          "bossSanitar",
+          "test",
+          "assaultGroup",
+          "sectantWarrior",
+          "sectantPriest",
+          "bossTagilla",
+          "followerTagilla",
+          "exUsec",
+          "gifter",
+          "bossKnight",
+          "followerBigPipe",
+          "followerBirdEye",
+          "bossZryachiy",
+          "followerZryachiy",
+          "bossBoar",
+          "followerBoar",
+          "arenaFighter",
+          "arenaFighterEvent",
+          "bossBoarSniper",
+          "crazyAssaultEvent",
+          "peacefullZryachiyEvent",
+          "sectactPriestEvent",
+          "ravangeZryachiyEvent",
+          "followerBoarClose1",
+          "followerBoarClose2",
+          "bossKolontay",
+          "followerKolontayAssault",
+          "followerKolontaySecurity",
+          "shooterBTR",
+          "bossPartisan",
+          "spiritWinter",
+          "spiritSpring",
+          "peacemaker",
+          "skier",
+        ],
+        SavagePlayerBehaviour: "Neutral",
+        BearPlayerBehaviour: "AlwaysEnemies",
+        UsecPlayerBehaviour: "AlwaysEnemies",
+      }));
+
+  // console.log(eventConfig.hostilitySettingsForEvent.zombies.default);
 };

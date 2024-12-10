@@ -2,7 +2,7 @@
   "customs": {
     "pmcWaveCount": 9,
     "scavWaveCount": 21,
-    "zombieWaveCount": 21,
+    "zombieWaveCount": 9,
     "scavHotZones": ["ZoneDormitory"],
     "pmcHotZones": ["ZoneDormitory"]
   },
@@ -21,7 +21,7 @@
   "interchange": {
     "pmcWaveCount": 12,
     "scavWaveCount": 32,
-    "zombieWaveCount": 32,
+    "zombieWaveCount": 12,
     "scavHotZones": ["ZoneCenterBot", "ZoneCenter"]
   },
   "laboratory": {
@@ -32,43 +32,43 @@
   "lighthouse": {
     "pmcWaveCount": 10,
     "scavWaveCount": 20,
-    "zombieWaveCount": 20,
+    "zombieWaveCount": 10,
     "scavHotZones": ["Zone_LongRoad", "Zone_LongRoad"]
   },
   "rezervbase": {
     "pmcWaveCount": 9,
     "scavWaveCount": 24,
-    "zombieWaveCount": 24,
+    "zombieWaveCount": 9,
     "scavHotZones": ["ZoneRailStrorage"],
     "pmcHotZones": ["ZoneBarrack"]
   },
   "shoreline": {
     "pmcWaveCount": 12,
     "scavWaveCount": 32,
-    "zombieWaveCount": 32,
+    "zombieWaveCount": 12,
     "scavHotZones": ["ZoneSanatorium1"],
     "pmcHotZones": ["ZoneSanatorium2"]
   },
   "tarkovstreets": {
     "pmcWaveCount": 13,
     "scavWaveCount": 28,
-    "zombieWaveCount": 28
+    "zombieWaveCount": 13
   },
   "woods": {
     "pmcWaveCount": 10,
     "scavWaveCount": 28,
-    "zombieWaveCount": 28,
+    "zombieWaveCount": 10,
     "scavHotZones": ["ZoneWoodCutter"],
     "pmcHotZones": ["ZoneWoodCutter"]
   },
   "gzLow": {
     "pmcWaveCount": 9,
     "scavWaveCount": 18,
-    "zombieWaveCount": 18
+    "zombieWaveCount": 9
   },
   "gzHigh": {
     "pmcWaveCount": 9,
     "scavWaveCount": 18,
-    "zombieWaveCount": 18
+    "zombieWaveCount": 9
   }
 }

@@ -3,6 +3,7 @@ import {
   IWave,
   WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
+import _config from "../../config/config.json";
 
 export const waveBuilder = (
   totalWaves: number,
@@ -19,13 +20,12 @@ export const waveBuilder = (
   moreGroups?: boolean
 ): IWave[] => {
   if (totalWaves === 0) return [];
-  const BotSide = getBotSide(wildSpawnType);
 
   const averageTime = timeLimit / totalWaves;
   const firstHalf = Math.round(averageTime * (1 - waveDistribution));
   const secondHalf = Math.round(averageTime * (1 + waveDistribution));
   let timeStart = offset || 0;
-  const waves = [];
+  const waves: IWave[] = [];
   let maxSlotsReached = Math.round(1.3 * totalWaves);
   while (
     totalWaves > 0 &&
@@ -56,7 +56,7 @@ export const waveBuilder = (
 
     waves.push({
       BotPreset,
-      BotSide,
+      BotSide: getBotSide(wildSpawnType),
       SpawnPoints: getZone(
         specialZones,
         combinedZones,
@@ -67,8 +67,9 @@ export const waveBuilder = (
       slots_min: slotMin,
       time_min: starting || !max ? -1 : min,
       time_max: starting || !max ? -1 : max,
-      WildSpawnType: wildSpawnType,
+      WildSpawnType: wildSpawnType as WildSpawnType,
       number: waves.length,
+      sptId: wildSpawnType + waves.length,
       SpawnMode: ["regular", "pve"],
     });
     maxSlotsReached -= slotMax;
@@ -165,6 +166,13 @@ export const buildBossBasedWave = (
 };
 
 export const zombieTypes = [
+  "infectedassault",
+  "infectedpmc",
+  "infectedlaborant",
+  "infectedcivil",
+];
+
+export const zombieTypesCaps = [
   "infectedAssault",
   "infectedPmc",
   "infectedLaborant",
@@ -175,7 +183,80 @@ export const getRandomDifficulty = (num: number = 1.5) =>
   getDifficulty(Math.round(Math.random() * num * 10) / 10);
 
 export const getRandomZombieType = () =>
-  zombieTypes[Math.round((zombieTypes.length - 1) * Math.random())];
+  zombieTypesCaps[Math.round((zombieTypesCaps.length - 1) * Math.random())];
+
+export const buildPmcWaves = (
+  totalWaves: number,
+  escapeTimeLimit: number,
+  config: typeof _config,
+  bossZones: string[]
+): IBossLocationSpawn[] => {
+  let {
+    pmcMaxGroupSize,
+    pmcDifficulty,
+    startingPmcs,
+    morePmcGroups,
+    pmcWaveDistribution,
+  } = config;
+
+  const averageTime = escapeTimeLimit / totalWaves;
+  const firstHalf = Math.round(averageTime * (1 - pmcWaveDistribution));
+  const secondHalf = Math.round(averageTime * (1 + pmcWaveDistribution));
+  let timeStart = -1;
+  const waves: IBossLocationSpawn[] = [];
+  let maxSlotsReached = Math.round(1.3 * totalWaves);
+
+  const BossEscortAmount =
+    (morePmcGroups ? "" : "0,0,0,0,") +
+    new Array(pmcMaxGroupSize)
+      .fill("")
+      .map((_, i) => i)
+      .join(",");
+
+  while (totalWaves > 0) {
+    const accelerate = totalWaves > 5 && waves.length < totalWaves / 3;
+    const stage = startingPmcs
+      ? 10
+      : Math.round(
+          waves.length < Math.round(totalWaves * 0.5)
+            ? accelerate
+              ? firstHalf / 3
+              : firstHalf
+            : secondHalf
+        );
+
+    if (waves.length >= 1) timeStart = timeStart + stage;
+
+    // console.log(timeStart, BossEscortAmount);
+    const side = Math.random() > 0.5 ? "pmcBEAR" : "pmcUSEC";
+
+    const BossDifficult = getDifficulty(pmcDifficulty);
+
+    waves.push({
+      BossChance: 9999,
+      BossDifficult,
+      BossEscortAmount,
+      BossEscortDifficult: "normal",
+      BossEscortType: side,
+      BossName: side,
+      BossPlayer: false,
+      BossZone: bossZones.pop() || "",
+      Delay: 0,
+      IgnoreMaxBots: false,
+      RandomTimeSpawn: false,
+      Time: timeStart,
+      Supports: null,
+      TriggerId: "",
+      TriggerName: "",
+      spawnMode: ["regular", "pve"],
+    });
+
+    maxSlotsReached -= 1 + Math.round(pmcMaxGroupSize / 4);
+    if (maxSlotsReached <= 0) break;
+  }
+
+  return waves;
+};
 
 export const buildZombie = (
   totalWaves: number,
@@ -186,7 +267,7 @@ export const buildZombie = (
   const averageTime = (escapeTimeLimit * 60) / totalWaves;
   const firstHalf = Math.round(averageTime * (1 - waveDistribution));
   const secondHalf = Math.round(averageTime * (1 + waveDistribution));
-  let timeStart = 0;
+  let timeStart = 90;
   const waves: IBossLocationSpawn[] = [];
   let maxSlotsReached = Math.round(1.3 * totalWaves);
 

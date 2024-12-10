@@ -20,32 +20,6 @@
     "defaultPmcWaveMultiplier": 1.2,
     "mainBossChanceBuff": 25
   },
-  "starting-pmcs-only-live-like": {
-    "startingPmcs": true
-  },
-  "starting-pmcs-only-more-scavs": {
-    "startingPmcs": true,
-    "moreScavGroups": true,
-    "defaultGroupMaxScav": 5,
-    "defaultScavWaveMultiplier": 1.2
-  },
-  "starting-pmcs-only-more-pmcs": {
-    "startingPmcs": true,
-    "morePmcGroups": true,
-    "defaultGroupMaxPMC": 5,
-    "defaultPmcWaveMultiplier": 1.2
-  },
-  "starting-pmcs-only-more-scavs-and-pmcs": {
-    "startingPmcs": true,
-    "defaultMaxBotCap": 30,
-    "moreScavGroups": true,
-    "defaultGroupMaxScav": 5,
-    "morePmcGroups": true,
-    "defaultGroupMaxPMC": 5,
-    "defaultScavWaveMultiplier": 1.2,
-    "defaultPmcWaveMultiplier": 1.2,
-    "mainBossChanceBuff": 25
-  },
   "boss-invasion": {
     "bossOpenZones": true,
     "bossInvasion": true,

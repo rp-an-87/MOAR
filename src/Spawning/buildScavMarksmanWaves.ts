@@ -7,10 +7,10 @@ import {
   originalMapList,
 } from "./constants";
 import { MapSettings, shuffle, waveBuilder } from "./utils";
-import { IWave } from "@spt/models/eft/common/ILocationBase";
+import { IWave, WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 
-export default function buildMainWaves(
+export default function buildScavMarksmanWaves(
   config: typeof _config,
   locationList: ILocation[],
   botConfig: IBotConfig
@@ -24,15 +24,9 @@ export default function buildMainWaves(
     noZoneDelay,
     reducedZoneDelay,
     maxBotPerZone,
-    pmcWaveDistribution,
-    pmcWaveQuantity,
-    pmcMaxGroupSize,
     scavMaxGroupSize,
-    pmcDifficulty,
     scavDifficulty,
-    startingPmcs,
     moreScavGroups,
-    morePmcGroups,
   } = config;
 
   for (let index = 0; index < locationList.length; index++) {
@@ -40,22 +34,16 @@ export default function buildMainWaves(
       keyof typeof mapConfig
     >;
     const map = mapSettingsList[index];
-    // if (locationList[index].base.Events?.Halloween2024) {
-    //   delete locationList[index].base.Events.Halloween2024;
-    // }
-    // console.log(locationList[index].base.Events);
-    locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
-      defaultHostility;
 
     locationList[index].base = {
       ...locationList[index].base,
       ...{
-        NewSpawn: false,
-        OcculsionCullingEnabled: true,
-        OfflineNewSpawn: false,
-        OfflineOldSpawn: true,
-        OldSpawn: true,
-        BotSpawnCountStep: 0,
+        // NewSpawn: false,
+        // OcculsionCullingEnabled: true,
+        // OfflineNewSpawn: false,
+        // OfflineOldSpawn: true,
+        // OldSpawn: true,
+        // BotSpawnCountStep: 0,
       },
     };
 
@@ -69,12 +57,8 @@ export default function buildMainWaves(
         locationList[index].base.EscapeTimeLimit * 60;
     }
 
-    const {
-      maxBotPerZoneOverride,
-      EscapeTimeLimit,
-      pmcHotZones = [],
-      scavHotZones,
-    } = (mapConfig?.[map] as MapSettings) || {};
+    const { maxBotPerZoneOverride, EscapeTimeLimit, scavHotZones } =
+      (mapConfig?.[map] as MapSettings) || {};
 
     // Set per map EscapeTimeLimit
     if (EscapeTimeLimit) {
@@ -158,17 +142,6 @@ export default function buildMainWaves(
       ),
     ];
 
-    const pmcZones = [
-      ...new Set(
-        [...locationList[index].base.SpawnPointParams]
-          .filter(
-            ({ Categories, BotZoneName }) =>
-              !!BotZoneName && Categories.includes("Player")
-          )
-          .map(({ BotZoneName }) => BotZoneName)
-      ),
-    ];
-
     const mapPulledLocations = [...locationList[index].base.waves]
       .filter(
         ({ WildSpawnType, SpawnPoints }) =>
@@ -181,18 +154,8 @@ export default function buildMainWaves(
     ];
 
     let combinedPmcScavOpenZones = shuffle<string[]>([
-      ...new Set([...scavZones, ...pmcZones, ...mapPulledLocations]),
+      ...new Set([...scavZones, ...mapPulledLocations]),
     ]).filter((location) => !sniperLocations.includes(location));
-
-    let combinedPmcZones = combinedPmcScavOpenZones.filter(
-      (zone) => !zone.toLowerCase().includes("snipe")
-    );
-
-    // if (map === "customs") {
-    //   combinedPmcScavOpenZones = globalValues.addedMapZones["bigmap"];
-
-    //   console.log(combinedPmcScavOpenZones);
-    // }
 
     if (map === "tarkovstreets") {
       const sniperZones = shuffle(
@@ -200,15 +163,13 @@ export default function buildMainWaves(
           zone.toLowerCase().includes("snipe")
         )
       ) as string[];
-      combinedPmcScavOpenZones = [];
-      combinedPmcZones = [];
 
       snipers = waveBuilder(
         sniperZones.length,
         locationList[index].base.EscapeTimeLimit * 10,
         1,
-        "marksman",
-        0.8,
+        WildSpawnType.MARKSMAN,
+        0.5,
         false,
         2,
         [],
@@ -220,50 +181,7 @@ export default function buildMainWaves(
     }
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
-    const { pmcWaveCount, scavWaveCount } = mapConfig[map];
-
-    // Pmcs
-    const pmcCountPerSide = Math.round((pmcWaveCount * pmcWaveQuantity) / 2);
-    const middleIndex = Math.ceil(pmcHotZones.length / 2);
-    const firstHalf = pmcHotZones.splice(0, middleIndex);
-    const secondHalf = pmcHotZones.splice(-middleIndex);
-    const randomBoolean = Math.random() > 0.5;
-
-    if (map === "laboratory") {
-      combinedPmcZones = combinedPmcZones.filter(
-        (zone) => zone !== "BotZoneGate1"
-      );
-    }
-
-    const bearWaves = waveBuilder(
-      pmcCountPerSide,
-      timeLimit,
-      pmcWaveDistribution,
-      "pmcBEAR",
-      pmcDifficulty,
-      true,
-      pmcMaxGroupSize,
-      map === "gzHigh" ? [] : combinedPmcZones,
-      randomBoolean ? firstHalf : secondHalf,
-      1,
-      !!startingPmcs,
-      !!morePmcGroups
-    );
-
-    const usecWaves = waveBuilder(
-      pmcCountPerSide,
-      timeLimit,
-      pmcWaveDistribution,
-      "pmcUSEC",
-      pmcDifficulty,
-      true,
-      pmcMaxGroupSize,
-      map === "gzHigh" ? [] : combinedPmcZones,
-      randomBoolean ? secondHalf : firstHalf,
-      5,
-      !!startingPmcs,
-      !!morePmcGroups
-    );
+    const { scavWaveCount } = mapConfig[map];
 
     // Scavs
     const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveQuantity);
@@ -272,7 +190,7 @@ export default function buildMainWaves(
       scavTotalWaveCount,
       timeLimit,
       scavWaveDistribution,
-      "assault",
+      WildSpawnType.ASSAULT,
       scavDifficulty,
       false,
       scavMaxGroupSize,
@@ -286,21 +204,9 @@ export default function buildMainWaves(
     if (debug) {
       let total = 0;
       let totalscav = 0;
-      bearWaves.forEach(({ slots_max }) => (total += slots_max));
-      usecWaves.forEach(({ slots_max }) => (total += slots_max));
       scavWaves.forEach(({ slots_max }) => (totalscav += slots_max));
 
       console.log(configLocations[index]);
-      console.log(
-        "Pmcs:",
-        total,
-        "configVal",
-        Math.round((total / pmcWaveCount) * 100) / 100,
-        "configWaveCount",
-        pmcWaveCount,
-        "waveCount",
-        bearWaves.length + usecWaves.length
-      );
       console.log(
         "Scavs:",
         totalscav,
@@ -321,12 +227,7 @@ export default function buildMainWaves(
       time_max: snipKey * 120 + 120,
     }));
     // if (map === "customs") saveToFile({ scavWaves }, "scavWaves.json");
-    locationList[index].base.waves = [
-      ...finalSniperWaves,
-      ...scavWaves,
-      ...bearWaves,
-      ...usecWaves,
-    ]
+    locationList[index].base.waves = [...finalSniperWaves, ...scavWaves]
       .sort(({ time_min: a }, { time_min: b }) => a - b)
       .map((wave, i) => ({ ...wave, number: i + 1 }));
   }

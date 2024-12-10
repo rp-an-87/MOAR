@@ -35,6 +35,8 @@ export default function buildZombieWaves(
       location.Events.Halloween2024.CrowdCooldownPerPlayerSec = 60;
     if (location.Events?.Halloween2024?.CrowdCooldownPerPlayerSec)
       location.Events.Halloween2024.CrowdsLimit = 10;
+    if (location.Events?.Halloween2024?.CrowdAttackSpawnParams)
+      location.Events.Halloween2024.CrowdAttackSpawnParams = [];
 
     if (!zombieWaveCount) return;
 
