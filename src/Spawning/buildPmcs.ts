@@ -19,40 +19,38 @@ export default function buildPmcs(
 
     const { pmcHotZones = [] } = (mapConfig?.[map] as MapSettings) || {};
 
-    // const pmcZones = [
-    //   ...new Set(
-    //     [...locationList[index].base.SpawnPointParams]
-    //       .filter(
-    //         ({ Categories, BotZoneName }) =>
-    //           !!BotZoneName && Categories.includes("Player")
-    //       )
-    //       .map(({ BotZoneName }) => BotZoneName)
-    //   ),
-    // ];
-
     const pmcZones = shuffle<string[]>([
       ...new Set(
-        [...locationList[index].base.BossLocationSpawn]
+        [...locationList[index].base.SpawnPointParams]
           .filter(
-            ({ BossName }) =>
-              BossName && ["pmcBEAR", "pmcUSEC"].includes(BossName)
+            ({ Categories, BotZoneName }) =>
+              !!BotZoneName &&
+              Categories.includes("Player") &&
+              !BotZoneName.includes("snipe")
           )
-          .map(({ BossZone }) => BossZone)
+          .map(({ BotZoneName }) => BotZoneName)
       ),
       ...pmcHotZones,
     ]);
+
+    // console.log(pmcZones);
+
+    // const pmcZones = shuffle<string[]>([
+    //   ...new Set(
+    //     [...locationList[index].base.BossLocationSpawn]
+    //       .filter(
+    //         ({ BossName }) =>
+    //           BossName && ["pmcBEAR", "pmcUSEC"].includes(BossName)
+    //       )
+    //       .map(({ BossZone }) => BossZone)
+    //   ),
+    //   ...pmcHotZones,
+    // ]);
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
     const { pmcWaveCount } = mapConfig[map];
 
     const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
-
-    //Remove all other spawns from pool now that we have the spawns zone list
-    locationList[index].base.BossLocationSpawn = locationList[
-      index
-    ].base.BossLocationSpawn.filter(
-      (boss) => !bossesToRemoveFromPool.has(boss.BossName)
-    );
 
     // apply our new waves
     locationList[index].base.BossLocationSpawn = [

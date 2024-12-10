@@ -3,19 +3,18 @@ import _config from "../../config/config.json";
 import bossConfig from "../../config/bossConfig.json";
 import mapConfig from "../../config/mapConfig.json";
 import {
+  bossesToRemoveFromPool,
   configLocations,
   mainBossNameList,
   originalMapList,
 } from "./constants";
 import { buildBossBasedWave, shuffle } from "./utils";
 import { IBossLocationSpawn } from "@spt/models/eft/common/ILocationBase";
-import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { cloneDeep } from "../utils";
 
 export function buildBossWaves(
   config: typeof _config,
-  locationList: ILocation[],
-  botConfig: IBotConfig
+  locationList: ILocation[]
 ) {
   let {
     randomRaiderGroup,
@@ -41,6 +40,13 @@ export function buildBossWaves(
     if (disableBosses && !!locationList[indx].base?.BossLocationSpawn) {
       locationList[indx].base.BossLocationSpawn = [];
     } else {
+      //Remove all other spawns from pool now that we have the spawns zone list
+      locationList[indx].base.BossLocationSpawn = locationList[
+        indx
+      ].base.BossLocationSpawn.filter(
+        (boss) => !bossesToRemoveFromPool.has(boss.BossName)
+      );
+
       const location = locationList[indx];
 
       const defaultBossSettings =
@@ -112,8 +118,9 @@ export function buildBossWaves(
     }
   }
 
+  if (disableBosses) return;
   // Make boss Invasion
-  if (!disableBosses && bossInvasion) {
+  if (bossInvasion) {
     if (bossInvasionSpawnChance) {
       bossList.forEach((bossName) => {
         if (bosses[bossName])
@@ -188,9 +195,9 @@ export function buildBossWaves(
     });
 
     const bossesToAdd = Object.keys(mapBossConfig)
-      .filter((adjustName) => !adjusted.has(adjustName))
+      .filter((adjustName) => !adjusted.has(adjustName) && bosses[name])
       .map((name) => {
-        const newBoss: IBossLocationSpawn = cloneDeep(bosses[name]);
+        const newBoss: IBossLocationSpawn = cloneDeep(bosses[name] || {});
         newBoss.BossChance = mapBossConfig[name];
         return newBoss;
       });

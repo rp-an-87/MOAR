@@ -9,6 +9,7 @@ import { globalValues } from "./GlobalValues";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { setupRoutes } from "./Routes/routes";
 import { setUpZombies } from "./Zombies/Zombies";
+import checkPresetLogic from "./Tests/checkPresets";
 
 class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   postDBLoad(container: DependencyContainer): void {
@@ -21,6 +22,7 @@ class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
 
   postSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
+      checkPresetLogic(container);
       setUpZombies(container);
       globalValues.baseConfig = config;
       globalValues.overrideConfig = {};

@@ -6,7 +6,11 @@ import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
-import { cloneDeep, getRandomPresetOrCurrentlySelectedPreset } from "../utils";
+import {
+  cloneDeep,
+  getRandomPresetOrCurrentlySelectedPreset,
+  saveToFile,
+} from "../utils";
 import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 import { resetCurrentEvents } from "../Zombies/Zombies";
 import { originalMapList } from "./constants";
@@ -125,28 +129,30 @@ export const buildWaves = (container: DependencyContainer) => {
 
   // Make main waves
   buildScavMarksmanWaves(config, locationList, botConfig);
-  buildPmcs(config, locationList, botConfig);
-
-  // BOSS RELATED STUFF!
-  buildBossWaves(config, locationList, botConfig);
-
-  //Zombies
-  if (config.zombiesEnabled) {
-    buildZombieWaves(config, locationList, bots);
-  }
-
-  // console.log(gzHigh.base.BossLocationSpawn);
-  globals.config.SeasonActivity.InfectionHalloween.Enabled =
-    config.zombiesEnabled;
-  globals.config.SeasonActivity.InfectionHalloween.DisplayUIEnabled =
-    config.zombiesEnabled;
 
   resetCurrentEvents(
     container,
     config.zombiesEnabled,
     config.zombieWaveQuantity
   );
-  // buildZombie
+
+  // BOSS RELATED STUFF!
+  buildBossWaves(config, locationList);
+
+  //Zombies
+  if (config.zombiesEnabled) {
+    buildZombieWaves(config, locationList, bots);
+  }
+
+  globals.config.SeasonActivity.InfectionHalloween.Enabled =
+    config.zombiesEnabled;
+  globals.config.SeasonActivity.InfectionHalloween.DisplayUIEnabled =
+    config.zombiesEnabled;
+
+  buildPmcs(config, locationList);
+
+  // saveToFile(customs.base.BossLocationSpawn, "custums.json");
+
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {
       console.log("[MOAR] OH CRAP we have a problem!", name);
