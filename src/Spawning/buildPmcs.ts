@@ -45,7 +45,7 @@ export default function buildPmcs(
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
     const { pmcWaveCount } = mapConfig[map];
 
-    const waves = buildPmcWaves(timeLimit, pmcWaveCount, config, pmcZones);
+    const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
 
     //Remove all other spawns from pool now that we have the spawns zone list
     locationList[index].base.BossLocationSpawn = locationList[

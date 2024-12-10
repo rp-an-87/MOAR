@@ -204,7 +204,7 @@ export const buildPmcWaves = (
   const secondHalf = Math.round(averageTime * (1 + pmcWaveDistribution));
   let timeStart = -1;
   const waves: IBossLocationSpawn[] = [];
-  let maxSlotsReached = Math.round(1.3 * totalWaves);
+  let maxSlotsReached = totalWaves;
 
   const BossEscortAmount =
     (morePmcGroups ? "" : "0,0,0,0,") +
@@ -251,9 +251,11 @@ export const buildPmcWaves = (
       spawnMode: ["regular", "pve"],
     });
 
-    maxSlotsReached -= 1 + Math.round(pmcMaxGroupSize / 4);
+    maxSlotsReached -= 1;
     if (maxSlotsReached <= 0) break;
   }
+
+  // console.log(waves.length);
 
   return waves;
 };
