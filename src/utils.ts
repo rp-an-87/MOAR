@@ -1,4 +1,3 @@
-import { ILogger } from "@spt/models/spt/utils/ILogger";
 import PresetWeightings from "../config/PresetWeightings.json";
 import Presets from "../config/Presets.json";
 import { globalValues } from "./GlobalValues";

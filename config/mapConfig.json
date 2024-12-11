@@ -1,6 +1,6 @@
 {
   "customs": {
-    "pmcWaveCount": 9,
+    "pmcWaveCount": 10,
     "scavWaveCount": 21,
     "zombieWaveCount": 9,
     "scavHotZones": ["ZoneDormitory"],
@@ -8,24 +8,24 @@
   },
   "factoryDay": {
     "maxBotPerZoneOverride": 10,
-    "pmcWaveCount": 4,
-    "scavWaveCount": 6,
+    "pmcWaveCount": 6,
+    "scavWaveCount": 8,
     "zombieWaveCount": 6
   },
   "factoryNight": {
     "maxBotPerZoneOverride": 10,
-    "pmcWaveCount": 4,
-    "scavWaveCount": 6,
+    "pmcWaveCount": 6,
+    "scavWaveCount": 8,
     "zombieWaveCount": 6
   },
   "interchange": {
-    "pmcWaveCount": 12,
+    "pmcWaveCount": 13,
     "scavWaveCount": 32,
     "zombieWaveCount": 12,
     "scavHotZones": ["ZoneCenterBot", "ZoneCenter"]
   },
   "laboratory": {
-    "pmcWaveCount": 9,
+    "pmcWaveCount": 11,
     "scavWaveCount": 0,
     "zombieWaveCount": 12
   },

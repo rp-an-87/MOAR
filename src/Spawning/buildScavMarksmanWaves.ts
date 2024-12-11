@@ -38,12 +38,12 @@ export default function buildScavMarksmanWaves(
     locationList[index].base = {
       ...locationList[index].base,
       ...{
-        // NewSpawn: false,
-        // OcculsionCullingEnabled: true,
-        // OfflineNewSpawn: false,
-        // OfflineOldSpawn: true,
-        // OldSpawn: true,
-        // BotSpawnCountStep: 0,
+        NewSpawn: false,
+        OcculsionCullingEnabled: true,
+        OfflineNewSpawn: false,
+        OfflineOldSpawn: true,
+        OldSpawn: true,
+        BotSpawnCountStep: 0,
       },
     };
 

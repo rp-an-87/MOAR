@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRandomPreset = exports.cloneDeep = exports.saveToFile = void 0;
+exports.kebabToTitle = exports.getRandomPresetOrCurrentlySelectedPreset = exports.cloneDeep = exports.saveToFile = void 0;
 const PresetWeightings_json_1 = __importDefault(require("../config/PresetWeightings.json"));
-const Presets_json_1 = __importDefault(require("../config/advanced/Presets.json"));
+const Presets_json_1 = __importDefault(require("../config/Presets.json"));
+const GlobalValues_1 = require("./GlobalValues");
 const saveToFile = (data, filePath) => {
     var fs = require("fs");
     let dir = __dirname;
@@ -19,7 +20,18 @@ const saveToFile = (data, filePath) => {
 exports.saveToFile = saveToFile;
 const cloneDeep = (objectToClone) => JSON.parse(JSON.stringify(objectToClone));
 exports.cloneDeep = cloneDeep;
-const getRandomPreset = (logger) => {
+const getRandomPresetOrCurrentlySelectedPreset = () => {
+    switch (true) {
+        case GlobalValues_1.globalValues.forcedPreset.toLowerCase() === "custom":
+            return {};
+        case !GlobalValues_1.globalValues.forcedPreset:
+            GlobalValues_1.globalValues.forcedPreset = "random";
+            break;
+        case GlobalValues_1.globalValues.forcedPreset === "random":
+            break;
+        default:
+            return Presets_json_1.default[GlobalValues_1.globalValues.forcedPreset];
+    }
     const all = [];
     const itemKeys = Object.keys(PresetWeightings_json_1.default);
     for (const key of itemKeys) {
@@ -28,8 +40,13 @@ const getRandomPreset = (logger) => {
         }
     }
     const preset = all[Math.round(Math.random() * (all.length - 1))];
-    console.log(`[MOAR] Bot preset set to: ${preset.toUpperCase()}`);
+    GlobalValues_1.globalValues.currentPreset = preset;
     return Presets_json_1.default[preset];
 };
-exports.getRandomPreset = getRandomPreset;
+exports.getRandomPresetOrCurrentlySelectedPreset = getRandomPresetOrCurrentlySelectedPreset;
+const kebabToTitle = (str) => str
+    .split("-")
+    .map((word) => word.slice(0, 1).toUpperCase() + word.slice(1))
+    .join(" ");
+exports.kebabToTitle = kebabToTitle;
 //# sourceMappingURL=utils.js.map
