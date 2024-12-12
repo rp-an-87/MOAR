@@ -1,6 +1,6 @@
 {
   "customs": {
-    "pmcWaveCount": 10,
+    "pmcWaveCount": 12,
     "scavWaveCount": 21,
     "zombieWaveCount": 9,
     "scavHotZones": ["ZoneDormitory"],
@@ -8,66 +8,66 @@
   },
   "factoryDay": {
     "maxBotPerZoneOverride": 10,
-    "pmcWaveCount": 6,
-    "scavWaveCount": 8,
+    "pmcWaveCount": 8,
+    "scavWaveCount": 9,
     "zombieWaveCount": 6
   },
   "factoryNight": {
     "maxBotPerZoneOverride": 10,
-    "pmcWaveCount": 6,
-    "scavWaveCount": 8,
+    "pmcWaveCount": 8,
+    "scavWaveCount": 9,
     "zombieWaveCount": 6
   },
   "interchange": {
-    "pmcWaveCount": 13,
+    "pmcWaveCount": 14,
     "scavWaveCount": 32,
     "zombieWaveCount": 12,
     "scavHotZones": ["ZoneCenterBot", "ZoneCenter"]
   },
   "laboratory": {
-    "pmcWaveCount": 11,
+    "pmcWaveCount": 10,
     "scavWaveCount": 0,
     "zombieWaveCount": 12
   },
   "lighthouse": {
-    "pmcWaveCount": 10,
+    "pmcWaveCount": 12,
     "scavWaveCount": 20,
     "zombieWaveCount": 10,
     "scavHotZones": ["Zone_LongRoad", "Zone_LongRoad"]
   },
   "rezervbase": {
-    "pmcWaveCount": 9,
+    "pmcWaveCount": 11,
     "scavWaveCount": 24,
     "zombieWaveCount": 9,
     "scavHotZones": ["ZoneRailStrorage"],
     "pmcHotZones": ["ZoneBarrack"]
   },
   "shoreline": {
-    "pmcWaveCount": 12,
+    "pmcWaveCount": 14,
     "scavWaveCount": 32,
     "zombieWaveCount": 12,
     "scavHotZones": ["ZoneSanatorium1"],
     "pmcHotZones": ["ZoneSanatorium2"]
   },
   "tarkovstreets": {
-    "pmcWaveCount": 13,
+    "pmcWaveCount": 16,
     "scavWaveCount": 28,
     "zombieWaveCount": 13
   },
   "woods": {
-    "pmcWaveCount": 10,
+    "pmcWaveCount": 14,
     "scavWaveCount": 28,
     "zombieWaveCount": 10,
     "scavHotZones": ["ZoneWoodCutter"],
     "pmcHotZones": ["ZoneWoodCutter"]
   },
   "gzLow": {
-    "pmcWaveCount": 9,
+    "pmcWaveCount": 10,
     "scavWaveCount": 18,
     "zombieWaveCount": 9
   },
   "gzHigh": {
-    "pmcWaveCount": 9,
+    "pmcWaveCount": 12,
     "scavWaveCount": 18,
     "zombieWaveCount": 9
   }

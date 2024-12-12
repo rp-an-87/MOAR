@@ -2,25 +2,24 @@ import { IBotConfig } from "@spt/models/spt/config/IBotConfig.d";
 import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig.d";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import _config from "../../config/config.json";
+import _mapConfig from "../../config/mapConfig.json";
 import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
-import {
-  cloneDeep,
-  getRandomPresetOrCurrentlySelectedPreset,
-  saveToFile,
-} from "../utils";
+import { cloneDeep, getRandomPresetOrCurrentlySelectedPreset } from "../utils";
 import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
-import { resetCurrentEvents } from "../Zombies/Zombies";
 import { originalMapList } from "./constants";
 import { buildBossWaves } from "./buildBossWaves";
 import buildZombieWaves from "./buildZombieWaves";
 import buildScavMarksmanWaves from "./buildScavMarksmanWaves";
 import buildPmcs from "./buildPmcs";
+import { setEscapeTimeOverrides } from "./utils";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 
 export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
+  const Logger = container.resolve<ILogger>("WinstonLogger");
   const pmcConfig = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
   const botConfig = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
 
@@ -30,7 +29,7 @@ export const buildWaves = (container: DependencyContainer) => {
 
   locationConfig.rogueLighthouseSpawnTimeSettings.waitTimeSeconds = 60;
   locationConfig.enableBotTypeLimits = false;
-  locationConfig.fitLootIntoContainerAttempts = 1;
+  locationConfig.fitLootIntoContainerAttempts = 1; // Move to ALP
   locationConfig.addCustomBotWavesToMaps = false;
   locationConfig.customWaves = { boss: {}, normal: {} };
 
@@ -127,14 +126,10 @@ export const buildWaves = (container: DependencyContainer) => {
     rezervbase: { pmcbot: { min: 0, max: 0 } },
   };
 
+  setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
+
   // Make main waves
   buildScavMarksmanWaves(config, locationList, botConfig);
-
-  resetCurrentEvents(
-    container,
-    config.zombiesEnabled,
-    config.zombieWaveQuantity
-  );
 
   // BOSS RELATED STUFF!
   buildBossWaves(config, locationList);
@@ -144,14 +139,7 @@ export const buildWaves = (container: DependencyContainer) => {
     buildZombieWaves(config, locationList, bots);
   }
 
-  globals.config.SeasonActivity.InfectionHalloween.Enabled =
-    config.zombiesEnabled;
-  globals.config.SeasonActivity.InfectionHalloween.DisplayUIEnabled =
-    config.zombiesEnabled;
-
   buildPmcs(config, locationList);
-
-  // saveToFile(customs.base.BossLocationSpawn, "custums.json");
 
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {

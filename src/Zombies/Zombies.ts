@@ -68,7 +68,6 @@ export const resetCurrentEvents = (
   seasonalEventService.currentlyActiveEvents = [];
   seasonalEventService.christmasEventActive = false;
   seasonalEventService.halloweenEventActive = false;
-
   // Then re-calculate the cached data
   seasonalEventService.cacheActiveEvents();
   // seasonalEventService.addEventBossesToMaps("halloweenzombies");

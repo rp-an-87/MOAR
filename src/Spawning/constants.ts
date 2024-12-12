@@ -187,3 +187,18 @@ export const mainBossNameList = [
   "bossPartisan",
   "bossBully",
 ];
+
+export const defaultEscapeTimes = {
+  customs: 40,
+  factoryDay: 20,
+  factoryNight: 25,
+  interchange: 40,
+  laboratory: 35,
+  lighthouse: 40,
+  rezervbase: 40,
+  shoreline: 45,
+  tarkovstreets: 50,
+  woods: 40,
+  gzLow: 35,
+  gzHigh: 35,
+};
