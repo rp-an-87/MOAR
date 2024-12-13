@@ -13,4 +13,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           asset-name: "DewardianDev-MOAR-*.*.*.zip"
-          file: "out/dist/DewardianDev-MOAR-*.*.*.zip"
+          file: "dist/DewardianDev-MOAR-*.*.*.zip"
