@@ -4,7 +4,10 @@ jobs:
   pre-release:
     name: "Pre Release"
     runs-on: "ubuntu-latest"
-
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
