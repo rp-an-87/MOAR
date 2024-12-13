@@ -1,15 +1,12 @@
 on: push
 
 jobs:
-  release-on-merge:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      uses: djnicholson/release-action@v2.11
-    with:
-      token: ${{ secrets.GITHUB_TOKEN }}
-      asset-name: "DewardianDev-MOAR-*.*.*.zip"
-      file: "out/dist/DewardianDev-MOAR-*.*.*.zipF"
+      - name: Mark release
+        uses: djnicholson/release-action@v2.11
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          asset-name: "DewardianDev-MOAR-*.*.*.zip"
+          file: "out/dist/DewardianDev-MOAR-*.*.*.zipF"
