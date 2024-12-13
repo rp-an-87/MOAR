@@ -17,12 +17,13 @@ jobs:
     - name: Print package.json version (before)
       id: versionstep
       run: |
-        echo "version=Moar v$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+        echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
       working-directory: ${{ github.workspace }}
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: ${{ steps.versionstep.outputs.version }}
+        title: "Moar - v${{ steps.versionstep.outputs.version }}"
         prerelease: false
         files: |
           ./dist/*.zip
