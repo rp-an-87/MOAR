@@ -16,4 +16,4 @@ jobs:
           prerelease: false
           title: "Latest build"
           files: |
-            *.zip
+            ./dist/*.zip
