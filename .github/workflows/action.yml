@@ -11,13 +11,18 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+       - name: Print package.json version (before)
+         id: versionstep
+          run: |
+            echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+          working-directory: ${{ github.workspace }}
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "$(jq -r .version package.json)"
+          automatic_release_tag: "${{ steps.versionstep.outputs.version }}"
           prerelease: false
           files: |
             ./dist/*.zip
