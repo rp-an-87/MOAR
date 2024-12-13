@@ -3,7 +3,7 @@ name: "tagged-release"
 on: push
 
 jobs:
-  pre-release:
+  tagged-release:
     name: "Pre Release"
     runs-on: "ubuntu-latest"
     permissions:
@@ -11,11 +11,12 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v2
+        with:
+        fetch-depth: 2
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Latest build"
+          prerelease: false
           files: |
-            *.zip
+            DewardianDev-MOAR-*.zip
