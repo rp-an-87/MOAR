@@ -13,4 +13,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           asset-name: "*.zip"
-          file: "dist/*.zip"
+          file: "./dist/*.zip"
