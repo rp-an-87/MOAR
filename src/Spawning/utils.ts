@@ -4,6 +4,9 @@ import {
   WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
 import _config from "../../config/config.json";
+import { ILocation } from "@spt/models/eft/common/ILocation";
+import { defaultEscapeTimes } from "./constants";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 
 export const waveBuilder = (
   totalWaves: number,
@@ -206,14 +209,12 @@ export const buildPmcWaves = (
   const waves: IBossLocationSpawn[] = [];
   let maxSlotsReached = totalWaves;
 
-  const BossEscortAmount =
-    (morePmcGroups ? "" : "0,0,0,0,") +
-    new Array(pmcMaxGroupSize)
-      .fill("")
-      .map((_, i) => i)
-      .join(",");
-
   while (totalWaves > 0) {
+    const bossEscortAmount = Math.round(
+      (morePmcGroups ? 1 : Math.random()) *
+        Math.random() *
+        (pmcMaxGroupSize - 1)
+    );
     const accelerate = totalWaves > 5 && waves.length < totalWaves / 3;
     const stage = startingPmcs
       ? 10
@@ -235,7 +236,7 @@ export const buildPmcWaves = (
     waves.push({
       BossChance: 9999,
       BossDifficult,
-      BossEscortAmount,
+      BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: "normal",
       BossEscortType: side,
       BossName: side,
@@ -254,11 +255,9 @@ export const buildPmcWaves = (
       spawnMode: ["regular", "pve"],
     });
 
-    maxSlotsReached -= 1;
+    maxSlotsReached -= 1 + bossEscortAmount;
     if (maxSlotsReached <= 0) break;
   }
-
-  // console.log(waves.length);
 
   return waves;
 };
@@ -367,4 +366,61 @@ export const getHealthBodyPartsByPercentage = (num: number) => {
       max: num80,
     },
   };
+};
+
+export interface MapConfigType {
+  pmcWaveCount?: number;
+  scavWaveCount?: number;
+  zombieWaveCount?: number;
+  scavHotZones?: string[];
+  pmcHotZones?: string[];
+  EscapeTimeLimitOverride?: number;
+}
+
+export const setEscapeTimeOverrides = (
+  locationList: ILocation[],
+  mapConfig: Record<string, MapConfigType>,
+  logger: ILogger,
+  config: typeof _config
+) => {
+  for (let index = 0; index < locationList.length; index++) {
+    const mapSettingsList = Object.keys(mapConfig) as Array<
+      keyof typeof mapConfig
+    >;
+
+    const map = mapSettingsList[index];
+    const override = mapConfig[map].EscapeTimeLimitOverride;
+    const hardcodedEscapeLimitMax = 5;
+
+    if (
+      !override &&
+      locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] >
+        hardcodedEscapeLimitMax
+    ) {
+      const maxLimit = defaultEscapeTimes[map] * hardcodedEscapeLimitMax;
+      logger.warning(
+        `[MOAR] EscapeTimeLimit set too high on ${map}\nEscapeTimeLimit changed from ${locationList[index].base.EscapeTimeLimit} => ${maxLimit}\n`
+      );
+      locationList[index].base.EscapeTimeLimit = maxLimit;
+    }
+
+    if (override && locationList[index].base.EscapeTimeLimit !== override) {
+      console.log(
+        `[Moar] Set ${map}'s Escape time limit to ${override} from ${locationList[index].base.EscapeTimeLimit}\n`
+      );
+      locationList[index].base.EscapeTimeLimit = override;
+      locationList[index].base.EscapeTimeLimitCoop = override;
+      locationList[index].base.EscapeTimeLimitPVE = override;
+    }
+
+    if (
+      config.startingPmcs &&
+      locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] > 2
+    ) {
+      logger.warning(
+        `[MOAR] Average EscapeTimeLimit is too high (greater than 2x) to enable starting PMCS\nStarting PMCS has been turned off to prevent performance issues.\n`
+      );
+      config.startingPmcs = false;
+    }
+  }
 };

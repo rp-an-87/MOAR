@@ -3,6 +3,7 @@ import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import {
   configLocations,
+  defaultEscapeTimes,
   defaultHostility,
   originalMapList,
 } from "./constants";
@@ -183,8 +184,20 @@ export default function buildScavMarksmanWaves(
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
     const { scavWaveCount } = mapConfig[map];
 
+    const escapeTimeLimitRatio = Math.round(
+      locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
+    );
+
     // Scavs
-    const scavTotalWaveCount = Math.round(scavWaveCount * scavWaveQuantity);
+    const scavTotalWaveCount = Math.round(
+      scavWaveCount * scavWaveQuantity * escapeTimeLimitRatio
+    );
+
+    config.debug &&
+      escapeTimeLimitRatio !== 1 &&
+      console.log(
+        `${map} Scav wave count changed from ${scavWaveCount} to ${scavTotalWaveCount} due to escapeTimeLimit adjustment`
+      );
 
     const scavWaves = waveBuilder(
       scavTotalWaveCount,
@@ -202,7 +215,6 @@ export default function buildScavMarksmanWaves(
     );
 
     if (debug) {
-      let total = 0;
       let totalscav = 0;
       scavWaves.forEach(({ slots_max }) => (totalscav += slots_max));
 
