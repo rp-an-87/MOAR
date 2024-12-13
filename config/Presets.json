@@ -46,7 +46,6 @@
     "pmcMaxGroupSize": 6,
     "scavMaxGroupSize": 6,
     "snipersHaveFriends": true,
-    "reducedZoneDelay": true,
     "bossOpenZones": true,
     "randomRaiderGroup": true,
     "randomRaiderGroupChance": 50,

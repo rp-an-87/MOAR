@@ -7,12 +7,14 @@
     "pmcHotZones": ["ZoneDormitory"]
   },
   "factoryDay": {
+    "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 10,
     "pmcWaveCount": 8,
     "scavWaveCount": 9,
     "zombieWaveCount": 6
   },
   "factoryNight": {
+    "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 10,
     "pmcWaveCount": 8,
     "scavWaveCount": 9,

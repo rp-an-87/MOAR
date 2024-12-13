@@ -12,7 +12,7 @@ export const waveBuilder = (
   totalWaves: number,
   timeLimit: number,
   waveDistribution: number,
-  wildSpawnType: "marksman" | "assault" | "pmcBEAR" | "pmcUSEC",
+  wildSpawnType: "marksman" | "assault",
   difficulty: number,
   isPlayer: boolean,
   maxSlots: number,
@@ -324,6 +324,7 @@ export const buildZombie = (
 export interface MapSettings {
   EscapeTimeLimit?: number;
   maxBotPerZoneOverride?: number;
+  maxBotCapOverride?: number;
   pmcHotZones?: string[];
   scavHotZones?: string[];
   pmcWaveCount: number;

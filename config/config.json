@@ -27,8 +27,6 @@
 
   "snipersHaveFriends": false,
 
-  "noZoneDelay": false,
-  "reducedZoneDelay": true,
   "bossOpenZones": false,
 
   "randomRaiderGroup": false,
