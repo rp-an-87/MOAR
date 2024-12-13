@@ -12,5 +12,5 @@ jobs:
         uses: djnicholson/release-action@v2.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          asset-name: "DewardianDev-MOAR-*.zip"
-          file: "dist/DewardianDev-MOAR-*.zip"
+          asset-name: "*.zip"
+          file: "dist/*.zip"
