@@ -1,15 +1,16 @@
 on: push
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  pre-release:
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+
     steps:
-      - name: Mark release
-        uses: djnicholson/release-action@v2.11
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          file: "./dist/"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Latest build"
+          files: |
+            *.zip
