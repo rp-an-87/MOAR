@@ -4,7 +4,7 @@ on: push
 
 jobs:
   tagged-release:
-    name: "Pre Release"
+    name: "Tagged Release"
     runs-on: "ubuntu-latest"
     permissions:
       contents: write
