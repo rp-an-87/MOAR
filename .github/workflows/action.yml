@@ -12,5 +12,4 @@ jobs:
         uses: djnicholson/release-action@v2.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          asset-name: "*.zip"
-          file: "./dist/*.zip"
+          file: "./dist/"
