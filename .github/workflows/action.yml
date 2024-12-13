@@ -3,6 +3,10 @@ on: push
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Mark release
         uses: djnicholson/release-action@v2.11
