@@ -112,7 +112,7 @@ export default function buildScavMarksmanWaves(
       ];
     }
 
-    const scavZones = [
+    const scavZones = shuffle<string[]>([
       ...new Set(
         [...locationList[index].base.SpawnPointParams]
           .filter(
@@ -124,7 +124,7 @@ export default function buildScavMarksmanWaves(
           .map(({ BotZoneName }) => BotZoneName)
           .filter((name) => !sniperLocations.has(name))
       ),
-    ];
+    ]);
 
     // Reduced Zone Delay
     locationList[index].base.SpawnPointParams = locationList[
@@ -171,15 +171,13 @@ export default function buildScavMarksmanWaves(
     );
 
     if (snipersHaveFriends)
-      snipers = shuffle<IWave[]>(
-        snipers.map((wave) => ({
-          ...wave,
-          slots_min: 0,
-          ...(snipersHaveFriends && wave.slots_max < 2
-            ? { slots_min: 1, slots_max: 2 }
-            : {}),
-        }))
-      );
+      snipers = snipers.map((wave) => ({
+        ...wave,
+        slots_min: 0,
+        ...(snipersHaveFriends && wave.slots_max < 2
+          ? { slots_min: 1, slots_max: 2 }
+          : {}),
+      }));
 
     const scavWaves = waveBuilder(
       scavTotalWaveCount,

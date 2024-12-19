@@ -24,7 +24,7 @@ export default function buildPmcs(
 
     const { pmcHotZones = [] } = (mapConfig?.[map] as MapSettings) || {};
 
-    const pmcZones = shuffle<string[]>([
+    let pmcZones = shuffle<string[]>([
       ...new Set(
         [...locationList[index].base.SpawnPointParams]
           .filter(
@@ -63,6 +63,14 @@ export default function buildPmcs(
     const totalWaves = Math.round(
       pmcWaveCount * config.pmcWaveQuantity * escapeTimeLimitRatio
     );
+    // console.log(pmcZones.length, totalWaves);
+    const numberOfZoneless = totalWaves - pmcZones.length;
+    if (numberOfZoneless > 0) {
+      const addEmpty = new Array(numberOfZoneless).fill("");
+      pmcZones = shuffle<string[]>([...pmcZones, ...addEmpty]);
+    }
+
+    // console.log(numberOfZoneless, pmcZones);
 
     if (config.debug) {
       console.log(`${map} PMC count ${totalWaves} \n`);
@@ -74,7 +82,7 @@ export default function buildPmcs(
     }
 
     const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
-
+    // console.log(waves.map(({ BossZone }) => BossZone));
     // apply our new waves
     locationList[index].base.BossLocationSpawn = [
       ...waves,

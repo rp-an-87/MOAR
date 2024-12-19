@@ -16,6 +16,7 @@ import buildScavMarksmanWaves from "./buildScavMarksmanWaves";
 import buildPmcs from "./buildPmcs";
 import { setEscapeTimeOverrides } from "./utils";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
+import updateSpawnLocations from "./updateSpawnLocations";
 
 export const buildWaves = (container: DependencyContainer) => {
   const configServer = container.resolve<ConfigServer>("ConfigServer");
@@ -125,6 +126,8 @@ export const buildWaves = (container: DependencyContainer) => {
     laboratory: { pmcbot: { min: 0, max: 0 } },
     rezervbase: { pmcbot: { min: 0, max: 0 } },
   };
+
+  updateSpawnLocations(locationList);
 
   setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
 
