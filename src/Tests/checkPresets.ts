@@ -10,7 +10,7 @@ export default function checkPresetLogic(container: DependencyContainer) {
   for (const key in presetWeightings) {
     if (presets[key] === undefined) {
       Logger.error(
-        `\nMOAR: No preset found in PresetWeightings.json for preset "${key}" in Presets.json`
+        `\n[MOAR]: No preset found in PresetWeightings.json for preset "${key}" in Presets.json`
       );
     }
   }
@@ -20,7 +20,7 @@ export default function checkPresetLogic(container: DependencyContainer) {
     for (const id in preset) {
       if (config[id] === undefined) {
         Logger.error(
-          `\nMOAR: No associated key found in config.json called "${id}" for preset "${key}" in Presets.json`
+          `\n[MOAR]: No associated key found in config.json called "${id}" for preset "${key}" in Presets.json`
         );
       }
     }

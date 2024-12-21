@@ -20,7 +20,7 @@ class Moar {
             GlobalValues_1.globalValues.baseConfig = config_json_2.default;
             GlobalValues_1.globalValues.overrideConfig = {};
             const logger = container.resolve("WinstonLogger");
-            logger.info("\nMOAR: Starting up, may the bots ever be in your favour!");
+            logger.info("\n[MOAR]: Starting up, may the bots ever be in your favour!");
             (0, Spawning_1.buildWaves)(container);
         }
     }

@@ -157,10 +157,10 @@ export default function buildScavMarksmanWaves(
 
     let snipers = waveBuilder(
       sniperLocations.size,
-      Math.round(timeLimit / 2),
+      Math.round(timeLimit / 4),
       0.5,
       WildSpawnType.MARKSMAN,
-      0.5,
+      0.7,
       false,
       2,
       [],

@@ -20,7 +20,7 @@ class Moar implements IPostSptLoadMod, IPreSptLoadMod {
       globalValues.baseConfig = config;
       globalValues.overrideConfig = {};
       const logger = container.resolve<ILogger>("WinstonLogger");
-      logger.info("\nMOAR: Starting up, may the bots ever be in your favour!");
+      logger.info("\n[MOAR]: Starting up, may the bots ever be in your favour!");
       buildWaves(container);
     }
   }

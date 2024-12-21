@@ -370,8 +370,9 @@ export const getHealthBodyPartsByPercentage = (num: number) => {
 };
 
 export interface MapConfigType {
-  pmcWaveCount?: number;
-  scavWaveCount?: number;
+  spawnMinDistance: number;
+  pmcWaveCount: number;
+  scavWaveCount: number;
   zombieWaveCount?: number;
   scavHotZones?: string[];
   pmcHotZones?: string[];
