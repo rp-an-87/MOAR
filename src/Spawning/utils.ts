@@ -50,11 +50,11 @@ export const waveBuilder = (
     const BotPreset = getDifficulty(difficulty);
     // console.log(wildSpawnType, BotPreset);
     // Math.round((1 - waves.length / totalWaves) * maxSlots) || 1;
-    const slotMax =
-      Math.round(
-        (moreGroups ? Math.random() : Math.random() * Math.random()) * maxSlots
-      ) || 1;
+    let slotMax = Math.round(
+      (moreGroups ? Math.random() : Math.random() * Math.random()) * maxSlots
+    );
 
+    if (slotMax < 1) slotMax = 1;
     const slotMin = (Math.round(Math.random() * slotMax) || 1) - 1;
 
     waves.push({
@@ -210,11 +210,13 @@ export const buildPmcWaves = (
   let maxSlotsReached = totalWaves;
 
   while (totalWaves > 0) {
-    const bossEscortAmount = Math.round(
+    let bossEscortAmount = Math.round(
       (morePmcGroups ? 1 : Math.random()) *
         Math.random() *
         (pmcMaxGroupSize - 1)
     );
+
+    if (bossEscortAmount < 0) bossEscortAmount = 0;
     const accelerate = totalWaves > 5 && waves.length < totalWaves / 3;
     const stage = startingPmcs
       ? 10
