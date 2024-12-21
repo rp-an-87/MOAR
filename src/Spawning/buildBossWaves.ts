@@ -33,6 +33,15 @@ export function buildBossWaves(
     (bossName) => !["bossKnight"].includes(bossName)
   );
 
+  const allBosses: Record<string, IBossLocationSpawn> = {};
+  for (const key in locationList) {
+    locationList[key].base.BossLocationSpawn.forEach((boss) => {
+      if (!allBosses[boss.BossName]) {
+        allBosses[boss.BossName] = boss;
+      }
+    });
+  }
+
   // CreateBossList
   const bosses: Record<string, IBossLocationSpawn> = {};
   for (let indx = 0; indx < locationList.length; indx++) {
@@ -118,123 +127,152 @@ export function buildBossWaves(
     }
   }
 
-  if (disableBosses) return;
-  // Make boss Invasion
-  if (bossInvasion) {
-    if (bossInvasionSpawnChance) {
-      bossList.forEach((bossName) => {
-        if (bosses[bossName])
-          bosses[bossName].BossChance = bossInvasionSpawnChance;
-      });
-    }
-
-    for (let key = 0; key < locationList.length; key++) {
-      //Gather bosses to avoid duplicating.
-      let bossLocations = "";
-
-      const duplicateBosses = [
-        ...locationList[key].base.BossLocationSpawn.filter(
-          ({ BossName, BossZone }) => {
-            bossLocations += BossZone + ",";
-            return bossList.includes(BossName);
-          }
-        ).map(({ BossName }) => BossName),
-        "bossKnight", // So knight doesn't invade
-      ];
-
-      const uniqueBossZones = bossOpenZones
-        ? ""
-        : [
-            ...new Set(
-              bossLocations
-                .split(",")
-                .filter(
-                  (zone) => !!zone && !zone.toLowerCase().includes("snipe")
-                )
-            ),
-          ].join(",");
-
-      //Build bosses to add
-      const bossesToAdd = shuffle<IBossLocationSpawn[]>(Object.values(bosses))
-        .filter(({ BossName }) => !duplicateBosses.includes(BossName))
-        .map((boss, j) => ({
-          ...boss,
-          BossZone: uniqueBossZones,
-          BossEscortAmount:
-            boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1",
-          ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
-        }));
-
-      // UpdateBosses
-      locationList[key].base.BossLocationSpawn = [
-        ...locationList[key].base.BossLocationSpawn,
-        ...bossesToAdd,
-      ];
-    }
-  }
-
-  //   Object.keys(bosses).map((name) => ({
-  //     name,
-  //     chance: bosses[name].BossChance,
-  //   }))
-  // );
-
-  configLocations.forEach((name, index) => {
-    const bossLocationSpawn = locationList[index].base.BossLocationSpawn;
-    const mapBossConfig = cloneDeep(bossConfig[name] || {});
-
-    const adjusted = new Set<string>([]);
-
-    bossLocationSpawn.forEach(({ BossName, BossChance }, bossIndex) => {
-      if (typeof mapBossConfig[BossName] === "number") {
-        locationList[index].base.BossLocationSpawn[bossIndex].BossChance =
-          mapBossConfig[BossName];
-        // console.log(name, BossName, mapBossConfig[BossName]);
-        adjusted.add(BossName);
+  if (!disableBosses) {
+    // Make boss Invasion
+    if (bossInvasion) {
+      if (bossInvasionSpawnChance) {
+        bossList.forEach((bossName) => {
+          if (bosses[bossName])
+            bosses[bossName].BossChance = bossInvasionSpawnChance;
+        });
       }
-    });
 
-    const bossesToAdd = Object.keys(mapBossConfig)
-      .filter((adjustName) => !adjusted.has(adjustName) && bosses[name])
-      .map((name) => {
-        const newBoss: IBossLocationSpawn = cloneDeep(bosses[name] || {});
-        newBoss.BossChance = mapBossConfig[name];
-        return newBoss;
-      });
+      for (let key = 0; key < locationList.length; key++) {
+        //Gather bosses to avoid duplicating.
+        let bossLocations = "";
 
-    if (bossOpenZones || mainBossChanceBuff) {
-      locationList[index].base?.BossLocationSpawn?.forEach((boss, key) => {
-        if (bossList.includes(boss.BossName)) {
-          if (bossOpenZones) {
-            locationList[index].base.BossLocationSpawn[key] = {
-              ...locationList[index].base.BossLocationSpawn[key],
-              BossZone: "",
-            };
+        const duplicateBosses = [
+          ...locationList[key].base.BossLocationSpawn.filter(
+            ({ BossName, BossZone }) => {
+              bossLocations += BossZone + ",";
+              return bossList.includes(BossName);
+            }
+          ).map(({ BossName }) => BossName),
+          "bossKnight", // So knight doesn't invade
+        ];
+
+        const uniqueBossZones = bossOpenZones
+          ? ""
+          : [
+              ...new Set(
+                bossLocations
+                  .split(",")
+                  .filter(
+                    (zone) => !!zone && !zone.toLowerCase().includes("snipe")
+                  )
+              ),
+            ].join(",");
+
+        //Build bosses to add
+        const bossesToAdd = shuffle<IBossLocationSpawn[]>(Object.values(bosses))
+          .filter(({ BossName }) => !duplicateBosses.includes(BossName))
+          .map((boss, j) => ({
+            ...boss,
+            BossZone: uniqueBossZones,
+            BossEscortAmount:
+              boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1",
+            ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
+          }));
+
+        // UpdateBosses
+        locationList[key].base.BossLocationSpawn = [
+          ...locationList[key].base.BossLocationSpawn,
+          ...bossesToAdd,
+        ];
+      }
+    }
+    let hasChangedBossSpawns = false;
+    // console.log(Object.keys(allBosses));
+    configLocations.forEach((mapName, index) => {
+      const bossLocationSpawn = locationList[index].base.BossLocationSpawn;
+      const mapBossConfig: Record<string, number> = cloneDeep(
+        bossConfig[mapName] || {}
+      );
+      // if (Object.keys(mapBossConfig).length === 0) console.log(name, "empty");
+      const adjusted = new Set<string>([]);
+
+      bossLocationSpawn.forEach(({ BossName, BossChance }, bossIndex) => {
+        if (typeof mapBossConfig[BossName] === "number") {
+          if (BossChance !== mapBossConfig[BossName]) {
+            if (!hasChangedBossSpawns) {
+              console.log(
+                `\n[MOAR]: --- Adjusting default boss spawn rates --- `
+              );
+              hasChangedBossSpawns = true;
+            }
+            console.log(
+              `[MOAR]: ${mapName} ${BossName}: ${locationList[index].base.BossLocationSpawn[bossIndex].BossChance} => ${mapBossConfig[BossName]}`
+            );
+            locationList[index].base.BossLocationSpawn[bossIndex].BossChance =
+              mapBossConfig[BossName];
           }
-
-          if (!!boss.BossChance && mainBossChanceBuff > 0) {
-            locationList[index].base.BossLocationSpawn[key] = {
-              ...locationList[index].base.BossLocationSpawn[key],
-              BossChance:
-                boss.BossChance + mainBossChanceBuff > 100
-                  ? 100
-                  : Math.round(boss.BossChance + mainBossChanceBuff),
-            };
-          }
+          adjusted.add(BossName);
         }
       });
-    }
 
-    locationList[index].base.BossLocationSpawn = [
-      ...locationList[index].base.BossLocationSpawn,
-      ...bossesToAdd,
-    ];
+      const bossesToAdd = Object.keys(mapBossConfig)
+        .filter(
+          (adjustName) => !adjusted.has(adjustName) && !!allBosses[adjustName]
+        )
+        .map((bossName) => {
+          `[MOAR]: Adding non-default boss ${bossName} to ${originalMapList[index]}`;
 
-    bossesToAdd.length &&
+          const newBoss: IBossLocationSpawn = cloneDeep(
+            allBosses[bossName] || {}
+          );
+          newBoss.BossChance = mapBossConfig[bossName];
+          // console.log(
+          //   "Adding boss",
+          //   bossName,
+          //   "to ",
+          //   originalMapList[index],
+          //   "spawn chance =>",
+          //   mapBossConfig[bossName]
+          // );
+          return newBoss;
+        });
+
+      // console.log(bossesToAdd);
+
+      if (bossOpenZones || mainBossChanceBuff) {
+        locationList[index].base?.BossLocationSpawn?.forEach((boss, key) => {
+          if (bossList.includes(boss.BossName)) {
+            if (bossOpenZones) {
+              locationList[index].base.BossLocationSpawn[key] = {
+                ...locationList[index].base.BossLocationSpawn[key],
+                BossZone: "",
+              };
+            }
+
+            if (!!boss.BossChance && mainBossChanceBuff > 0) {
+              locationList[index].base.BossLocationSpawn[key] = {
+                ...locationList[index].base.BossLocationSpawn[key],
+                BossChance:
+                  boss.BossChance + mainBossChanceBuff > 100
+                    ? 100
+                    : Math.round(boss.BossChance + mainBossChanceBuff),
+              };
+            }
+          }
+        });
+      }
+
+      locationList[index].base.BossLocationSpawn = [
+        ...locationList[index].base.BossLocationSpawn,
+        ...bossesToAdd,
+      ];
+
+      bossesToAdd.length &&
+        console.log(
+          `[MOAR] Adding the following bosses to map ${
+            configLocations[index]
+          }: ${bossesToAdd.map(({ BossName }) => BossName)}`
+        );
+    });
+    if (hasChangedBossSpawns) {
       console.log(
-        `[MOAR] Adding the following bosses to map ${
-          configLocations[index]
-        }: ${bossesToAdd.map(({ BossName }) => BossName)}`
+        `[MOAR]: --- Adjusting default boss spawn rates complete --- \n`
       );
-  });
+    }
+  }
 }

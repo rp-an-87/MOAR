@@ -21,8 +21,8 @@
     "bossBully": 0
   },
   "customs": {
-    "bossKnight": 15,
-    "bossPartisan": 15,
+    "bossKnight": 30,
+    "bossPartisan": 30,
     "bossBully": 30
   },
   "factoryDay": {
@@ -36,15 +36,15 @@
   },
   "laboratory": {},
   "lighthouse": {
-    "bossKnight": 15,
-    "bossPartisan": 15
+    "bossKnight": 30,
+    "bossPartisan": 30
   },
   "rezervbase": {
     "bossGluhar": 30
   },
   "shoreline": {
-    "bossKnight": 15,
-    "bossPartisan": 15,
+    "bossKnight": 30,
+    "bossPartisan": 30,
     "bossSanitar": 30
   },
   "tarkovstreets": {
@@ -53,8 +53,8 @@
   },
   "woods": {
     "bossKojaniy": 30,
-    "bossKnight": 15,
-    "bossPartisan": 15
+    "bossKnight": 30,
+    "bossPartisan": 30
   },
   "gzLow": {},
   "gzHigh": {
