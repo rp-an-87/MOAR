@@ -1,43 +1,38 @@
 import { ILocation } from "@spt/models/eft/common/ILocation";
-import { originalMapList } from "./constants";
+import { configLocations } from "./constants";
+import mapConfig from "../../config/mapConfig.json";
 
 export default function updateSpawnLocations(locationList: ILocation[]) {
   for (let index = 0; index < locationList.length; index++) {
-    const map = originalMapList[index];
+    const map = configLocations[index];
 
-    // if (index !== 1 && index !== 2) {
-    let limit = 50;
-    switch (map) {
-      case "factory4_day":
-      case "laboratory":
-      case "factory4_night":
-        limit = 20;
-        break;
-      case "bigmap":
+    const limit = mapConfig[map].spawnMinDistance;
 
-      case "sandbox_high":
-      case "sandbox":
-        limit = 30;
-        break;
-
-      default:
-        limit = 40;
-        break;
-    }
     // console.log("\n" + map);
     locationList[index].base.SpawnPointParams.forEach(
-      ({ ColliderParams, BotZoneName }, innerIndex) => {
+      (
+        { ColliderParams, BotZoneName, DelayToCanSpawnSec, Categories, Sides },
+        innerIndex
+      ) => {
         if (
           ColliderParams?._props?.Radius !== undefined &&
-          ColliderParams?._props?.Radius < limit
+          ColliderParams?._props?.Radius < limit &&
+          !BotZoneName?.toLowerCase().includes("snipe") &&
+          DelayToCanSpawnSec < 300
         ) {
-        //   console.log(ColliderParams._props.Radius, "=>", limit, BotZoneName);
+          // console.log(
+          //   "----",
+          //   ColliderParams._props.Radius,
+          //   "=>",
+          //   limit,
+          //   BotZoneName
+          // );
+
           locationList[index].base.SpawnPointParams[
             innerIndex
           ].ColliderParams._props.Radius = limit;
         }
       }
     );
-    // }
   }
 }

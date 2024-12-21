@@ -1,12 +1,18 @@
 {
   "customs": {
+    "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 21,
     "zombieWaveCount": 9,
-    "scavHotZones": ["ZoneDormitory"],
-    "pmcHotZones": ["ZoneDormitory"]
+    "scavHotZones": [
+      "ZoneDormitory"
+    ],
+    "pmcHotZones": [
+      "ZoneDormitory"
+    ]
   },
   "factoryDay": {
+    "spawnMinDistance": 20,
     "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 10,
     "pmcWaveCount": 8,
@@ -14,6 +20,7 @@
     "zombieWaveCount": 6
   },
   "factoryNight": {
+    "spawnMinDistance": 20,
     "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 10,
     "pmcWaveCount": 8,
@@ -21,54 +28,81 @@
     "zombieWaveCount": 6
   },
   "interchange": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 32,
     "zombieWaveCount": 12,
-    "scavHotZones": ["ZoneCenterBot", "ZoneCenter"]
+    "scavHotZones": [
+      "ZoneCenterBot",
+      "ZoneCenter"
+    ]
   },
   "laboratory": {
+    "spawnMinDistance": 20,
     "pmcWaveCount": 10,
     "scavWaveCount": 0,
     "zombieWaveCount": 12
   },
   "lighthouse": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 12,
     "scavWaveCount": 20,
     "zombieWaveCount": 10,
-    "scavHotZones": ["Zone_LongRoad", "Zone_LongRoad"]
+    "scavHotZones": [
+      "Zone_LongRoad",
+      "Zone_LongRoad"
+    ]
   },
   "rezervbase": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 11,
     "scavWaveCount": 24,
     "zombieWaveCount": 9,
-    "scavHotZones": ["ZoneRailStrorage"],
-    "pmcHotZones": ["ZoneBarrack"]
+    "scavHotZones": [
+      "ZoneRailStrorage"
+    ],
+    "pmcHotZones": [
+      "ZoneBarrack"
+    ]
   },
   "shoreline": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 32,
     "zombieWaveCount": 12,
-    "scavHotZones": ["ZoneSanatorium1"],
-    "pmcHotZones": ["ZoneSanatorium2"]
+    "scavHotZones": [
+      "ZoneSanatorium1"
+    ],
+    "pmcHotZones": [
+      "ZoneSanatorium2"
+    ]
   },
   "tarkovstreets": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 16,
     "scavWaveCount": 28,
     "zombieWaveCount": 13
   },
   "woods": {
+    "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
     "zombieWaveCount": 10,
-    "scavHotZones": ["ZoneWoodCutter"],
-    "pmcHotZones": ["ZoneWoodCutter"]
+    "scavHotZones": [
+      "ZoneWoodCutter"
+    ],
+    "pmcHotZones": [
+      "ZoneWoodCutter"
+    ]
   },
   "gzLow": {
+    "spawnMinDistance": 30,
     "pmcWaveCount": 10,
     "scavWaveCount": 18,
     "zombieWaveCount": 9
   },
   "gzHigh": {
+    "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 18,
     "zombieWaveCount": 9
