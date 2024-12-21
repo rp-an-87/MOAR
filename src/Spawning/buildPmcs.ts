@@ -30,27 +30,20 @@ export default function buildPmcs(
           .filter(
             ({ Categories, BotZoneName }) =>
               !!BotZoneName &&
-              Categories.includes("Player") &&
+              (Categories.includes("Player") || map === "laboratory") &&
               !BotZoneName.includes("snipe")
           )
-          .map(({ BotZoneName }) => BotZoneName)
+          .map(({ BotZoneName, ...rest }) => {
+            return BotZoneName;
+          })
       ),
       ...pmcHotZones,
     ]);
-
-    // console.log(pmcZones);
-
-    // const pmcZones = shuffle<string[]>([
-    //   ...new Set(
-    //     [...locationList[index].base.BossLocationSpawn]
-    //       .filter(
-    //         ({ BossName }) =>
-    //           BossName && ["pmcBEAR", "pmcUSEC"].includes(BossName)
-    //       )
-    //       .map(({ BossZone }) => BossZone)
-    //   ),
-    //   ...pmcHotZones,
-    // ]);
+    // Make labs have only named zones
+    if (map === "laboratory") {
+      pmcZones = new Array(10).fill(pmcZones).flat(1);
+      // console.log(pmcZones);
+    }
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
@@ -69,8 +62,7 @@ export default function buildPmcs(
       const addEmpty = new Array(numberOfZoneless).fill("");
       pmcZones = shuffle<string[]>([...pmcZones, ...addEmpty]);
     }
-
-    // console.log(numberOfZoneless, pmcZones);
+    // if (map === "laboratory") console.log(numberOfZoneless, pmcZones);
 
     if (config.debug) {
       console.log(`${map} PMC count ${totalWaves} \n`);
@@ -82,7 +74,8 @@ export default function buildPmcs(
     }
 
     const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
-    // console.log(waves.map(({ BossZone }) => BossZone));
+    // if (map === "laboratory")
+    //   console.log(waves.map(({ BossZone }) => BossZone));
     // apply our new waves
     locationList[index].base.BossLocationSpawn = [
       ...waves,
