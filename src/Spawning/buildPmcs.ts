@@ -30,7 +30,9 @@ export default function buildPmcs(
           .filter(
             ({ Categories, BotZoneName }) =>
               !!BotZoneName &&
-              (Categories.includes("Player") || map === "laboratory") &&
+              (Categories.includes("Player") ||
+                (map === "laboratory" &&
+                  !BotZoneName.includes("BotZoneGate"))) &&
               !BotZoneName.includes("snipe")
           )
           .map(({ BotZoneName, ...rest }) => {
