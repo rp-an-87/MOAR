@@ -30,10 +30,9 @@ export default function buildPmcs(
           .filter(
             ({ Categories, BotZoneName }) =>
               !!BotZoneName &&
-              (Categories.includes("Player") ||
-                (map === "laboratory" &&
-                  !BotZoneName.includes("BotZoneGate"))) &&
-              !BotZoneName.includes("snipe")
+              !BotZoneName.includes("snipe") &&
+              (Categories.includes("Player") || Categories.includes("All")) &&
+              !BotZoneName.includes("BotZoneGate")
           )
           .map(({ BotZoneName, ...rest }) => {
             return BotZoneName;
@@ -41,13 +40,11 @@ export default function buildPmcs(
       ),
       ...pmcHotZones,
     ]);
+
     // Make labs have only named zones
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
-      // console.log(pmcZones);
     }
-
-    const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
     const { pmcWaveCount } = mapConfig[map];
 
@@ -58,13 +55,12 @@ export default function buildPmcs(
     const totalWaves = Math.round(
       pmcWaveCount * config.pmcWaveQuantity * escapeTimeLimitRatio
     );
-    // console.log(pmcZones.length, totalWaves);
+
     const numberOfZoneless = totalWaves - pmcZones.length;
     if (numberOfZoneless > 0) {
       const addEmpty = new Array(numberOfZoneless).fill("");
       pmcZones = shuffle<string[]>([...pmcZones, ...addEmpty]);
     }
-    // if (map === "laboratory") console.log(numberOfZoneless, pmcZones);
 
     if (config.debug) {
       console.log(`${map} PMC count ${totalWaves} \n`);
@@ -74,11 +70,9 @@ export default function buildPmcs(
           `${map} PMC wave count changed from ${pmcWaveCount} to ${totalWaves} due to escapeTimeLimit adjustment`
         );
     }
+    const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
     const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
-    // if (map === "laboratory")
-    //   console.log(waves.map(({ BossZone }) => BossZone));
-    // apply our new waves
     locationList[index].base.BossLocationSpawn = [
       ...waves,
       ...locationList[index].base.BossLocationSpawn,

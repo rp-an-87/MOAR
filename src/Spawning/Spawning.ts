@@ -7,7 +7,11 @@ import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { DependencyContainer } from "tsyringe";
 import { globalValues } from "../GlobalValues";
-import { cloneDeep, getRandomPresetOrCurrentlySelectedPreset } from "../utils";
+import {
+  cloneDeep,
+  getRandomPresetOrCurrentlySelectedPreset,
+  saveToFile,
+} from "../utils";
 import { ILocationConfig } from "@spt/models/spt/config/ILocationConfig.d";
 import { originalMapList } from "./constants";
 import { buildBossWaves } from "./buildBossWaves";
@@ -127,7 +131,7 @@ export const buildWaves = (container: DependencyContainer) => {
     rezervbase: { pmcbot: { min: 0, max: 0 } },
   };
 
-  updateSpawnLocations(locationList);
+  updateSpawnLocations(locationList, config);
 
   setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
 
@@ -143,7 +147,7 @@ export const buildWaves = (container: DependencyContainer) => {
   }
 
   buildPmcs(config, locationList);
-
+ 
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {
       console.log("[MOAR] OH CRAP we have a problem!", name);
