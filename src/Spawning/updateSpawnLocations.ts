@@ -111,10 +111,10 @@ export default function updateSpawnLocations(
             locationList[index].base.SpawnPointParams[
               innerIndex
             ].DelayToCanSpawnSec = Math.round(
-              DelayToCanSpawnSec * Math.random() * Math.random()
+              DelayToCanSpawnSec * Math.random() * Math.random() * 0.5
             );
+
             // console.log(
-            //   count,
             //   BotZoneName,
             //   DelayToCanSpawnSec,
             //   locationList[index].base.SpawnPointParams[innerIndex]
