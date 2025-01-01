@@ -12,6 +12,18 @@ export default function updateSpawnLocations(
     // console.log(map);
     const limit = mapConfig[map].spawnMinDistance;
 
+    const InfiltrationList = [
+      ...new Set(
+        locationList[index].base.SpawnPointParams.filter(
+          ({ Infiltration }) => Infiltration
+        ).map(({ Infiltration }) => Infiltration)
+      ),
+    ];
+
+    // console.log(map, InfiltrationList);
+    const getRandomInfil = (): string =>
+      InfiltrationList[Math.floor(Math.random() * InfiltrationList.length)];
+    // console.log(InfiltrationList);
     // console.log("\n" + map);
     locationList[index].base.SpawnPointParams.forEach(
       (
@@ -30,13 +42,11 @@ export default function updateSpawnLocations(
           !BotZoneName?.toLowerCase().includes("snipe") &&
           DelayToCanSpawnSec < 41
         ) {
-          // Make it so players can spawn anywhere.
+          // Make it so players/pmcs can spawn anywhere.
           if (
             config.playerOpenZones &&
             !!Infiltration &&
-            (Sides.includes("Pmc") || Sides.includes("All")) &&
-            Categories.length === 1 &&
-            Categories[0] === "Player"
+            (Sides.includes("Pmc") || Sides.includes("All"))
           ) {
             locationList[index].base.SpawnPointParams[innerIndex].Categories = [
               "Player",
@@ -44,6 +54,10 @@ export default function updateSpawnLocations(
               innerIndex % 2 === 0 ? "Group" : "Opposite",
             ];
 
+            locationList[index].base.SpawnPointParams[innerIndex].Sides = [
+              "Pmc",
+              "All",
+            ];
             // console.log(
             //   BotZoneName || "none",
             //   locationList[index].base.SpawnPointParams[innerIndex].Categories,
@@ -65,12 +79,21 @@ export default function updateSpawnLocations(
 
           if (!Infiltration && config.allOpenZones) {
             locationList[index].base.SpawnPointParams[innerIndex].Categories = [
+              "All",
               "Bot",
               "Player",
               "Coop",
               innerIndex % 2 === 0 ? "Group" : "Opposite",
             ];
+
+            locationList[index].base.SpawnPointParams[innerIndex].Infiltration =
+              getRandomInfil();
+            // console.log(
+            //   locationList[index].base.SpawnPointParams[innerIndex].Infiltration
+            // );
             locationList[index].base.SpawnPointParams[innerIndex].Sides = [
+              "Pmc",
+              "Savage",
               "All",
             ];
           }

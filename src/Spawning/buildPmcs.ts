@@ -38,7 +38,6 @@ export default function buildPmcs(
             return BotZoneName;
           })
       ),
-      ...pmcHotZones,
     ]);
 
     // Make labs have only named zones
@@ -70,9 +69,17 @@ export default function buildPmcs(
           `${map} PMC wave count changed from ${pmcWaveCount} to ${totalWaves} due to escapeTimeLimit adjustment`
         );
     }
+
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
-    const waves = buildPmcWaves(pmcWaveCount, timeLimit, config, pmcZones);
+    const waves = buildPmcWaves(
+      totalWaves,
+      timeLimit,
+      config,
+      pmcZones,
+      pmcHotZones
+    );
+    
     locationList[index].base.BossLocationSpawn = [
       ...waves,
       ...locationList[index].base.BossLocationSpawn,

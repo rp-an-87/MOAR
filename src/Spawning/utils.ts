@@ -193,9 +193,23 @@ export const buildPmcWaves = (
   pmcTotal: number,
   escapeTimeLimit: number,
   config: typeof _config,
-  bossZones: string[]
+  bossZones: string[],
+  hotZones: string[]
 ): IBossLocationSpawn[] => {
+  // console.log(pmcTotal)
   if (!pmcTotal) return [];
+  const halfIndex = Math.round(bossZones.length * 0.75); //Put hotzones in the 2 - 4 spawns
+  // console.log(bossZones.length);
+  bossZones = [
+    ...bossZones.slice(0, halfIndex),
+    ...hotZones,
+    ...bossZones.slice(halfIndex),
+  ];
+
+  // console.log(bossZones.length, hotZones.length);
+  // console.log(bossZones);
+  pmcTotal = pmcTotal + hotZones.length;
+
   let {
     pmcMaxGroupSize,
     pmcDifficulty,
@@ -203,6 +217,7 @@ export const buildPmcWaves = (
     morePmcGroups,
     pmcWaveDistribution,
   } = config;
+
   const averageTime = (escapeTimeLimit * 0.8) / pmcTotal;
 
   const waves: IBossLocationSpawn[] = [];
