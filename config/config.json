@@ -10,7 +10,7 @@
   "startingPmcs": false,
 
   "playerOpenZones": false,
-  "pmcOpenZones": false,
+  "pmcOpenZones": true,
   "allOpenZones": false,
 
   "pmcWaveDistribution": 0.7,

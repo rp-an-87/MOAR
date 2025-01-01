@@ -66,6 +66,7 @@ export default function updateSpawnLocations(
           }
 
           if (
+            !config.allOpenZones &&
             config.pmcOpenZones &&
             Categories.includes("Bot") &&
             Sides[0] === "Savage" &&
@@ -79,7 +80,6 @@ export default function updateSpawnLocations(
 
           if (!Infiltration && config.allOpenZones) {
             locationList[index].base.SpawnPointParams[innerIndex].Categories = [
-              "All",
               "Bot",
               "Player",
               "Coop",
