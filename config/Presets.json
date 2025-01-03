@@ -6,12 +6,13 @@
     "scavWaveQuantity": 1.2
   },
   "more-pmcs": {
+    "scavWaveDistribution": 0.4,
     "morePmcGroups": true,
     "pmcMaxGroupSize": 5,
     "pmcWaveQuantity": 1.2
   },
   "more-scavs-and-pmcs": {
-    "maxBotCap": 30,
+    "scavWaveDistribution": 0.4,
     "moreScavGroups": true,
     "scavMaxGroupSize": 5,
     "morePmcGroups": true,
@@ -39,8 +40,6 @@
     "scavWaveDistribution": 0.4,
     "scavWaveQuantity": 1.3,
     "pmcWaveQuantity": 1.3,
-    "maxBotCap": 30,
-    "maxBotPerZone": 9,
     "moreScavGroups": true,
     "morePmcGroups": true,
     "pmcMaxGroupSize": 6,

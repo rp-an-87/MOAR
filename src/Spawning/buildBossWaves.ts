@@ -139,36 +139,20 @@ export function buildBossWaves(
 
       for (let key = 0; key < locationList.length; key++) {
         //Gather bosses to avoid duplicating.
-        let bossLocations = "";
 
         const duplicateBosses = [
           ...locationList[key].base.BossLocationSpawn.filter(
-            ({ BossName, BossZone }) => {
-              bossLocations += BossZone + ",";
-              return bossList.includes(BossName);
-            }
+            ({ BossName, BossZone }) => bossList.includes(BossName)
           ).map(({ BossName }) => BossName),
           "bossKnight", // So knight doesn't invade
         ];
-
-        const uniqueBossZones = bossOpenZones
-          ? ""
-          : [
-              ...new Set(
-                bossLocations
-                  .split(",")
-                  .filter(
-                    (zone) => !!zone && !zone.toLowerCase().includes("snipe")
-                  )
-              ),
-            ].join(",");
 
         //Build bosses to add
         const bossesToAdd = shuffle<IBossLocationSpawn[]>(Object.values(bosses))
           .filter(({ BossName }) => !duplicateBosses.includes(BossName))
           .map((boss, j) => ({
             ...boss,
-            BossZone: uniqueBossZones,
+            BossZone: "",
             BossEscortAmount:
               boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1",
             ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
@@ -268,7 +252,22 @@ export function buildBossWaves(
             configLocations[index]
           }: ${bossesToAdd.map(({ BossName }) => BossName)}`
         );
+      // console.log(locationList[index].base.BossLocationSpawn.length);
+
+      // Apply the percentages on all bosses, cull those that won't spawn, make all bosses 100 chance that remain.
+      locationList[index].base.BossLocationSpawn = locationList[
+        index
+      ].base.BossLocationSpawn.filter(({ BossChance, BossName }, bossIndex) => {
+        if (BossChance < 100 && BossChance / 100 < Math.random()) {
+          return false;
+        }
+        return true;
+      }).map((boss) => ({ ...boss, ...{ BossChance: 100 } }));
+
+      // if (mapName === "customs")
+      //   console.log(mapName, locationList[index].base.BossLocationSpawn);
     });
+
     if (hasChangedBossSpawns) {
       console.log(
         `[MOAR]: --- Adjusting default boss spawn rates complete --- \n`

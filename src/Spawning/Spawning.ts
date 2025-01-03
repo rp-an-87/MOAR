@@ -67,12 +67,12 @@ export const buildWaves = (container: DependencyContainer) => {
     }
   });
 
-  config.debug &&
-    console.log(
-      globalValues.forcedPreset === "custom"
-        ? "custom"
-        : globalValues.currentPreset
-    );
+  // config.debug &&
+  console.log(
+    globalValues.forcedPreset === "custom"
+      ? "custom"
+      : globalValues.currentPreset
+  );
 
   const {
     bigmap: customs,
@@ -147,7 +147,7 @@ export const buildWaves = (container: DependencyContainer) => {
   }
 
   buildPmcs(config, locationList);
- 
+
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {
       console.log("[MOAR] OH CRAP we have a problem!", name);

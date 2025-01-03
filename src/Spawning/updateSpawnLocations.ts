@@ -64,38 +64,44 @@ export default function updateSpawnLocations(
             //   locationList[index].base.SpawnPointParams[innerIndex].Sides
             // );
           }
+          if (!Infiltration) {
+            if (
+              !config.allOpenZones &&
+              config.pmcOpenZones &&
+              Categories.includes("Bot") &&
+              Sides[0] === "Savage"
+            ) {
+              locationList[index].base.SpawnPointParams[innerIndex].Categories =
+                ["Player", "Bot"];
+            }
 
-          if (
-            !config.allOpenZones &&
-            config.pmcOpenZones &&
-            Categories.includes("Bot") &&
-            Sides[0] === "Savage" &&
-            !Infiltration
-          ) {
-            locationList[index].base.SpawnPointParams[innerIndex].Categories = [
-              "Player",
-              "Bot",
-            ];
-          }
+            if (config.allOpenZones) {
+              locationList[index].base.SpawnPointParams[innerIndex].Categories =
+                [
+                  "Bot",
+                  "Player",
+                  "Coop",
+                  innerIndex % 2 === 0 ? "Group" : "Opposite",
+                ];
 
-          if (!Infiltration && config.allOpenZones) {
-            locationList[index].base.SpawnPointParams[innerIndex].Categories = [
-              "Bot",
-              "Player",
-              "Coop",
-              innerIndex % 2 === 0 ? "Group" : "Opposite",
-            ];
+              locationList[index].base.SpawnPointParams[
+                innerIndex
+              ].Infiltration = getRandomInfil();
+              // console.log(
+              //   locationList[index].base.SpawnPointParams[innerIndex].Infiltration
+              // );
+              locationList[index].base.SpawnPointParams[innerIndex].Sides = [
+                "Pmc",
+                "Savage",
+                "All",
+              ];
+            }
 
-            locationList[index].base.SpawnPointParams[innerIndex].Infiltration =
-              getRandomInfil();
-            // console.log(
-            //   locationList[index].base.SpawnPointParams[innerIndex].Infiltration
-            // );
-            locationList[index].base.SpawnPointParams[innerIndex].Sides = [
-              "Pmc",
-              "Savage",
-              "All",
-            ];
+            if (config.bossOpenZones && Categories.includes("Bot")) {
+              locationList[index].base.SpawnPointParams[
+                innerIndex
+              ].Categories.push("Boss");
+            }
           }
 
           if (

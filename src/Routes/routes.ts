@@ -1,7 +1,7 @@
 import { DependencyContainer } from "tsyringe";
 import { buildWaves } from "../Spawning/Spawning";
 import { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRouterModService";
-import { DynamicRouterModService } from "@spt/services/mod/dynamicRouter/DynamicRouterModService";
+// import { DynamicRouterModService } from "@spt/services/mod/dynamicRouter/DynamicRouterModService";
 import { globalValues } from "../GlobalValues";
 import { kebabToTitle } from "../utils";
 import PresetWeightingsConfig from "../../config/PresetWeightings.json";
@@ -11,9 +11,9 @@ export const setupRoutes = (container: DependencyContainer) => {
     "StaticRouterModService"
   );
 
-  const dynamicRouterModService = container.resolve<DynamicRouterModService>(
-    "DynamicRouterModService"
-  );
+  // const dynamicRouterModService = container.resolve<DynamicRouterModService>(
+  //   "DynamicRouterModService"
+  // );
 
   // Make buildwaves run on game end
   staticRouterModService.registerStaticRouter(
