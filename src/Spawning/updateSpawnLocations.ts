@@ -71,8 +71,13 @@ export default function updateSpawnLocations(
               Categories.includes("Bot") &&
               Sides[0] === "Savage"
             ) {
+              // if (BotZoneName === "Zone_LongRoad") console.log("yes");
               locationList[index].base.SpawnPointParams[innerIndex].Categories =
                 ["Player", "Bot"];
+
+              locationList[index].base.SpawnPointParams[
+                innerIndex
+              ].Infiltration = getRandomInfil();
             }
 
             if (config.allOpenZones) {

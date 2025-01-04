@@ -4,7 +4,7 @@
   "GitStatus": false,
   "ContainPlugin": true,
   "PluginFileName": "MOAR.dll",
-  "PluginPath": "C:/3103/Bepinex/Plugins/",
+  "PluginPath": "C:/3105/Bepinex/Plugins/",
   "CopyBundles": false,
   "BuildZip": true,
   "BuildDir": "./dist",
@@ -48,6 +48,8 @@
     "mod.code-workspace",
     "package-lock.json",
     "tsconfig.json",
-    ".nvmrc"
+    ".nvmrc",
+    ".releaserc",
+    ".github"
   ]
 }
