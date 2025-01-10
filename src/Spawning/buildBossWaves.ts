@@ -254,17 +254,29 @@ export function buildBossWaves(
         );
       // console.log(locationList[index].base.BossLocationSpawn.length);
 
+      const bossesToSkip = new Set(["sectantPriest", "pmcBot"]);
       // Apply the percentages on all bosses, cull those that won't spawn, make all bosses 100 chance that remain.
       locationList[index].base.BossLocationSpawn = locationList[
         index
-      ].base.BossLocationSpawn.filter(({ BossChance, BossName }, bossIndex) => {
-        if (BossChance < 100 && BossChance / 100 < Math.random()) {
-          return false;
+      ].base.BossLocationSpawn.filter(
+        ({ BossChance, BossName, TriggerId }, bossIndex) => {
+          if (
+            !TriggerId &&
+            !bossesToSkip.has(BossName) &&
+            BossChance < 100 &&
+            BossChance / 100 < Math.random()
+          ) {
+            return false;
+          }
+          return true;
         }
-        return true;
-      }).map((boss) => ({ ...boss, ...{ BossChance: 100 } }));
+      ).map((boss) =>
+        bossesToSkip.has(boss.BossName) || !!boss.TriggerId
+          ? boss
+          : { ...boss, ...{ BossChance: 100 } }
+      );
 
-      // if (mapName === "customs")
+      // if (mapName === "rezervbase")
       //   console.log(mapName, locationList[index].base.BossLocationSpawn);
     });
 
