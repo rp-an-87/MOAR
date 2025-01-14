@@ -18,7 +18,7 @@ import { buildBossWaves } from "./buildBossWaves";
 import buildZombieWaves from "./buildZombieWaves";
 import buildScavMarksmanWaves from "./buildScavMarksmanWaves";
 import buildPmcs from "./buildPmcs";
-import { setEscapeTimeOverrides } from "./utils";
+import { enforceSmoothing, setEscapeTimeOverrides } from "./utils";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import updateSpawnLocations from "./updateSpawnLocations";
 
@@ -40,7 +40,7 @@ export const buildWaves = (container: DependencyContainer) => {
 
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
-  const { locations, bots, globals } = databaseServer.getTables();
+  const { locations, bots } = databaseServer.getTables();
 
   let config = cloneDeep(globalValues.baseConfig) as typeof _config;
 
@@ -135,9 +135,6 @@ export const buildWaves = (container: DependencyContainer) => {
 
   setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
 
-  // Make main waves
-  buildScavMarksmanWaves(config, locationList, botConfig);
-
   // BOSS RELATED STUFF!
   buildBossWaves(config, locationList);
 
@@ -147,6 +144,16 @@ export const buildWaves = (container: DependencyContainer) => {
   }
 
   buildPmcs(config, locationList);
+
+  // Make main waves
+  buildScavMarksmanWaves(config, locationList, botConfig);
+
+  // enableSmoothing
+  if (config.spawnSmoothing) {
+    enforceSmoothing(locationList)
+  }
+
+  // saveToFile(locations.bigmap.base.SpawnPointParams, "spawns.json");
 
   originalMapList.forEach((name, index) => {
     if (!locations[name]) {

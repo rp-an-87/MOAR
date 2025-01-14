@@ -1,35 +1,36 @@
 {
   "enableBotSpawning": true,
+  "spawnSmoothing":true,
 
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
 
-  "scavWaveDistribution": 0.5,
+  "scavWaveDistribution": 1.2,
   "scavWaveQuantity": 1,
 
   "startingPmcs": false,
+  "pmcWaveDistribution": 0.7,
+  "pmcWaveQuantity": 1,
 
   "playerOpenZones": false,
   "pmcOpenZones": true,
   "allOpenZones": false,
 
-  "pmcWaveDistribution": 0.7,
-  "pmcWaveQuantity": 1,
-
   "zombiesEnabled": false,
-  "zombieWaveDistribution": 0.5,
+  "zombieWaveDistribution": 0.8,
   "zombieWaveQuantity": 1,
   "zombieHealth": 1,
 
   "maxBotCap": 25,
-  "maxBotPerZone": 5,
+  "maxBotPerZone": 7,
 
-  "moreScavGroups": false,
-  "morePmcGroups": false,
+  "sniperGroupChance": 0.1,
+  "scavGroupChance": 0.2,
+  "pmcGroupChance": 0.2,
+  
   "pmcMaxGroupSize": 4,
   "scavMaxGroupSize": 4,
-
-  "snipersHaveFriends": false,
+  "sniperMaxGroupSize": 1.7,
 
   "bossOpenZones": false,
 
