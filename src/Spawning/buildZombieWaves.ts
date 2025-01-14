@@ -60,7 +60,7 @@ export default function buildZombieWaves(
 
     const zombieWaves = buildZombie(
       zombieTotalWaveCount,
-      location.EscapeTimeLimit,
+      location.EscapeTimeLimit * 60,
       zombieWaveDistribution,
       9999
     );

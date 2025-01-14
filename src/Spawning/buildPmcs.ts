@@ -6,7 +6,7 @@ import {
   defaultEscapeTimes,
   defaultHostility,
 } from "./constants";
-import { buildPmcWaves, MapSettings, shuffle } from "./utils";
+import { buildBotWaves, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
 
 export default function buildPmcs(
@@ -19,10 +19,14 @@ export default function buildPmcs(
     >;
     const map = mapSettingsList[index];
 
+    // Set pmcs hostile to everything
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
-    const { pmcHotZones = [] } = (mapConfig?.[map] as MapSettings) || {};
+    const {
+      pmcHotZones = [],
+      pmcWaveCount,
+    } = (mapConfig?.[map] as MapSettings) || {};
 
     let pmcZones = shuffle<string[]>([
       ...new Set(
@@ -37,15 +41,13 @@ export default function buildPmcs(
           .map(({ BotZoneName, ...rest }) => {
             return BotZoneName;
           })
-      ),
+      ), ...pmcHotZones
     ]);
 
     // Make labs have only named zones
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }
-
-    const { pmcWaveCount } = mapConfig[map];
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
@@ -72,16 +74,44 @@ export default function buildPmcs(
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
-    const waves = buildPmcWaves(
-      totalWaves,
-      timeLimit,
-      config,
-      pmcZones,
-      pmcHotZones
+    const half = Math.round(
+      totalWaves % 2 === 0 ? totalWaves / 2 : (totalWaves + 1) / 2
     );
-    
+
+    const start = Math.random() > 0.5
+
+    const pmcUSEC = buildBotWaves(
+      half,
+      config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
+      config.pmcMaxGroupSize - 1,
+      config.pmcGroupChance,
+      pmcZones.slice(0, Math.round(pmcZones.length / 2)),
+      config.pmcDifficulty,
+      "pmcUSEC",
+      false,
+      config.pmcWaveDistribution,
+      start ? -1 : 0
+    );
+
+    const pmcBEAR = buildBotWaves(
+      half,
+      config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
+      config.pmcMaxGroupSize - 1,
+      config.pmcGroupChance,
+      pmcZones.slice(Math.round(pmcZones.length / 2)),
+      config.pmcDifficulty,
+      "pmcBEAR",
+      false,
+      config.pmcWaveDistribution,
+      start ? 15 : -1
+    );
+
+
+
+
     locationList[index].base.BossLocationSpawn = [
-      ...waves,
+      ...pmcUSEC,
+      ...pmcBEAR,
       ...locationList[index].base.BossLocationSpawn,
     ];
   }

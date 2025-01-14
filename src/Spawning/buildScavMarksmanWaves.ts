@@ -7,8 +7,8 @@ import {
   defaultHostility,
   originalMapList,
 } from "./constants";
-import { MapSettings, shuffle, waveBuilder } from "./utils";
-import { IWave, WildSpawnType } from "@spt/models/eft/common/ILocationBase";
+import { buildBotWaves, MapSettings, shuffle, waveBuilder } from "./utils";
+import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { saveToFile } from "../utils";
 
@@ -18,15 +18,15 @@ export default function buildScavMarksmanWaves(
   botConfig: IBotConfig
 ) {
   let {
-    debug,
     maxBotCap,
     scavWaveQuantity,
     scavWaveDistribution,
-    snipersHaveFriends,
+    sniperMaxGroupSize,
     maxBotPerZone,
     scavMaxGroupSize,
     scavDifficulty,
-    moreScavGroups,
+    sniperGroupChance,
+    scavGroupChance
   } = config;
 
   for (let index = 0; index < locationList.length; index++) {
@@ -35,6 +35,7 @@ export default function buildScavMarksmanWaves(
     >;
     const map = mapSettingsList[index];
 
+    locationList[index].base.waves = []
     locationList[index].base = {
       ...locationList[index].base,
       ...{
@@ -61,7 +62,7 @@ export default function buildScavMarksmanWaves(
       maxBotPerZoneOverride,
       maxBotCapOverride,
       EscapeTimeLimit,
-      scavHotZones,
+      scavHotZones = [],
     } = (mapConfig?.[map] as MapSettings) || {};
 
     // Set per map EscapeTimeLimit
@@ -120,7 +121,7 @@ export default function buildScavMarksmanWaves(
           )
           .map(({ BotZoneName }) => BotZoneName)
           .filter((name) => !sniperLocations.has(name))
-      ),
+      ), ...scavHotZones,
     ]);
 
 
@@ -136,83 +137,51 @@ export default function buildScavMarksmanWaves(
     );
 
     const numberOfZoneless = scavTotalWaveCount - scavZones.length;
-    // console.log(numberOfZoneless);
+
     if (numberOfZoneless > 0) {
       const addEmpty = new Array(numberOfZoneless).fill("");
       scavZones = shuffle<string[]>([...scavZones, ...addEmpty]);
     }
-    // console.log(scavZones);
+
     config.debug &&
       escapeTimeLimitRatio !== 1 &&
       console.log(
         `${map} Scav wave count changed from ${scavWaveCount} to ${scavTotalWaveCount} due to escapeTimeLimit adjustment`
       );
+
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
-    let snipers = waveBuilder(
+
+    const snipers = buildBotWaves(
       sniperLocations.size,
-      Math.round(timeLimit / 4),
-      0.5,
-      WildSpawnType.MARKSMAN,
-      0.7,
-      false,
-      2,
-      [],
+      timeLimit,
+      sniperMaxGroupSize,
+      sniperGroupChance,
       shuffle([...sniperLocations]),
-      80,
+      0.7,
+      WildSpawnType.MARKSMAN,
       true,
-      true
+      0.3,
+      60
     );
 
-    if (snipersHaveFriends)
-      snipers = snipers.map((wave) => ({
-        ...wave,
-        ...(snipersHaveFriends && wave.slots_max < 2
-          ? { slots_min: 1, slots_max: 2 }
-          : {}),
-      }));
 
-    const scavWaves = waveBuilder(
+    const scavWaves = buildBotWaves(
       scavTotalWaveCount,
       timeLimit,
-      scavWaveDistribution,
-      WildSpawnType.ASSAULT,
-      scavDifficulty,
-      false,
       scavMaxGroupSize,
+      scavGroupChance,
       map === "gzHigh" ? [] : scavZones,
-      scavHotZones,
-      0,
+      scavDifficulty,
+      WildSpawnType.ASSAULT,
       false,
-      !!moreScavGroups
+      scavWaveDistribution,
+      0
     );
-
-    if (debug) {
-      let totalscav = 0;
-      scavWaves.forEach(({ slots_max }) => (totalscav += slots_max));
-
-      console.log(configLocations[index]);
-      console.log(
-        "Scavs:",
-        totalscav,
-        "configVal",
-        Math.round((totalscav / scavWaveCount) * 100) / 100,
-        "configWaveCount",
-        scavWaveCount,
-        "waveCount",
-        scavWaves.length,
-        "\n"
-      );
-    }
-
-    // const finalSniperWaves = snipers?.map(({ ...rest }, snipKey) => ({
-    //   ...rest,
-    //   number: snipKey,
-    //   time_min: snipKey * 120,
-    //   time_max: snipKey * 120 + 120,
-    // }));
-    // if (map === "customs") saveToFile({ scavWaves }, "scavWaves.json");
-    locationList[index].base.waves = [...snipers, ...scavWaves]
-      .sort(({ time_min: a }, { time_min: b }) => a - b)
-      .map((wave, i) => ({ ...wave, number: i + 1 }));
+    // if (map === "laboratory") console.log(snipers, scavWaves)
+    locationList[index].base.BossLocationSpawn = [
+      ...snipers,
+      ...scavWaves,
+      ...locationList[index].base.BossLocationSpawn,
+    ];
   }
 }
