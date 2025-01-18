@@ -248,8 +248,7 @@ export function buildBossWaves(
 
       bossesToAdd.length &&
         console.log(
-          `[MOAR] Adding the following bosses to map ${
-            configLocations[index]
+          `[MOAR] Adding the following bosses to map ${configLocations[index]
           }: ${bossesToAdd.map(({ BossName }) => BossName)}`
         );
       // console.log(locationList[index].base.BossLocationSpawn.length);
@@ -276,7 +275,7 @@ export function buildBossWaves(
           : { ...boss, ...{ BossChance: 100 } }
       );
 
-      // if (mapName === "rezervbase")
+      // if (mapName === "customs")
       //   console.log(mapName, locationList[index].base.BossLocationSpawn);
     });
 

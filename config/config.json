@@ -1,6 +1,6 @@
 {
   "enableBotSpawning": true,
-  "spawnSmoothing":true,
+  "spawnSmoothing": true,
 
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
@@ -13,7 +13,7 @@
   "pmcWaveQuantity": 1,
 
   "playerOpenZones": false,
-  "pmcOpenZones": true,
+  "pmcOpenZones": false,
   "allOpenZones": false,
 
   "zombiesEnabled": false,

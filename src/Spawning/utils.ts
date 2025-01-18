@@ -4,8 +4,9 @@ import {
   WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
 import _config from "../../config/config.json";
+import mapConfig from "../../config/mapConfig.json";
 import { ILocation } from "@spt/models/eft/common/ILocation";
-import { defaultEscapeTimes } from "./constants";
+import { configLocations, defaultEscapeTimes } from "./constants";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
 export const waveBuilder = (
@@ -204,6 +205,8 @@ export const buildBotWaves = (
   if (!botTotal) return [];
   const pushToEnd = botDistribution > 1;
   const pullFromEnd = botDistribution < 1;
+  const botToZoneTotal = bossZones.length / botTotal
+  const isMarksman = botType === "marksman"
 
   let startTime = pushToEnd
     ? Math.round((botDistribution - 1) * escapeTimeLimit)
@@ -222,20 +225,20 @@ export const buildBotWaves = (
 
     if (bossEscortAmount < 0) bossEscortAmount = 0;
 
-    const totalCountThisWave = bossEscortAmount + 1;
+    const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
 
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
-      BossChance: 100,
+      BossChance: isMarksman ? 80 : 100,
       BossDifficult,
       BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: BossDifficult,
       BossEscortType: botType,
       BossName: botType,
       BossPlayer: false,
-      BossZone: bossZones[totalCountThusFar] || "",
+      BossZone: bossZones[isMarksman ? totalCountThusFar : Math.floor(totalCountThusFar * botToZoneTotal)] || "",
       Delay: 0,
       DependKarma: false,
       DependKarmaPVE: false,
@@ -254,9 +257,10 @@ export const buildBotWaves = (
     maxSlotsReached -= 1 + bossEscortAmount;
     if (maxSlotsReached <= 0) break;
   }
-  // console.log(
-  //   escapeTimeLimit,
+  // isMarksman && console.log(
+  //   // bossZones,
   //   botType,
+  //   bossZones,
   //   waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
   // );
   return waves;
@@ -476,14 +480,14 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
 
     let start = first
     const increment = Math.round((last - first) / (notBosses.length - 1))
-
+    const smoothingDistribution = (mapConfig[configLocations[index]] as any).smoothingDistribution as number
     for (let index = 0; index < notBosses.length; index++) {
       notBosses[index].Time = start
 
-      start += Math.round(index < notBosses.length / 2 ? increment * (0.5) : increment * 1.5)
+      start += Math.round(index < notBosses.length / 2 ? increment * (smoothingDistribution) : increment * (1 + smoothingDistribution))
     }
 
-    // console.log(notBosses.map(({ Time, BossName }) => ({ BossName, Time })))
+    // console.log(configLocations[index], last, notBosses.map(({ Time, BossName }) => ({ BossName, Time })))
 
     locationList[index].base.BossLocationSpawn = [...Bosses, ...notBosses]
   }

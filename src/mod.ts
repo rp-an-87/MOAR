@@ -1,5 +1,6 @@
 import { DependencyContainer } from "tsyringe";
 import { IPostSptLoadMod } from "@spt/models/external/IPostSptLoadMod";
+import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { IPreSptLoadMod } from "@spt/models/external/IPreSptLoadMod";
 import { enableBotSpawning } from "../config/config.json";
 import { buildWaves } from "./Spawning/Spawning";
@@ -8,10 +9,19 @@ import { globalValues } from "./GlobalValues";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { setupRoutes } from "./Routes/routes";
 import checkPresetLogic from "./Tests/checkPresets";
+import { setupSpawns } from "./SpawnZoneChanges/setupSpawn";
 
-class Moar implements IPostSptLoadMod, IPreSptLoadMod {
+class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   preSptLoad(container: DependencyContainer): void {
-    if (enableBotSpawning) setupRoutes(container);
+    if (enableBotSpawning) {
+      setupRoutes(container);
+    }
+  }
+
+  postDBLoad(container: DependencyContainer): void {
+    if (enableBotSpawning) {
+      setupSpawns(container);
+    }
   }
 
   postSptLoad(container: DependencyContainer): void {

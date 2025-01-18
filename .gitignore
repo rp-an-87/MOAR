@@ -3,8 +3,11 @@ dist/Bepinex
 dist/user
 src/refDBS
 
-*.js
-*.js.map
-
+src/**/**/*.js
+src/**/*.js
 src/*.js
+src/**/**/*.js.map
+src/**/*.js.map
 src/*.js.map
+src/**/**.js.map
+src/**/**.js

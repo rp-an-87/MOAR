@@ -8,6 +8,7 @@ class globalValues {
     static currentPreset = "";
     static forcedPreset = "random";
     static addedMapZones = {};
+    static indexedMapSpawns = {};
 }
 exports.globalValues = globalValues;
 //# sourceMappingURL=GlobalValues.js.map
