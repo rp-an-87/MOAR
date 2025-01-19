@@ -5,29 +5,24 @@ import { getRandomInArray } from "./utils";
 import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { globalValues } from "../GlobalValues";
 
-export default function updateSpawnLocations(
-  locationList: ILocation[],
-) {
+export default function updateSpawnLocations(locationList: ILocation[]) {
   for (let index = 0; index < locationList.length; index++) {
     const map = configLocations[index];
-    const playerSpawns = []
-    const mapSpawns = globalValues.indexedMapSpawns[index]
+    const playerSpawns = [];
+    const mapSpawns = globalValues.indexedMapSpawns[index];
 
-    locationList[index].base.SpawnPointParams =
-      mapSpawns.
-        filter((point) => {
-          if (point.BotZoneName.slice(0, 7) === "player_") {
-            playerSpawns.push(point)
-            return false
-          }
-          return true
-        })
+    locationList[index].base.SpawnPointParams = mapSpawns.filter((point) => {
+      if (point?.BotZoneName?.slice(0, 5) === "coop_") {
+        playerSpawns.push(point);
+        return false;
+      }
+      return true;
+    });
 
-    // console.log(playerSpawns.length)
-    const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns) //getRandomInArray(playerSpawns)
+    const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns); //playerSpawns[20];
+    // console.log(playerSpawn.n)
+    // console.log(map, playerSpawn.Position);
 
-    // console.log(map, playerSpawn.BotZoneName)
-
-    locationList[index].base.SpawnPointParams.push(playerSpawn)
+    locationList[index].base.SpawnPointParams.push(playerSpawn);
   }
 }

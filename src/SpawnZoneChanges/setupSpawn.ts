@@ -2,115 +2,97 @@ import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import { configLocations, originalMapList } from "../Spawning/constants";
 import { DependencyContainer } from "tsyringe";
 import mapConfig from "../../config/mapConfig.json";
-import { ILocationBase, ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
+import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { globalValues } from "../GlobalValues";
 import { cleanClosest } from "../Spawning/spawnZoneUtils";
 import { shuffle } from "../Spawning/utils";
 
 export const setupSpawns = (container: DependencyContainer) => {
-    const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
-    const { locations } = databaseServer.getTables();
+  const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+  const { locations } = databaseServer.getTables();
 
+  const indexedMapSpawns: Record<number, ISpawnPointParam[]> = {};
 
-    const indexedMapSpawns: Record<number, ISpawnPointParam[]> = {}
+  originalMapList.forEach((map, mapIndex) => {
+    const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
 
-    originalMapList.forEach((map, mapIndex) => {
+    locations[map].base.SpawnPointParams.forEach(
+      (
+        { ColliderParams, Categories }: ISpawnPointParam,
+        innerIndex: number
+      ) => {
+        if (
+          !Categories.includes("Boss") &&
+          ColliderParams?._props?.Radius !== undefined &&
+          ColliderParams?._props?.Radius < limit
+        ) {
+          locations[map].base.SpawnPointParams[
+            innerIndex
+          ].ColliderParams._props.Radius = limit;
+        }
+      }
+    );
 
-        const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance
+    let bossSpawnSpawns: ISpawnPointParam[] = [];
+    let nonBossSpawns: ISpawnPointParam[] = [];
+    let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
+    let coopSpawns: ISpawnPointParam[] = [];
 
-        locations[map].base.SpawnPointParams.forEach(
-            (
-                {
-                    ColliderParams,
-                    Categories
-                }: ISpawnPointParam,
-                innerIndex: number
-            ) => {
-                if (
-                    !Categories.includes("Boss") &&
-                    ColliderParams?._props?.Radius !== undefined &&
-                    ColliderParams?._props?.Radius < limit
-                ) {
-                    locations[map].base.SpawnPointParams[
-                        innerIndex
-                    ].ColliderParams._props.Radius = limit;
-                }
-            })
+    locations[map].base.SpawnPointParams.forEach((point) => {
+      switch (true) {
+        case point.Categories.includes("Boss"):
+          bossSpawnSpawns.push(point);
+          break;
+        case point.BotZoneName?.toLowerCase().includes("snipe") ||
+          point.DelayToCanSpawnSec > 40:
+          sniperSpawnSpawnPoints.push(point);
+          break;
 
-        let bossSpawnSpawns: ISpawnPointParam[] = [];
-        let nonBossSpawns: ISpawnPointParam[] = [];
-        let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
-        let playerSpawns: ISpawnPointParam[] = [];
+        case point.Categories.includes("Coop") && !!point.Infiltration:
+          coopSpawns.push(point);
+          break;
 
-        locations[map].base.SpawnPointParams.forEach((point) => {
-            switch (true) {
-                case point.Categories.includes("Boss"):
-                    bossSpawnSpawns.push(point);
-                    break;
-                case point.BotZoneName?.toLowerCase().includes("snipe") ||
-                    point.DelayToCanSpawnSec > 40:
-                    sniperSpawnSpawnPoints.push(point);
-                    break;
-                case point.Categories.includes("Coop") &&
-                    !!point.Infiltration:
-                    playerSpawns.push(point);
-                    break;
+        default:
+          nonBossSpawns.push(point);
+          break;
+      }
+    });
 
-                default:
-                    nonBossSpawns.push(point);
-                    break;
-            }
-        });
+    coopSpawns = coopSpawns.map((point, index) => {
+      point.Categories.push("Player");
+      return {
+        ...point,
+        // Categories: point.Categories.filter((cat) => cat !== "Player"),
+        BotZoneName: point?.BotZoneName ? point.BotZoneName : "coop_" + index,
+        Categories: point.Categories,
+        CorePointId: 0,
+      };
+    });
 
-        bossSpawnSpawns = bossSpawnSpawns.map((point, index) =>
-        ({
-            ...point,
-            BotZoneName: !point.BotZoneName ?
-                "boss_" + index
-                : point.BotZoneName
-        }))
+    nonBossSpawns = cleanClosest(
+      nonBossSpawns.map((point, index) => ({
+        ...point,
+        BotZoneName: point?.BotZoneName ? point.BotZoneName : "open_" + index,
+        Categories: ["Bot", "Player"],
+        Infiltration: "",
+        Sides: ["Savage"],
+        DelayToCanSpawnSec: 1,
+        CorePointId: 1,
+      })),
+      configLocations[mapIndex]
+    );
 
-        playerSpawns = playerSpawns.
-            map((point, index) => ({
-                ...point,
-                BotZoneName: "player_" + index,
-                Categories: ['Player', 'Coop', 'Opposite', 'Group'],
-                Sides: ["Pmc"],
-                DelayToCanSpawnSec: 1
-            }))
+    locations[map].base.OpenZones = "";
 
-        nonBossSpawns = cleanClosest(nonBossSpawns.
-            map((point, index) =>
-            ({
-                ...point,
-                BotZoneName: point?.BotZoneName ? point.BotZoneName : "open_" + index,
-                Categories: ['Bot'],
-                Sides: ["Savage"],
-                DelayToCanSpawnSec: 1
-            })), configLocations[mapIndex])
+    indexedMapSpawns[mapIndex] = [
+      ...sniperSpawnSpawnPoints,
+      ...bossSpawnSpawns,
+      ...nonBossSpawns,
+      ...coopSpawns,
+    ];
 
-        sniperSpawnSpawnPoints = sniperSpawnSpawnPoints.map((point, index) =>
-            ({ ...point, BotZoneName: "sniper_" + index, DelayToCanSpawnSec: 1 }))
+    locations[map].base.SpawnPointParams = [];
+  });
 
-        // console.log(playerSpawns)
-        // console.log(map,
-        //     bossSpawnSpawns.length,
-        //     playerSpawns.length,
-        //     nonBossSpawns.length,
-        //     sniperSpawnSpawnPoints.length,
-        // )
-
-        locations[map].base.OpenZones = ""
-
-        indexedMapSpawns[mapIndex] = shuffle<ISpawnPointParam[]>([
-            ...bossSpawnSpawns,
-            ...nonBossSpawns,
-            ...sniperSpawnSpawnPoints,
-            ...playerSpawns
-        ])
-
-        locations[map].base.SpawnPointParams = []
-    })
-
-    globalValues.indexedMapSpawns = indexedMapSpawns
-}
+  globalValues.indexedMapSpawns = indexedMapSpawns;
+};

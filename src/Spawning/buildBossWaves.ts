@@ -219,6 +219,22 @@ export function buildBossWaves(
       // console.log(bossesToAdd);
 
       if (bossOpenZones || mainBossChanceBuff) {
+        if (bossOpenZones) {
+          locationList[index].base.SpawnPointParams.forEach(
+            ({ Categories, Sides }, spawnIndex) => {
+              if (
+                index % 3 !== 0 &&
+                Categories[0] === "Bot" &&
+                Categories[1] === "Player"
+              ) {
+                locationList[index].base.SpawnPointParams[
+                  spawnIndex
+                ].Categories.push("Boss");
+              }
+            }
+          );
+        }
+
         locationList[index].base?.BossLocationSpawn?.forEach((boss, key) => {
           if (bossList.includes(boss.BossName)) {
             if (bossOpenZones) {
@@ -248,7 +264,8 @@ export function buildBossWaves(
 
       bossesToAdd.length &&
         console.log(
-          `[MOAR] Adding the following bosses to map ${configLocations[index]
+          `[MOAR] Adding the following bosses to map ${
+            configLocations[index]
           }: ${bossesToAdd.map(({ BossName }) => BossName)}`
         );
       // console.log(locationList[index].base.BossLocationSpawn.length);

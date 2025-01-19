@@ -27,7 +27,7 @@ export default function buildScavMarksmanWaves(
     scavMaxGroupSize,
     scavDifficulty,
     sniperGroupChance,
-    scavGroupChance
+    scavGroupChance,
   } = config;
 
   for (let index = 0; index < locationList.length; index++) {
@@ -36,7 +36,7 @@ export default function buildScavMarksmanWaves(
     >;
     const map = mapSettingsList[index];
 
-    locationList[index].base.waves = []
+    locationList[index].base.waves = [];
     locationList[index].base = {
       ...locationList[index].base,
       ...{
@@ -100,17 +100,24 @@ export default function buildScavMarksmanWaves(
     //     .map(({ BotZoneName }) => BotZoneName || "")
     // );
 
-    const { Position: { x, z } } = locationList[index].base.SpawnPointParams[locationList[index].base.SpawnPointParams.length - 1]
-    // console.log(BotZoneName)
-    // let pmcZones = getSortedSpawnPointList(locationList[index].base.SpawnPointParams.
-    //   filter(({ BotZoneName }, index) => index % 2 !== 0 && BotZoneName.slice(0, 5) === "open_"), x, z).
-    //   map(({ BotZoneName }) => BotZoneName)
+    const {
+      Position: { x, z },
+    } =
+      locationList[index].base.SpawnPointParams[
+        locationList[index].base.SpawnPointParams.length - 1
+      ];
 
-    let sniperLocations = getSortedSpawnPointList(locationList[index].base.SpawnPointParams.
-      filter(({ BotZoneName }) => BotZoneName.slice(0, 7) === "sniper_"), x, z).
-      map(({ BotZoneName }) => BotZoneName)
-
-    // console.log(sniperLocations)
+    let sniperLocations = getSortedSpawnPointList(
+      [...locationList[index].base.SpawnPointParams].filter(
+        ({ Categories, DelayToCanSpawnSec, BotZoneName, Sides }) =>
+          !Categories.includes("Boss") &&
+          Sides[0] === "Savage" &&
+          (BotZoneName?.toLowerCase().includes("snipe") ||
+            DelayToCanSpawnSec > 40)
+      ),
+      x,
+      z
+    ).map(({ BotZoneName }) => BotZoneName);
 
     if (sniperLocations.length) {
       locationList[index].base.MinMaxBots = [
@@ -122,44 +129,42 @@ export default function buildScavMarksmanWaves(
       ];
     }
 
-    // let scavZones = shuffle<string[]>([
-    //   ...new Set(
-    //     [...locationList[index].base.SpawnPointParams]
-    //       .filter(
-    //         ({ Categories, Sides, BotZoneName }) =>
-    //           !!BotZoneName &&
-    //           Categories.includes("Bot") &&
-    //           (Sides.includes("Savage") || Sides.includes("All"))
-    //       )
-    //       .map(({ BotZoneName }) => BotZoneName)
-    //       .filter((name) => !sniperLocations.has(name))
-    //   ), ...scavHotZones,
-    // ]);
-
-    let scavZones = getSortedSpawnPointList(locationList[index].base.SpawnPointParams.
-      filter(({ Categories, Sides }, index) =>
-        index % 2 === 0 &&
-        Categories[0] === 'Bot' &&
-        Sides[0] === "Savage"), x, z).
-      map(({ BotZoneName }) => BotZoneName)
-
     const { scavWaveCount } = mapConfig[map];
+
+    let scavZones = getSortedSpawnPointList(
+      locationList[index].base.SpawnPointParams.filter(
+        ({ Categories, Sides }, index) =>
+          index % 3 !== 0 &&
+          Categories[0] === "Bot" &&
+          Categories[1] === "Player"
+      ),
+      x,
+      z,
+      0.1
+    ).map(({ BotZoneName }) => BotZoneName);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
     );
 
     // Scavs
-    const scavTotalWaveCount = Math.round(
+    let scavTotalWaveCount = Math.round(
       scavWaveCount * scavWaveQuantity * escapeTimeLimitRatio
     );
 
-    const numberOfZoneless = scavTotalWaveCount - scavZones.length;
+    if (scavHotZones.length && scavTotalWaveCount > 0) {
+      scavTotalWaveCount = scavTotalWaveCount + scavHotZones.length;
+    }
 
-    if (numberOfZoneless > 0) {
-      console.log(`${map} ran out of appropriate zones for scavs, duplicating zones`)
+    while (scavTotalWaveCount - scavZones.length > 0) {
+      console.log(
+        `${map} ran out of appropriate zones for scavs, duplicating zones`
+      );
       // const addEmpty = new Array(numberOfZoneless).fill("");
-      scavZones = [...scavZones, ...scavZones,]
+      scavZones = [...scavZones, ...scavZones];
+      if (scavZones.length === 0) {
+        scavZones = [""];
+      }
     }
 
     config.debug &&
@@ -169,7 +174,8 @@ export default function buildScavMarksmanWaves(
       );
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
-    if (config.allOpenZones) sniperLocations = shuffle<string[]>(sniperLocations)
+    if (config.disableCascadingSpawns)
+      sniperLocations = shuffle<string[]>(sniperLocations);
     const snipers = buildBotWaves(
       sniperLocations.length,
       timeLimit,
@@ -183,9 +189,7 @@ export default function buildScavMarksmanWaves(
       60
     );
 
-
-    // console.log(snipers)
-    if (config.allOpenZones) scavZones = shuffle<string[]>(scavZones)
+    if (config.disableCascadingSpawns) scavZones = shuffle<string[]>(scavZones);
     const scavWaves = buildBotWaves(
       scavTotalWaveCount,
       timeLimit,
@@ -198,6 +202,13 @@ export default function buildScavMarksmanWaves(
       scavWaveDistribution,
       0
     );
+
+    // Add hotzones if exist
+    scavHotZones.forEach((hotzone) => {
+      const index = Math.floor(scavWaves.length * Math.random());
+      scavWaves[index].BossZone = hotzone;
+      // console.log(scavWaves[index].BossZone);
+    });
 
     // if (map === "laboratory") console.log(snipers, scavWaves)
     locationList[index].base.BossLocationSpawn = [

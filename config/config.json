@@ -5,16 +5,14 @@
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
 
-  "scavWaveDistribution": 1.2,
+  "scavWaveDistribution": 0.8,
   "scavWaveQuantity": 1,
 
   "startingPmcs": false,
-  "pmcWaveDistribution": 0.7,
+  "pmcWaveDistribution": 0.6,
   "pmcWaveQuantity": 1,
 
-  "playerOpenZones": false,
-  "pmcOpenZones": false,
-  "allOpenZones": false,
+  "disableCascadingSpawns": false,
 
   "zombiesEnabled": false,
   "zombieWaveDistribution": 0.8,
