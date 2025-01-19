@@ -48,7 +48,9 @@ export const setupSpawns = (container: DependencyContainer) => {
           sniperSpawnSpawnPoints.push(point);
           break;
 
-        case point.Categories.includes("Coop") && !!point.Infiltration:
+        case (point.Categories.includes("Coop") ||
+          point.Categories.includes("Player")) &&
+          !!point.Infiltration:
           coopSpawns.push(point);
           break;
 
@@ -58,25 +60,25 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     });
 
-    coopSpawns = coopSpawns.map((point, index) => {
-      point.Categories.push("Player");
-      return {
-        ...point,
-        // Categories: point.Categories.filter((cat) => cat !== "Player"),
-        BotZoneName: point?.BotZoneName ? point.BotZoneName : "coop_" + index,
-        Categories: point.Categories,
-        CorePointId: 0,
-      };
-    });
+    coopSpawns = cleanClosest(coopSpawns, configLocations[mapIndex]).map(
+      (point, index) => {
+        return {
+          ...point,
+          Categories: ["Coop", "Opposite", "Group", "Player"],
+          BotZoneName: point?.BotZoneName ? point.BotZoneName : "coop_" + index,
+          CorePointId: 0,
+          // Sides: ["Pmc"],
+        };
+      }
+    );
 
     nonBossSpawns = cleanClosest(
       nonBossSpawns.map((point, index) => ({
         ...point,
         BotZoneName: point?.BotZoneName ? point.BotZoneName : "open_" + index,
-        Categories: ["Bot", "Player"],
+        Categories: ["Bot"],
         Infiltration: "",
         Sides: ["Savage"],
-        DelayToCanSpawnSec: 1,
         CorePointId: 1,
       })),
       configLocations[mapIndex]

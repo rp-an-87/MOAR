@@ -134,9 +134,7 @@ export default function buildScavMarksmanWaves(
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
         ({ Categories, Sides }, index) =>
-          index % 3 !== 0 &&
-          Categories[0] === "Bot" &&
-          Categories[1] === "Player"
+          index % 3 !== 0 && Categories[0] === "Bot"
       ),
       x,
       z,

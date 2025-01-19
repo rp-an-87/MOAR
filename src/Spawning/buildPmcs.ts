@@ -20,10 +20,8 @@ export default function buildPmcs(
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
-    const {
-      pmcHotZones = [],
-      pmcWaveCount,
-    } = (mapConfig?.[map] as MapSettings) || {};
+    const { pmcHotZones = [], pmcWaveCount } =
+      (mapConfig?.[map] as MapSettings) || {};
 
     const {
       Position: { x, z },
@@ -36,9 +34,7 @@ export default function buildPmcs(
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
         ({ Categories, Sides }, index) =>
-          (map === "laboratory" || index % 3 === 0) &&
-          Categories[0] === "Bot" &&
-          Categories[1] === "Player"
+          (map === "laboratory" || index % 3 === 0) && Categories[0] === "Bot"
       ),
       x,
       z,
@@ -90,8 +86,6 @@ export default function buildPmcs(
       totalWaves % 2 === 0 ? totalWaves / 2 : (totalWaves + 1) / 2
     );
 
-    const start = Math.random() > 0.5;
-
     const usecSpawns = pmcZones.filter((_, i) => i % 2 === 0);
     const bearSpawns = pmcZones.filter((_, i) => i % 2 !== 0);
 
@@ -105,7 +99,7 @@ export default function buildPmcs(
       "pmcUSEC",
       false,
       config.pmcWaveDistribution,
-      start ? -1 : 0
+      5 + Math.round(20 * Math.random())
     );
 
     const pmcBEAR = buildBotWaves(
@@ -118,7 +112,7 @@ export default function buildPmcs(
       "pmcBEAR",
       false,
       config.pmcWaveDistribution,
-      start ? 15 : -1
+      5 + Math.round(20 * Math.random())
     );
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];
