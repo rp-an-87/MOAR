@@ -62,9 +62,20 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     coopSpawns = cleanClosest(coopSpawns, configLocations[mapIndex]).map(
       (point, index) => {
+        // Categories: ["Coop", "Opposite", "Group", "Player"],
+        // if (point.Categories[0] === "Coop") {
+        //   point.Categories.push("Player");
+        // } else if (point.Categories[0] === "Player") {
+        //   point.Categories = [
+        //     "Coop",
+        //     Math.random() > 0.5 ? "Opposite" : "Group",
+        //     "Player",
+        //   ];
+        // }
+
         return {
           ...point,
-          Categories: ["Coop", "Opposite", "Group", "Player"],
+          Categories: ["Player"],
           BotZoneName: point?.BotZoneName ? point.BotZoneName : "coop_" + index,
           CorePointId: 0,
           // Sides: ["Pmc"],

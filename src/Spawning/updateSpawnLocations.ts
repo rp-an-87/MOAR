@@ -12,7 +12,7 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     const mapSpawns = globalValues.indexedMapSpawns[index];
 
     locationList[index].base.SpawnPointParams = mapSpawns.filter((point) => {
-      if (point?.Categories[0] === "Coop") {
+      if (point?.Categories[0] === "Player") {
         playerSpawns.push(point);
         return false;
       }
