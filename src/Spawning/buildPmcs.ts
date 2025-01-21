@@ -117,12 +117,14 @@ export default function buildPmcs(
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];
 
-    // Add hotzones if exist
-    pmcHotZones.forEach((hotzone) => {
-      const index = Math.floor(pmcs.length * Math.random());
-      pmcs[index].BossZone = hotzone;
-      // console.log(pmcs[index]);
-    });
+    if (pmcs.length) {
+      // Add hotzones if exist
+      pmcHotZones.forEach((hotzone) => {
+        const index = Math.floor(pmcs.length * Math.random());
+        pmcs[index].BossZone = hotzone;
+        // console.log(pmcs[index]);
+      });
+    }
 
     locationList[index].base.BossLocationSpawn = [
       ...pmcs,

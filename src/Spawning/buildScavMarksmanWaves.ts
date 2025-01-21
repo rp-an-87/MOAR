@@ -202,11 +202,13 @@ export default function buildScavMarksmanWaves(
     );
 
     // Add hotzones if exist
-    scavHotZones.forEach((hotzone) => {
-      const index = Math.floor(scavWaves.length * Math.random());
-      scavWaves[index].BossZone = hotzone;
-      // console.log(scavWaves[index].BossZone);
-    });
+    if (scavWaves.length) {
+      scavHotZones.forEach((hotzone) => {
+        const index = Math.floor(scavWaves.length * Math.random());
+        scavWaves[index].BossZone = hotzone;
+        // console.log(scavWaves[index].BossZone);
+      });
+    }
 
     // if (map === "laboratory") console.log(snipers, scavWaves)
     locationList[index].base.BossLocationSpawn = [
