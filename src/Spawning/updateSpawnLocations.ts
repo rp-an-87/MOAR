@@ -11,13 +11,15 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     const playerSpawns: ISpawnPointParam[] = [];
     const mapSpawns = globalValues.indexedMapSpawns[index];
 
-    locationList[index].base.SpawnPointParams = mapSpawns.filter((point) => {
-      if (point?.Categories[0] === "Player") {
-        playerSpawns.push(point);
-        return false;
+    locationList[index].base.SpawnPointParams = [...mapSpawns].filter(
+      (point) => {
+        if (point?.Categories[0] === "Player") {
+          playerSpawns.push(point);
+          return false;
+        }
+        return true;
       }
-      return true;
-    });
+    );
 
     // console.log(playerSpawns.length);
 

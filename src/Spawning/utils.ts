@@ -485,6 +485,8 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       last = Math.max(notBoss.Time, last);
     });
 
+    // if (first < 15) first = 15;
+
     notBosses = notBosses.sort((a, b) => a.Time - b.Time);
 
     // console.log(notBosses.map(({ Time }) => Time))

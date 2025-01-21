@@ -38,47 +38,38 @@ export const setupSpawns = (container: DependencyContainer) => {
     let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
     let coopSpawns: ISpawnPointParam[] = [];
 
-    locations[map].base.SpawnPointParams.forEach((point) => {
-      switch (true) {
-        case point.Categories.includes("Boss"):
-          bossSpawnSpawns.push(point);
-          break;
-        case point.BotZoneName?.toLowerCase().includes("snipe") ||
-          point.DelayToCanSpawnSec > 40:
-          sniperSpawnSpawnPoints.push(point);
-          break;
+    shuffle<ISpawnPointParam[]>(locations[map].base.SpawnPointParams).forEach(
+      (point) => {
+        switch (true) {
+          case point.Categories.includes("Boss"):
+            bossSpawnSpawns.push(point);
+            break;
+          case point.BotZoneName?.toLowerCase().includes("snipe") ||
+            point.DelayToCanSpawnSec > 40:
+            sniperSpawnSpawnPoints.push(point);
+            break;
 
-        case (point.Categories.includes("Coop") ||
-          point.Categories.includes("Player")) &&
-          !!point.Infiltration:
-          coopSpawns.push(point);
-          break;
+          case (point.Categories.includes("Coop") ||
+            point.Categories.includes("Player")) &&
+            !!point.Infiltration:
+            coopSpawns.push(point);
+            break;
 
-        default:
-          nonBossSpawns.push(point);
-          break;
+          default:
+            nonBossSpawns.push(point);
+            break;
+        }
       }
-    });
+    );
 
     coopSpawns = cleanClosest(coopSpawns, configLocations[mapIndex]).map(
       (point, index) => {
-        // Categories: ["Coop", "Opposite", "Group", "Player"],
-        // if (point.Categories[0] === "Coop") {
-        //   point.Categories.push("Player");
-        // } else if (point.Categories[0] === "Player") {
-        //   point.Categories = [
-        //     "Coop",
-        //     Math.random() > 0.5 ? "Opposite" : "Group",
-        //     "Player",
-        //   ];
-        // }
-
         return {
           ...point,
           Categories: ["Player"],
           BotZoneName: point?.BotZoneName ? point.BotZoneName : "coop_" + index,
           CorePointId: 0,
-          // Sides: ["Pmc"],
+          Sides: ["Pmc"],
         };
       }
     );

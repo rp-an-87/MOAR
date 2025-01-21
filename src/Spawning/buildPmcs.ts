@@ -99,7 +99,7 @@ export default function buildPmcs(
       "pmcUSEC",
       false,
       config.pmcWaveDistribution,
-      5 + Math.round(20 * Math.random())
+      10 + Math.round(10 * Math.random())
     );
 
     const pmcBEAR = buildBotWaves(
@@ -112,7 +112,7 @@ export default function buildPmcs(
       "pmcBEAR",
       false,
       config.pmcWaveDistribution,
-      5 + Math.round(20 * Math.random())
+      10 + Math.round(10 * Math.random())
     );
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];

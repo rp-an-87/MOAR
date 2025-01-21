@@ -198,7 +198,7 @@ export default function buildScavMarksmanWaves(
       WildSpawnType.ASSAULT,
       false,
       scavWaveDistribution,
-      0
+      11
     );
 
     // Add hotzones if exist
