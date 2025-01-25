@@ -24,7 +24,7 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     // console.log(playerSpawns.length);
 
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns); // playerSpawns[playerSpawns.length - 1]
-
+    playerSpawn.ColliderParams._props.Radius = 1
     // console.log(map, playerSpawn.Position);
 
     const spawnsToAdd = playerSpawns
@@ -32,7 +32,7 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
       .map((point, index) => ({
         ...point,
         Categories: ["Bot"],
-        Infiltration: "",
+        // Infiltration: "",
         Sides: ["Savage"],
         CorePointId: 1,
       }));
