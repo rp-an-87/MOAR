@@ -10,11 +10,29 @@ import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { setupRoutes } from "./Routes/routes";
 import checkPresetLogic from "./Tests/checkPresets";
 import { setupSpawns } from "./SpawnZoneChanges/setupSpawn";
+import { saveToFile } from "./utils";
 
 class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   preSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
       setupRoutes(container);
+
+      // const hash = {}
+
+      // for (const key in BotSpawns) {
+      //   const spawns: {
+      //     MapName: string, Zones: Record<string, {
+      //       "x": number;
+      //       "y": number;
+      //       "z": number;
+      //     }[]>
+      //   } = BotSpawns[key]
+
+
+      //   hash[spawns.MapName] = Object.values(spawns.Zones).flat(1)
+
+      // }
+      // saveToFile(hash, "./botSpawns.json")
     }
   }
 

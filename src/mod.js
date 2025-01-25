@@ -14,6 +14,18 @@ class Moar {
     preSptLoad(container) {
         if (config_json_1.enableBotSpawning) {
             (0, routes_1.setupRoutes)(container);
+            // const hash = {}
+            // for (const key in BotSpawns) {
+            //   const spawns: {
+            //     MapName: string, Zones: Record<string, {
+            //       "x": number;
+            //       "y": number;
+            //       "z": number;
+            //     }[]>
+            //   } = BotSpawns[key]
+            //   hash[spawns.MapName] = Object.values(spawns.Zones).flat(1)
+            // }
+            // saveToFile(hash, "./botSpawns.json")
         }
     }
     postDBLoad(container) {
