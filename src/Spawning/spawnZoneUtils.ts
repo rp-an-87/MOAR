@@ -33,10 +33,10 @@ export default function getSortedSpawnPointList(
   if (_config.debug && culledAmount > 0) {
     console.log(
       "Reduced to " +
-        Math.round(
-          (sortedCulledResult.length / SpawnPointParams.length) * 100
-        ) +
-        "% of original spawns",
+      Math.round(
+        (sortedCulledResult.length / SpawnPointParams.length) * 100
+      ) +
+      "% of original spawns",
       SpawnPointParams.length,
       ">",
       sortedCulledResult.length,
@@ -60,29 +60,58 @@ export function cleanClosest(
   );
 
   let prev = undefined;
-  const culled = sortedSpawnPoints.filter(({ Position }) => {
+  const culled = sortedSpawnPoints.map(({ Position, ...rest }) => {
     // const fromMiddle = getDistance(Position.x, Position.z, mX, mZ)
     if (
       !!prev &&
       getDistance(prev.x, prev.z, Position.x, Position.z) <
-        mapCullingNearPointValue
+      mapCullingNearPointValue
     ) {
-      return false;
+      return ({ ...rest, Position, DelayToCanSpawnSec: 9999999, CorePointId: 99999, BotZoneName: "_removed", Categories: [], Sides: [], });
     }
+
     prev = Position;
-    return true;
+    return ({ Position, ...rest });
   });
-  _config.debug &&
+
+  if (_config.debug) {
+    const actualCulled = culled.filter(({ Categories }) => !!Categories.length)
     console.log(
       map,
       "Reduced to " +
-        Math.round((culled.length / sortedSpawnPoints.length) * 100) +
-        "% of original spawns",
-      sortedSpawnPoints.length,
-      ">",
+      Math.round((actualCulled.length / culled.length) * 100) +
+      "% of original spawns",
       culled.length,
-      "\n"
-    ); // high, low
-
+      ">",
+      actualCulled.length,
+      // "\n"
+    ); // high, low}
+  }
   return culled;
 }
+
+
+// customs Reduced to 33% of original spawns 160 > 52
+// customs Reduced to 98% of original spawns 81 > 79
+// factoryDay Reduced to 66% of original spawns 126 > 83
+// factoryDay Reduced to 95% of original spawns 19 > 18
+// factoryNight Reduced to 66% of original spawns 126 > 83
+// factoryNight Reduced to 95% of original spawns 19 > 18
+// interchange Reduced to 34% of original spawns 171 > 58
+// interchange Reduced to 77% of original spawns 52 > 40
+// laboratory Reduced to 63% of original spawns 115 > 72
+// laboratory Reduced to NaN% of original spawns 0 > 0
+// lighthouse Reduced to 31% of original spawns 101 > 31
+// lighthouse Reduced to 78% of original spawns 90 > 70
+// rezervbase Reduced to 34% of original spawns 120 > 41
+// rezervbase Reduced to 75% of original spawns 60 > 45
+// shoreline Reduced to 30% of original spawns 171 > 51
+// shoreline Reduced to 94% of original spawns 81 > 76
+// tarkovstreets Reduced to 24% of original spawns 236 > 57
+// tarkovstreets Reduced to 60% of original spawns 186 > 112
+// woods Reduced to 32% of original spawns 181 > 58
+// woods Reduced to 88% of original spawns 129 > 114
+// gzLow Reduced to 34% of original spawns 140 > 47
+// gzLow Reduced to 56% of original spawns 59 > 33
+// gzHigh Reduced to 34% of original spawns 140 > 47
+// gzHigh Reduced to 52% of original spawns 50 > 26
