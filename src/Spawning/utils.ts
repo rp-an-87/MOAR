@@ -244,9 +244,9 @@ export const buildBotWaves = (
       BossPlayer: false,
       BossZone:
         bossZones[
-          isMarksman
-            ? totalCountThusFar
-            : Math.floor(totalCountThusFar * botToZoneTotal)
+        isMarksman
+          ? totalCountThusFar
+          : Math.floor(totalCountThusFar * botToZoneTotal)
         ] || "",
       Delay: 0,
       DependKarma: false,
@@ -341,6 +341,7 @@ export const buildZombie = (
 };
 
 export interface MapSettings {
+  initialSpawnDelay: number;
   smoothingDistribution: number;
   mapCullingNearPointValue: number;
   spawnMinDistance: number;
@@ -419,7 +420,7 @@ export const setEscapeTimeOverrides = (
     if (
       !override &&
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] >
-        hardcodedEscapeLimitMax
+      hardcodedEscapeLimitMax
     ) {
       const maxLimit = defaultEscapeTimes[map] * hardcodedEscapeLimitMax;
       logger.warning(

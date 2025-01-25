@@ -20,14 +20,14 @@ export default function buildPmcs(
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
-    const { pmcHotZones = [], pmcWaveCount } =
+    const { pmcHotZones = [], pmcWaveCount, initialSpawnDelay } =
       (mapConfig?.[map] as MapSettings) || {};
 
     const {
       Position: { x, z },
     } =
       locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
+      locationList[index].base.SpawnPointParams.length - 1
       ];
 
     // console.log(map);
@@ -99,7 +99,7 @@ export default function buildPmcs(
       "pmcUSEC",
       false,
       config.pmcWaveDistribution,
-      15 + Math.round(10 * Math.random())
+      initialSpawnDelay + Math.round(10 * Math.random())
     );
 
     const pmcBEAR = buildBotWaves(
@@ -112,7 +112,7 @@ export default function buildPmcs(
       "pmcBEAR",
       false,
       config.pmcWaveDistribution,
-      15 + Math.round(10 * Math.random())
+      initialSpawnDelay + Math.round(10 * Math.random())
     );
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];

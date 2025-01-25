@@ -2,12 +2,10 @@ import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import {
-  configLocations,
   defaultEscapeTimes,
-  defaultHostility,
   originalMapList,
 } from "./constants";
-import { buildBotWaves, MapSettings, shuffle, waveBuilder } from "./utils";
+import { buildBotWaves, MapSettings, shuffle } from "./utils";
 import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { saveToFile } from "../utils";
@@ -64,6 +62,8 @@ export default function buildScavMarksmanWaves(
       maxBotCapOverride,
       EscapeTimeLimit,
       scavHotZones = [],
+      scavWaveCount,
+      initialSpawnDelay
     } = (mapConfig?.[map] as MapSettings) || {};
 
     // Set per map EscapeTimeLimit
@@ -104,7 +104,7 @@ export default function buildScavMarksmanWaves(
       Position: { x, z },
     } =
       locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
+      locationList[index].base.SpawnPointParams.length - 1
       ];
 
     let sniperLocations = getSortedSpawnPointList(
@@ -129,7 +129,6 @@ export default function buildScavMarksmanWaves(
       ];
     }
 
-    const { scavWaveCount } = mapConfig[map];
 
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
@@ -198,7 +197,7 @@ export default function buildScavMarksmanWaves(
       WildSpawnType.ASSAULT,
       false,
       scavWaveDistribution,
-      15
+      initialSpawnDelay + Math.round(10 * Math.random())
     );
 
     // Add hotzones if exist
