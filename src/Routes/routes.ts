@@ -5,15 +5,56 @@ import { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRou
 import { globalValues } from "../GlobalValues";
 import { kebabToTitle } from "../utils";
 import PresetWeightingsConfig from "../../config/PresetWeightings.json";
+import { Ixyz } from "@spt/models/eft/common/Ixyz";
+import { updateBotSpawn, updatePlayerSpawn } from "../Spawns/updateUtils";
 
 export const setupRoutes = (container: DependencyContainer) => {
   const staticRouterModService = container.resolve<StaticRouterModService>(
     "StaticRouterModService"
   );
 
-  // const dynamicRouterModService = container.resolve<DynamicRouterModService>(
-  //   "DynamicRouterModService"
-  // );
+  interface AddSpawnRequest {
+    map: string;
+    position: Ixyz;
+  }
+
+  staticRouterModService.registerStaticRouter(
+    `moarAddBotSpawn`,
+    [
+      {
+        url: "/moar/addBotSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          updateBotSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarAddBotSpawn"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `moarAddPlayerSpawn`,
+    [
+      {
+        url: "/moar/addPlayerSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          updatePlayerSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarAddPlayerSpawn"
+  );
 
   // Make buildwaves run on game end
   staticRouterModService.registerStaticRouter(

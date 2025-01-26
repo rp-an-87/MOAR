@@ -38,6 +38,17 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
+    const allZones = [
+      ...new Set(
+        locations[map].base.SpawnPointParams.filter(
+          ({ BotZoneName }: ISpawnPointParam) => !!BotZoneName
+        ).map(({ BotZoneName }: ISpawnPointParam) => BotZoneName)
+      ),
+    ];
+
+    locations[map].base.OpenZones = allZones.join(",");
+    // console.log(locations[map].base.OpenZones);
+
     let bossSpawnSpawns: ISpawnPointParam[] = [];
     let nonBossSpawns: ISpawnPointParam[] = [];
     let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
@@ -83,26 +94,26 @@ export const setupSpawns = (container: DependencyContainer) => {
           }
         : point
     );
-
-    nonBossSpawns = cleanClosest(
-      AddCustomBotSpawnPoints(nonBossSpawns, map, configLocations[mapIndex]),
-      configLocations[mapIndex]
-    ).map((point, index) =>
-      !!point.Categories.length
-        ? {
-            ...point,
-            BotZoneName: point?.BotZoneName
-              ? point.BotZoneName
-              : "open_" + index,
-            Categories: ["Bot"],
-            // Infiltration: "",
-            Sides: ["Savage"],
-            CorePointId: 1,
-          }
-        : point
+    //AddCustomBotSpawnPoints(nonBossSpawns, map, configLocations[mapIndex])
+    nonBossSpawns = cleanClosest(nonBossSpawns, configLocations[mapIndex]).map(
+      (point, index) =>
+        !!point.Categories.length
+          ? {
+              ...point,
+              BotZoneName: point?.BotZoneName
+                ? point.BotZoneName
+                : "open_" + index,
+              Categories: ["Bot"],
+              // Infiltration: "",
+              Sides: ["Savage"],
+              CorePointId: 1,
+            }
+          : point
     );
 
-    locations[map].base.OpenZones = "";
+    // if (map === "bigmap") {
+    //   console.log(nonBossSpawns.length);
+    // }
 
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints,

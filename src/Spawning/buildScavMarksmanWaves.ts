@@ -1,10 +1,7 @@
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
-import {
-  defaultEscapeTimes,
-  originalMapList,
-} from "./constants";
+import { defaultEscapeTimes, originalMapList } from "./constants";
 import { buildBotWaves, MapSettings, shuffle } from "./utils";
 import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
@@ -63,7 +60,7 @@ export default function buildScavMarksmanWaves(
       EscapeTimeLimit,
       scavHotZones = [],
       scavWaveCount,
-      initialSpawnDelay
+      initialSpawnDelay,
     } = (mapConfig?.[map] as MapSettings) || {};
 
     // Set per map EscapeTimeLimit
@@ -104,7 +101,7 @@ export default function buildScavMarksmanWaves(
       Position: { x, z },
     } =
       locationList[index].base.SpawnPointParams[
-      locationList[index].base.SpawnPointParams.length - 1
+        locationList[index].base.SpawnPointParams.length - 1
       ];
 
     let sniperLocations = getSortedSpawnPointList(
@@ -129,11 +126,17 @@ export default function buildScavMarksmanWaves(
       ];
     }
 
-
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        ({ Categories, Sides }, index) =>
-          index % 3 !== 0 && Categories[0] === "Bot"
+        ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
+          BotZoneName &&
+          !Categories.includes("Boss") &&
+          index % 3 !== 0 &&
+          Categories[0] === "Bot" &&
+          !(
+            BotZoneName?.toLowerCase().includes("snipe") ||
+            DelayToCanSpawnSec > 40
+          )
       ),
       x,
       z,

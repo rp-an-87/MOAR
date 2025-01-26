@@ -116,7 +116,7 @@ export const AddCustomBotSpawnPoints = (
   mapConfigMap: string
 ) => {
   if (!BotSpawns[map] || !BotSpawns[map].length) {
-    _config.debug && console.log("no custom spawns for " + map);
+    _config.debug && console.log("no custom Bot spawns for " + map);
     return SpawnPointParams;
   }
 
@@ -167,6 +167,7 @@ export const AddCustomBotSpawnPoints = (
   // });
 
   // console.log(culled.length)
+  //...SpawnPointParams,
   return [...SpawnPointParams, ...botSpawns];
 };
 
@@ -176,7 +177,7 @@ export const AddCustomPlayerSpawnPoints = (
   mapConfigMap: string
 ) => {
   if (!PlayerSpawns[map] || !PlayerSpawns[map].length) {
-    _config.debug && console.log("no custom spawns for " + map);
+    _config.debug && console.log("no custom Player spawns for " + map);
     return SpawnPointParams;
   }
 

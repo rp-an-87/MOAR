@@ -20,21 +20,31 @@ export default function buildPmcs(
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
-    const { pmcHotZones = [], pmcWaveCount, initialSpawnDelay } =
-      (mapConfig?.[map] as MapSettings) || {};
+    const {
+      pmcHotZones = [],
+      pmcWaveCount,
+      initialSpawnDelay,
+    } = (mapConfig?.[map] as MapSettings) || {};
 
     const {
       Position: { x, z },
     } =
       locationList[index].base.SpawnPointParams[
-      locationList[index].base.SpawnPointParams.length - 1
+        locationList[index].base.SpawnPointParams.length - 1
       ];
 
     // console.log(map);
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        ({ Categories, Sides }, index) =>
-          (map === "laboratory" || index % 3 === 0) && Categories[0] === "Bot"
+        ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
+          BotZoneName &&
+          index % 3 === 0 &&
+          !Categories.includes("Boss") &&
+          Categories[0] === "Bot" &&
+          !(
+            BotZoneName?.toLowerCase().includes("snipe") ||
+            DelayToCanSpawnSec > 40
+          )
       ),
       x,
       z,
@@ -125,6 +135,8 @@ export default function buildPmcs(
         // console.log(pmcs[index]);
       });
     }
+
+    // console.log(pmcs.map(({ BossZone }) => BossZone));
 
     locationList[index].base.BossLocationSpawn = [
       ...pmcs,
