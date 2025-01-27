@@ -14,6 +14,7 @@ class Moar {
     preSptLoad(container) {
         if (config_json_1.enableBotSpawning) {
             (0, routes_1.setupRoutes)(container);
+            // updateBotSpawn("bnana", { x: 12, y: 21, z: 2 });
         }
     }
     postDBLoad(container) {

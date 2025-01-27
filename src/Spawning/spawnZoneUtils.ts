@@ -4,7 +4,8 @@ import { shuffle } from "./utils";
 import mapConfig from "../../config/mapConfig.json";
 import { BotSpawns, PlayerSpawns } from "../Spawns";
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
-import { saveToFile } from "src/utils";
+import { globalValues } from "../GlobalValues";
+import { configLocations } from "./constants";
 
 const getDistance = (x: number, z: number, mX: number, mZ: number) => {
   const pA1 = x - mX;
@@ -98,6 +99,7 @@ export function cleanClosest(
       // "\n"
     ); // high, low}
   }
+
   return culled;
 }
 
@@ -113,8 +115,10 @@ function uuidv4() {
 export const AddCustomBotSpawnPoints = (
   SpawnPointParams: ISpawnPointParam[],
   map: string,
-  mapConfigMap: string
+  mapIndex: number
 ) => {
+  const mapConfigMap = configLocations[mapIndex];
+
   if (!BotSpawns[map] || !BotSpawns[map].length) {
     _config.debug && console.log("no custom Bot spawns for " + map);
     return SpawnPointParams;
@@ -123,8 +127,9 @@ export const AddCustomBotSpawnPoints = (
   const spawnMinDistance =
     mapConfig[mapConfigMap as keyof typeof mapConfig].spawnMinDistance;
 
-  const botSpawns = BotSpawns[map].map((coords: Ixyz, index) => ({
-    BotZoneName: "Added_" + index,
+  const botSpawns = BotSpawns[map].map((coords: Ixyz, index: number) => ({
+    BotZoneName:
+      getClosestZone(mapIndex, coords.x, coords.z) || "Added_" + index,
     Categories: ["Bot"],
     ColliderParams: {
       _parent: "SpawnSphereParams",
@@ -146,28 +151,6 @@ export const AddCustomBotSpawnPoints = (
     Sides: ["Savage"],
   }));
 
-  // const targetSpawnPoints = SpawnPointParams.filter(({ Categories }) => Categories)
-
-  // const mapCullingNearPointValue =
-  //   mapConfig[mapConfigMap as keyof typeof mapConfig].mapCullingNearPointValue;
-
-  // const originalSubSet = SpawnPointParams.map(({ Position }) => Position)
-
-  // const culled = BotSpawns[map].filter((Position) => {
-  //   for (const original of originalSubSet) {
-  //     if (
-  //       getDistance(original.x, original.z, Position.x, Position.z) <
-  //       mapCullingNearPointValue
-  //     ) {
-  //       return false
-  //     }
-  //   }
-
-  //   return true
-  // });
-
-  // console.log(culled.length)
-  //...SpawnPointParams,
   return [...SpawnPointParams, ...botSpawns];
 };
 
@@ -238,4 +221,20 @@ export const AddCustomPlayerSpawnPoints = (
   }));
 
   return [...SpawnPointParams, ...playerSpawns];
+};
+
+export const getClosestZone = (mapIndex: number, x: number, z: number) => {
+  if (!globalValues.zoneHash[mapIndex]) return "";
+  let closest = Infinity;
+  let selectedZone = Object.keys(globalValues.zoneHash[mapIndex])?.[0];
+  Object.keys(globalValues.zoneHash[mapIndex]).forEach((zone) => {
+    const current = globalValues.zoneHash[mapIndex][zone];
+    const dist = getDistance(current.x, current.z, x, z);
+    if (dist < closest) {
+      closest = dist;
+      selectedZone = zone;
+    }
+  });
+
+  return selectedZone || "";
 };

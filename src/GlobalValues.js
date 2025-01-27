@@ -7,6 +7,7 @@ class globalValues {
     static locationsBase = undefined;
     static currentPreset = "";
     static forcedPreset = "random";
+    static zoneHash = {};
     static addedMapZones = {};
     static indexedMapSpawns = {};
 }

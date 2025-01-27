@@ -17,6 +17,7 @@ class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   preSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
       setupRoutes(container);
+      // updateBotSpawn("bnana", { x: 12, y: 21, z: 2 });
     }
   }
 

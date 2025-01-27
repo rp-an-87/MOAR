@@ -27,7 +27,11 @@ export const updateJsonFile = <T>(
     }
 
     // Update the JSON object
-    jsonData[key] = [...(jsonData[key] || {}), newValue];
+    if (jsonData[key]) {
+      jsonData[key] = [...(jsonData[key] || {}), newValue];
+    } else {
+      jsonData[key] = [newValue];
+    }
 
     // Write the updated JSON object back to the file
     fs.writeFile(
@@ -49,7 +53,7 @@ export const updateJsonFile = <T>(
 export const updateBotSpawn = (map: string, value: Ixyz) =>
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
-    map,
+    map.toLowerCase(),
     value,
     "Successfully added one bot spawn to " + map
   );
@@ -58,7 +62,7 @@ export const updatePlayerSpawn = (map: string, value: Ixyz) =>
   updateJsonFile<Ixyz>(
     currentDirectory +
       "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
-    map,
+    map.toLowerCase(),
     value,
     "Successfully added one player spawn to " + map
   );

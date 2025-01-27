@@ -51,7 +51,7 @@ export default function buildPmcs(
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
 
-    // console.log(map, pmcZones.length)
+    // console.log(map, pmcZones);
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }
@@ -136,7 +136,10 @@ export default function buildPmcs(
       });
     }
 
-    // console.log(pmcs.map(({ BossZone }) => BossZone));
+    // console.log(
+    //   map,
+    //   pmcs.map(({ BossZone }) => BossZone)
+    // );
 
     locationList[index].base.BossLocationSpawn = [
       ...pmcs,

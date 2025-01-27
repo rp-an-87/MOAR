@@ -11,6 +11,7 @@ import {
 } from "../Spawning/spawnZoneUtils";
 import { shuffle } from "../Spawning/utils";
 import { saveToFile } from "../utils";
+import { Ixyz } from "@spt/models/eft/common/Ixyz";
 
 export const setupSpawns = (container: DependencyContainer) => {
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
@@ -47,9 +48,8 @@ export const setupSpawns = (container: DependencyContainer) => {
     ];
 
     locations[map].base.OpenZones = allZones.join(",");
-    // console.log(locations[map].base.OpenZones);
 
-    let bossSpawnSpawns: ISpawnPointParam[] = [];
+    let bossSpawn: ISpawnPointParam[] = [];
     let nonBossSpawns: ISpawnPointParam[] = [];
     let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
     let coopSpawns: ISpawnPointParam[] = [];
@@ -58,7 +58,7 @@ export const setupSpawns = (container: DependencyContainer) => {
       (point) => {
         switch (true) {
           case point.Categories.includes("Boss"):
-            bossSpawnSpawns.push(point);
+            bossSpawn.push(point);
             break;
           case point.BotZoneName?.toLowerCase().includes("snipe") ||
             point.DelayToCanSpawnSec > 40:
@@ -78,6 +78,24 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
+    const zoneHash: Record<string, Ixyz> = {};
+
+    [...coopSpawns, ...nonBossSpawns, ...bossSpawn].forEach((point) => {
+      if (!point.BotZoneName) return;
+      if (!zoneHash[point.BotZoneName]) {
+        zoneHash[point.BotZoneName] = point.Position;
+      } else {
+        zoneHash[point.BotZoneName].x = Math.round(
+          (zoneHash[point.BotZoneName].x + point.Position.x) / 2
+        );
+        zoneHash[point.BotZoneName].z = Math.round(
+          (zoneHash[point.BotZoneName].z + point.Position.z) / 2
+        );
+      }
+    });
+
+    globalValues.zoneHash[mapIndex] = zoneHash;
+
     coopSpawns = cleanClosest(
       AddCustomPlayerSpawnPoints(coopSpawns, map, configLocations[mapIndex]),
       configLocations[mapIndex]
@@ -94,52 +112,38 @@ export const setupSpawns = (container: DependencyContainer) => {
           }
         : point
     );
-    //AddCustomBotSpawnPoints(nonBossSpawns, map, configLocations[mapIndex])
-    nonBossSpawns = cleanClosest(nonBossSpawns, configLocations[mapIndex]).map(
-      (point, index) =>
-        !!point.Categories.length
-          ? {
-              ...point,
-              BotZoneName: point?.BotZoneName
-                ? point.BotZoneName
-                : "open_" + index,
-              Categories: ["Bot"],
-              // Infiltration: "",
-              Sides: ["Savage"],
-              CorePointId: 1,
-            }
-          : point
+
+    nonBossSpawns = cleanClosest(
+      AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
+      configLocations[mapIndex]
+    ).map((point, index) =>
+      !!point.Categories.length
+        ? {
+            ...point,
+            BotZoneName: point?.BotZoneName
+              ? point.BotZoneName
+              : "open_" + index,
+            Categories: ["Bot"],
+            // Infiltration: "",
+            Sides: ["Savage"],
+            CorePointId: 1,
+          }
+        : point
     );
 
-    // if (map === "bigmap") {
-    //   console.log(nonBossSpawns.length);
+    // if (map === "sandbox") {
+    //   console.log(nonBossSpawns.map(({ BotZoneName }) => BotZoneName));
     // }
 
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints,
-      ...bossSpawnSpawns,
+      ...bossSpawn,
       ...nonBossSpawns,
       ...coopSpawns,
     ];
 
-    // const added = indexedMapSpawns[mapIndex].filter(
-    //   ({ BotZoneName }) => BotZoneName?.slice(0, 6) === "Added_"
-    // );
-    // console.log(
-    //   map,
-    //   "total added",
-    //   added.length,
-    //   "player",
-    //   added.filter(({ Categories }) => Categories[0] === "Player").length,
-    //   "bot",
-    //   added.filter(({ Categories }) => Categories[0] === "Bot").length
-    // );
-
-    //;
-    // console.log(locations[map].base.SpawnPointParams.length, indexedMapSpawns[mapIndex].filter(({ Categories }) => Categories.length).length)
-
     locations[map].base.SpawnPointParams = [];
   });
-
+  // saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;
 };
