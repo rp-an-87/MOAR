@@ -27,10 +27,10 @@ export default function buildPmcs(
     } = (mapConfig?.[map] as MapSettings) || {};
 
     const {
-      Position: { x, z },
+      Position: { x, y, z },
     } =
       locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
+      locationList[index].base.SpawnPointParams.length - 1
       ];
 
     // console.log(map);
@@ -47,6 +47,7 @@ export default function buildPmcs(
           )
       ),
       x,
+      y,
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);

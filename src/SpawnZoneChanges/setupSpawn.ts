@@ -102,14 +102,14 @@ export const setupSpawns = (container: DependencyContainer) => {
     ).map((point, index) =>
       !!point.Categories.length
         ? {
-            ...point,
-            Categories: ["Player"],
-            BotZoneName: point?.BotZoneName
-              ? point.BotZoneName
-              : "coop_" + index,
-            CorePointId: 0,
-            Sides: ["Pmc"],
-          }
+          ...point,
+          Categories: ["Player"],
+          BotZoneName: point?.BotZoneName
+            ? point.BotZoneName
+            : "coop_" + index,
+          CorePointId: 0,
+          Sides: ["Pmc"],
+        }
         : point
     );
 
@@ -119,15 +119,15 @@ export const setupSpawns = (container: DependencyContainer) => {
     ).map((point, index) =>
       !!point.Categories.length
         ? {
-            ...point,
-            BotZoneName: point?.BotZoneName
-              ? point.BotZoneName
-              : "open_" + index,
-            Categories: ["Bot"],
-            // Infiltration: "",
-            Sides: ["Savage"],
-            CorePointId: 1,
-          }
+          ...point,
+          BotZoneName: point?.BotZoneName
+            ? point.BotZoneName
+            : "open_" + index,
+          Categories: ["Bot"],
+          // Infiltration: "",
+          Sides: ["Savage"],
+          CorePointId: 1,
+        }
         : point
     );
 
@@ -141,6 +141,23 @@ export const setupSpawns = (container: DependencyContainer) => {
       ...nonBossSpawns,
       ...coopSpawns,
     ];
+
+    const added = indexedMapSpawns[mapIndex].filter(
+      ({ BotZoneName }) => BotZoneName?.slice(0, 6) === "Added_"
+    );
+    console.log(
+      map,
+      "total added",
+      added.length,
+      "player",
+      added.filter(({ Categories }) => Categories[0] === "Player").length,
+      "bot",
+      added.filter(({ Categories }) => Categories[0] === "Bot").length
+    );
+
+    //;
+    console.log(locations[map].base.SpawnPointParams.length, indexedMapSpawns[mapIndex].filter(({ Categories }) => Categories.length).length)
+
 
     locations[map].base.SpawnPointParams = [];
   });

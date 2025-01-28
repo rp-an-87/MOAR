@@ -38,7 +38,7 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
       .map((point, pindex) => ({
         ...point,
         BotZoneName: point.BotZoneName.includes("Added_")
-          ? getClosestZone(pindex, point.Position.x, point.Position.z)
+          ? getClosestZone(pindex, point.Position.x, point.Position.y, point.Position.z)
           : point.BotZoneName,
         Categories: ["Bot"],
         // Infiltration: "",

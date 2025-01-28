@@ -7,24 +7,44 @@ import { Ixyz } from "@spt/models/eft/common/Ixyz";
 import { globalValues } from "../GlobalValues";
 import { configLocations } from "./constants";
 
-const getDistance = (x: number, z: number, mX: number, mZ: number) => {
-  const pA1 = x - mX;
-  const pB2 = z - mZ;
+// const getDistance = (x: number, z: number, mX: number, mZ: number) => {
+//   const pA1 = x - mX;
+//   const pB2 = z - mZ;
 
-  return Math.sqrt(pA1 * pA1 + pB2 * pB2);
-};
+//   return Math.sqrt(pA1 * pA1 + pB2 * pB2);
+// };
+
+function sq(n: number) {
+  return n * n;
+}
+
+function pt(a: number, b: number) {
+  return Math.sqrt(sq(a) + sq(b));
+}
+
+const getDistance = (x: number, y: number, z: number, mX: number, mY: number, mZ: number) => {
+  x = Math.abs(x - mX),
+    y = Math.abs(y - mY),
+    z = Math.abs(z - mZ);
+
+  return pt(pt(x, z), y);
+}
+
+
+
 
 export default function getSortedSpawnPointList(
   SpawnPointParams: ISpawnPointParam[],
   mX: number,
+  my: number,
   mZ: number,
   cull?: number
 ): ISpawnPointParam[] {
   let culledAmount = 0;
 
   const sortedCulledResult = SpawnPointParams.sort((a, b) => {
-    const a1 = getDistance(a.Position.x, a.Position.z, mX, mZ);
-    const b1 = getDistance(b.Position.x, b.Position.z, mX, mZ);
+    const a1 = getDistance(a.Position.x, a.Position.y, a.Position.z, mX, my, mZ);
+    const b1 = getDistance(b.Position.x, b.Position.y, b.Position.z, mX, my, mZ);
     return a1 - b1;
   }).filter((_, index) => {
     if (!cull) return true;
@@ -37,10 +57,10 @@ export default function getSortedSpawnPointList(
   if (_config.debug && culledAmount > 0) {
     console.log(
       "Reduced to " +
-        Math.round(
-          (sortedCulledResult.length / SpawnPointParams.length) * 100
-        ) +
-        "% of original spawns",
+      Math.round(
+        (sortedCulledResult.length / SpawnPointParams.length) * 100
+      ) +
+      "% of original spawns",
       SpawnPointParams.length,
       ">",
       sortedCulledResult.length,
@@ -60,6 +80,7 @@ export function cleanClosest(
   const sortedSpawnPoints = getSortedSpawnPointList(
     SpawnPointParams,
     -100000,
+    -100000,
     -100000
   );
 
@@ -68,8 +89,8 @@ export function cleanClosest(
     // const fromMiddle = getDistance(Position.x, Position.z, mX, mZ)
     if (
       !!prev &&
-      getDistance(prev.x, prev.z, Position.x, Position.z) <
-        mapCullingNearPointValue
+      getDistance(prev.x, prev.y, prev.z, Position.x, Position.y, Position.z) <
+      mapCullingNearPointValue
     ) {
       return {
         ...rest,
@@ -91,8 +112,8 @@ export function cleanClosest(
     console.log(
       map,
       "Reduced to " +
-        Math.round((actualCulled.length / culled.length) * 100) +
-        "% of original spawns",
+      Math.round((actualCulled.length / culled.length) * 100) +
+      "% of original spawns",
       culled.length,
       ">",
       actualCulled.length
@@ -129,7 +150,7 @@ export const AddCustomBotSpawnPoints = (
 
   const botSpawns = BotSpawns[map].map((coords: Ixyz, index: number) => ({
     BotZoneName:
-      getClosestZone(mapIndex, coords.x, coords.z) || "Added_" + index,
+      getClosestZone(mapIndex, coords.x, coords.y, coords.z) || "Added_" + index,
     Categories: ["Bot"],
     ColliderParams: {
       _parent: "SpawnSphereParams",
@@ -179,12 +200,12 @@ export const AddCustomPlayerSpawnPoints = (
     }
   });
 
-  const getClosestInfil = (x: number, z: number) => {
+  const getClosestInfil = (x: number, y: number, z: number) => {
     let closest = Infinity;
     let selectedInfil = Object.keys(infilHash)[0];
     Object.keys(infilHash).forEach((infil) => {
       const current = infilHash[infil];
-      const dist = getDistance(current.x, current.z, x, z);
+      const dist = getDistance(current.x, current.y, current.z, x, y, z);
       if (dist < closest) {
         closest = dist;
         selectedInfil = infil;
@@ -214,7 +235,7 @@ export const AddCustomPlayerSpawnPoints = (
     CorePointId: 0,
     DelayToCanSpawnSec: 4,
     Id: uuidv4(),
-    Infiltration: getClosestInfil(coords.x, coords.z),
+    Infiltration: getClosestInfil(coords.x, coords.y, coords.z),
     Position: coords,
     Rotation: 116.208389,
     Sides: ["Pmc"],
@@ -223,13 +244,13 @@ export const AddCustomPlayerSpawnPoints = (
   return [...SpawnPointParams, ...playerSpawns];
 };
 
-export const getClosestZone = (mapIndex: number, x: number, z: number) => {
+export const getClosestZone = (mapIndex: number, x: number, y: number, z: number) => {
   if (!globalValues.zoneHash[mapIndex]) return "";
   let closest = Infinity;
   let selectedZone = Object.keys(globalValues.zoneHash[mapIndex])?.[0];
   Object.keys(globalValues.zoneHash[mapIndex]).forEach((zone) => {
     const current = globalValues.zoneHash[mapIndex][zone];
-    const dist = getDistance(current.x, current.z, x, z);
+    const dist = getDistance(current.x, current.y, current.z, x, y, z);
     if (dist < closest) {
       closest = dist;
       selectedZone = zone;
