@@ -6,8 +6,7 @@ const currentDirectory = process.cwd();
 // Function to update JSON file
 export const updateJsonFile = <T>(
   filePath: string,
-  key: string,
-  newValue: T,
+  callback: (jsonData) => void,
   successMessage: string
 ) => {
   // Read the JSON file
@@ -26,12 +25,10 @@ export const updateJsonFile = <T>(
       return;
     }
 
+
+    callback(jsonData)
+
     // Update the JSON object
-    if (jsonData[key]) {
-      jsonData[key] = [...(jsonData[key] || {}), newValue];
-    } else {
-      jsonData[key] = [newValue];
-    }
 
     // Write the updated JSON object back to the file
     fs.writeFile(
@@ -50,19 +47,48 @@ export const updateJsonFile = <T>(
   });
 };
 
-export const updateBotSpawn = (map: string, value: Ixyz) =>
+export const updateBotSpawn = (map: string, value: Ixyz) => {
+  map = map.toLowerCase()
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
-    map.toLowerCase(),
-    value,
+    (jsonData) => {
+      if (jsonData[map]) {
+        jsonData[map].push(value)
+      } else {
+        jsonData[map] = [value];
+      }
+      return jsonData
+    },
     "Successfully added one bot spawn to " + map
-  );
+  )
+};
 
-export const updatePlayerSpawn = (map: string, value: Ixyz) =>
+export const updatePlayerSpawn = (map: string, value: Ixyz) => {
+  map = map.toLowerCase()
   updateJsonFile<Ixyz>(
     currentDirectory +
-      "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
-    map.toLowerCase(),
-    value,
+    "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
+    (jsonData) => {
+      if (jsonData[map]) {
+        jsonData[map].push(value)
+      } else {
+        jsonData[map] = [value];
+      }
+      return jsonData
+    },
     "Successfully added one player spawn to " + map
   );
+}
+
+
+
+export const updateAllBotSpawns = (values: Record<string, Ixyz[]>) =>
+  updateJsonFile<Ixyz>(
+    currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
+    (jsonData) => {
+      Object.keys(jsonData).forEach(map =>
+        jsonData[map] = values[map])
+    },
+    "Successfully updated all Spawns"
+  )
+

@@ -2,22 +2,28 @@ import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import { configLocations, originalMapList } from "../Spawning/constants";
 import { DependencyContainer } from "tsyringe";
 import mapConfig from "../../config/mapConfig.json";
+import advancedConfig from "../../config/advancedConfig.json";
 import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { globalValues } from "../GlobalValues";
 import {
   AddCustomBotSpawnPoints,
   AddCustomPlayerSpawnPoints,
   cleanClosest,
+  removeClosestSpawnsFromCustomBots,
 } from "../Spawning/spawnZoneUtils";
 import { shuffle } from "../Spawning/utils";
 import { saveToFile } from "../utils";
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
+import { BotSpawns } from "../Spawns";
+import { updateAllBotSpawns } from "../Spawns/updateUtils";
 
 export const setupSpawns = (container: DependencyContainer) => {
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
   const { locations } = databaseServer.getTables();
 
   const indexedMapSpawns: Record<number, ISpawnPointParam[]> = {};
+
+  const botSpawnHash = BotSpawns
 
   originalMapList.forEach((map, mapIndex) => {
     const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
@@ -65,8 +71,7 @@ export const setupSpawns = (container: DependencyContainer) => {
             sniperSpawnSpawnPoints.push(point);
             break;
 
-          case (point.Categories.includes("Coop") ||
-            point.Categories.includes("Player")) &&
+          case point.Categories.includes("Player") && // (point.Categories.includes("Coop") || )
             !!point.Infiltration:
             coopSpawns.push(point);
             break;
@@ -113,6 +118,9 @@ export const setupSpawns = (container: DependencyContainer) => {
         : point
     );
 
+    if (advancedConfig.ActivateSpawnCullingOnServerStart) {
+      botSpawnHash[map] = removeClosestSpawnsFromCustomBots(nonBossSpawns, map, configLocations[mapIndex]) || []
+    }
     nonBossSpawns = cleanClosest(
       AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
       configLocations[mapIndex]
@@ -142,25 +150,27 @@ export const setupSpawns = (container: DependencyContainer) => {
       ...coopSpawns,
     ];
 
-    const added = indexedMapSpawns[mapIndex].filter(
-      ({ BotZoneName }) => BotZoneName?.slice(0, 6) === "Added_"
-    );
-    console.log(
-      map,
-      "total added",
-      added.length,
-      "player",
-      added.filter(({ Categories }) => Categories[0] === "Player").length,
-      "bot",
-      added.filter(({ Categories }) => Categories[0] === "Bot").length
-    );
+    // const added = indexedMapSpawns[mapIndex].filter(
+    //   ({ BotZoneName }) => BotZoneName?.slice(0, 6) === "Added_"
+    // );
+    // console.log(
+    //   map,
+    //   "total added",
+    //   added.length,
+    //   "player",
+    //   added.filter(({ Categories }) => Categories[0] === "Player").length,
+    //   "bot",
+    //   added.filter(({ Categories }) => Categories[0] === "Bot").length
+    // );
 
     //;
-    console.log(locations[map].base.SpawnPointParams.length, indexedMapSpawns[mapIndex].filter(({ Categories }) => Categories.length).length)
+    // console.log(locations[map].base.SpawnPointParams.length, indexedMapSpawns[mapIndex].filter(({ Categories }) => Categories.length).length)
 
 
     locations[map].base.SpawnPointParams = [];
   });
-  // saveToFile(globalValues.zoneHash, "zoneHash.json");
+
+  advancedConfig.ActivateSpawnCullingOnServerStart && updateAllBotSpawns(botSpawnHash)
+  saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;
 };

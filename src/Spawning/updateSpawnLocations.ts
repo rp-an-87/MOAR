@@ -29,27 +29,30 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     //   addedSpawns.push(point);
     //   return false;
     // }
-    const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns); // playerSpawns[playerSpawns.length - 1]
+
+    const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
+
     playerSpawn.ColliderParams._props.Radius = 1;
+
     // console.log(map, playerSpawn.Position);
 
-    const spawnsToAdd = playerSpawns
-      .filter((point) => point.Id !== playerSpawn.Id)
-      .map((point, pindex) => ({
-        ...point,
-        BotZoneName: point.BotZoneName.includes("Added_")
-          ? getClosestZone(pindex, point.Position.x, point.Position.y, point.Position.z)
-          : point.BotZoneName,
-        Categories: ["Bot"],
-        // Infiltration: "",
-        Sides: ["Savage"],
-        CorePointId: 1,
-      }))
-      .filter(({ BotZoneName }) => !!BotZoneName);
+    // const spawnsToAdd = playerSpawns
+    //   .filter((point) => point.Id !== playerSpawn.Id)
+    //   .map((point, pindex) => ({
+    //     ...point,
+    //     BotZoneName: point.BotZoneName.includes("Added_")
+    //       ? getClosestZone(pindex, point.Position.x, point.Position.y, point.Position.z)
+    //       : point.BotZoneName,
+    //     Categories: ["Bot"],
+    //     // Infiltration: "",
+    //     Sides: ["Savage"],
+    //     CorePointId: 1,
+    //   }))
+    //   .filter(({ BotZoneName }) => !!BotZoneName);
 
     // console.log(spawnsToAdd.map(({ BotZoneName }) => BotZoneName));
 
-    locationList[index].base.SpawnPointParams.push(...spawnsToAdd);
+    // locationList[index].base.SpawnPointParams.push(...spawnsToAdd);
 
     const listToAddToOpenZones = shuffle<string[]>([
       ...new Set(

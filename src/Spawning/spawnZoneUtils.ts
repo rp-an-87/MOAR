@@ -30,9 +30,6 @@ const getDistance = (x: number, y: number, z: number, mX: number, mY: number, mZ
   return pt(pt(x, z), y);
 }
 
-
-
-
 export default function getSortedSpawnPointList(
   SpawnPointParams: ISpawnPointParam[],
   mX: number,
@@ -85,6 +82,7 @@ export function cleanClosest(
   );
 
   let prev = undefined;
+
   const culled = sortedSpawnPoints.map(({ Position, ...rest }) => {
     // const fromMiddle = getDistance(Position.x, Position.z, mX, mZ)
     if (
@@ -259,3 +257,43 @@ export const getClosestZone = (mapIndex: number, x: number, y: number, z: number
 
   return selectedZone || "";
 };
+
+
+
+export const removeClosestSpawnsFromCustomBots = (SpawnPointParams: ISpawnPointParam[],
+  map: string, mapConfigMap: string) => {
+  if (!BotSpawns[map] || !BotSpawns[map].length) {
+    console.log("No map called ", map)
+    return;
+  }
+
+  const coords: Ixyz[] = BotSpawns[map]
+
+  const mapCullingNearPointValue = mapConfig[mapConfigMap].mapCullingNearPointValue
+
+  // let lowest = Infinity, highest = 0, average = 0
+
+  let filteredCoords = coords.filter(({ x: X, y: Y, z: Z }) =>
+    !SpawnPointParams.some(({ Position: { z, x, y } }) => {
+      return mapCullingNearPointValue > getDistance(X, Y, Z, x, y, z)
+      // lowest = Math.min(lowest, dist)
+      // highest = Math.max(highest, dist)
+      // average = (average + dist) / 2
+    })
+  )
+
+  // console.log(map, coords.length, filteredCoords.length)
+
+  // remove close coordinates
+  filteredCoords = [...coords].filter(({ x: X, y: Y, z: Z }, index) =>
+    !coords.some(({ z, x, y }) => {
+      const dist = getDistance(X, Y, Z, x, y, z)
+      return mapCullingNearPointValue * 1.3 > dist && dist !== 0
+    })
+  )
+
+  console.log(map, coords.length, ">", filteredCoords.length, "culled", coords.length - filteredCoords.length, "spawns")
+  return filteredCoords
+
+  // await updateAllBotSpawns(map, filteredCoords)
+}
