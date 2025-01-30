@@ -503,8 +503,9 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       const ratio = (index + 1) / notBosses.length;
       // console.log(ratio);
       notBosses[index].Time = start;
-
-      start += Math.round(increment * ratio);
+      let inc = Math.round(increment * ratio)
+      if (inc < 10) inc = 5
+      start += inc;
     }
 
     // console.log(

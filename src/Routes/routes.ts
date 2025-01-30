@@ -6,7 +6,7 @@ import { globalValues } from "../GlobalValues";
 import { kebabToTitle } from "../utils";
 import PresetWeightingsConfig from "../../config/PresetWeightings.json";
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
-import { updateBotSpawn, updatePlayerSpawn } from "../Spawns/updateUtils";
+import { deleteBotSpawn, updateBotSpawn, updatePlayerSpawn } from "../Spawns/updateUtils";
 
 export const setupRoutes = (container: DependencyContainer) => {
   const staticRouterModService = container.resolve<StaticRouterModService>(
@@ -35,6 +35,26 @@ export const setupRoutes = (container: DependencyContainer) => {
       },
     ],
     "moarAddBotSpawn"
+  );
+
+
+  staticRouterModService.registerStaticRouter(
+    `moarDeleteBotSpawn`,
+    [
+      {
+        url: "/moar/deleteBotSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          deleteBotSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarDeleteBotSpawn"
   );
 
   staticRouterModService.registerStaticRouter(

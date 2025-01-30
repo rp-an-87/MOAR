@@ -84,10 +84,13 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
+    const sniperZones = new Set(sniperSpawnSpawnPoints.map((point) => point.BotZoneName).filter((item) => !!item))
+    // console.log(sniperZones)
     const zoneHash: Record<string, Ixyz> = {};
 
+
     [...coopSpawns, ...nonBossSpawns, ...bossSpawn].forEach((point) => {
-      if (!point.BotZoneName) return;
+      if (!point.BotZoneName || sniperZones.has(point.BotZoneName)) return;
       if (!zoneHash[point.BotZoneName]) {
         zoneHash[point.BotZoneName] = point.Position;
       } else {
@@ -174,6 +177,7 @@ export const setupSpawns = (container: DependencyContainer) => {
   });
 
   advancedConfig.ActivateSpawnCullingOnServerStart && updateAllBotSpawns(botSpawnHash)
+  // console.log(globalValues.zoneHash)
   // saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;
 };

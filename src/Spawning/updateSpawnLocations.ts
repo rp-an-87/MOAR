@@ -28,27 +28,10 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
     const { x, y, z } = playerSpawn.Position
 
-    const hash = {}
 
-    const sortedSpawnPointList = getSortedSpawnPointList(filteredSpawns, x, y, z).map((point, pIndex) => {
-      const { BotZoneName, Categories, DelayToCanSpawnSec } = point
-      if (BotZoneName && !Categories.includes("Boss") &&
-        Categories[0] === "Bot" &&
-        !(
-          BotZoneName?.toLowerCase().includes("snipe") ||
-          DelayToCanSpawnSec > 40
-        )) {
+    const sortedSpawnPointList = getSortedSpawnPointList(filteredSpawns, x, y, z)
 
-        if (!hash[BotZoneName]) hash[BotZoneName] = 1
-
-        hash[BotZoneName] = pIndex % 2 === 0 ? hash[BotZoneName] + 1 : hash[BotZoneName]
-
-        point.CorePointId = hash[BotZoneName]
-
-        return point
-      } else return point
-    })
-
+    // console.log(map, sortedSpawnPointList.filter((point) => point.CorePointId < 100).map((point) => point.CorePointId))
 
     // console.log(map, hash)
 

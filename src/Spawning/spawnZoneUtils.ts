@@ -22,7 +22,7 @@ function pt(a: number, b: number) {
   return Math.sqrt(sq(a) + sq(b));
 }
 
-const getDistance = (x: number, y: number, z: number, mX: number, mY: number, mZ: number) => {
+export const getDistance = (x: number, y: number, z: number, mX: number, mY: number, mZ: number) => {
   x = Math.abs(x - mX),
     y = Math.abs(y - mY),
     z = Math.abs(z - mZ);

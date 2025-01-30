@@ -1,4 +1,5 @@
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
+import getSortedSpawnPointList, { getDistance } from "../Spawning/spawnZoneUtils";
 
 const fs = require("fs");
 const path = require("path");
@@ -57,9 +58,37 @@ export const updateBotSpawn = (map: string, value: Ixyz) => {
       } else {
         jsonData[map] = [value];
       }
-      return jsonData
     },
     "Successfully added one bot spawn to " + map
+  )
+};
+
+
+export const deleteBotSpawn = (map: string, value: Ixyz) => {
+  map = map.toLowerCase()
+  updateJsonFile<Ixyz>(
+    currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
+    (jsonData) => {
+      if (jsonData[map]) {
+        const { x: X, y: Y, z: Z } = value
+        let nearest = undefined
+        let nearDist = Infinity
+        jsonData[map].forEach(({ x, y, z }, index) => {
+          const dist = getDistance(x, y, z, X, Y, Z)
+          if (dist < nearDist) {
+            nearest = index
+            nearDist = dist
+          }
+        })
+
+        if (nearest) {
+          (jsonData[map] as Ixyz[]).splice(nearest, 1)
+        } else {
+          console.log("No nearest spawn on " + map)
+        }
+      }
+    },
+    "Successfully removed one bot spawn from "
   )
 };
 
@@ -74,7 +103,6 @@ export const updatePlayerSpawn = (map: string, value: Ixyz) => {
       } else {
         jsonData[map] = [value];
       }
-      return jsonData
     },
     "Successfully added one player spawn to " + map
   );
