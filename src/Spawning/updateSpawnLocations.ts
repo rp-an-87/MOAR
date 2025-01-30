@@ -4,16 +4,16 @@ import _config from "../../config/config.json";
 import { getRandomInArray, shuffle } from "./utils";
 import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { globalValues } from "../GlobalValues";
-import { getClosestZone } from "./spawnZoneUtils";
+import getSortedSpawnPointList from "./spawnZoneUtils";
 
 export default function updateSpawnLocations(locationList: ILocation[]) {
   for (let index = 0; index < locationList.length; index++) {
     const map = configLocations[index];
     const playerSpawns: ISpawnPointParam[] = [];
-    const addedSpawns: ISpawnPointParam[] = [];
+    // const addedSpawns: ISpawnPointParam[] = [];
     const mapSpawns = globalValues.indexedMapSpawns[index];
 
-    locationList[index].base.SpawnPointParams = [...mapSpawns].filter(
+    const filteredSpawns = [...mapSpawns].filter(
       (point) => {
         if (point?.Categories[0] === "Player") {
           playerSpawns.push(point);
@@ -22,37 +22,41 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
 
         return true;
       }
-    );
+    )
 
-    // console.log(playerSpawns.length);
-    // if (point.BotZoneName.includes("Added_")) {
-    //   addedSpawns.push(point);
-    //   return false;
-    // }
 
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
+    const { x, y, z } = playerSpawn.Position
+
+    const hash = {}
+
+    const sortedSpawnPointList = getSortedSpawnPointList(filteredSpawns, x, y, z).map((point, pIndex) => {
+      const { BotZoneName, Categories, DelayToCanSpawnSec } = point
+      if (BotZoneName && !Categories.includes("Boss") &&
+        Categories[0] === "Bot" &&
+        !(
+          BotZoneName?.toLowerCase().includes("snipe") ||
+          DelayToCanSpawnSec > 40
+        )) {
+
+        if (!hash[BotZoneName]) hash[BotZoneName] = 1
+
+        hash[BotZoneName] = pIndex % 2 === 0 ? hash[BotZoneName] + 1 : hash[BotZoneName]
+
+        point.CorePointId = hash[BotZoneName]
+
+        return point
+      } else return point
+    })
+
+
+    // console.log(map, hash)
+
+    locationList[index].base.SpawnPointParams = sortedSpawnPointList
+
 
     playerSpawn.ColliderParams._props.Radius = 1;
 
-    // console.log(map, playerSpawn.Position);
-
-    // const spawnsToAdd = playerSpawns
-    //   .filter((point) => point.Id !== playerSpawn.Id)
-    //   .map((point, pindex) => ({
-    //     ...point,
-    //     BotZoneName: point.BotZoneName.includes("Added_")
-    //       ? getClosestZone(pindex, point.Position.x, point.Position.y, point.Position.z)
-    //       : point.BotZoneName,
-    //     Categories: ["Bot"],
-    //     // Infiltration: "",
-    //     Sides: ["Savage"],
-    //     CorePointId: 1,
-    //   }))
-    //   .filter(({ BotZoneName }) => !!BotZoneName);
-
-    // console.log(spawnsToAdd.map(({ BotZoneName }) => BotZoneName));
-
-    // locationList[index].base.SpawnPointParams.push(...spawnsToAdd);
 
     const listToAddToOpenZones = shuffle<string[]>([
       ...new Set(

@@ -9,6 +9,7 @@ import {
   AddCustomBotSpawnPoints,
   AddCustomPlayerSpawnPoints,
   cleanClosest,
+  getClosestZone,
   removeClosestSpawnsFromCustomBots,
 } from "../Spawning/spawnZoneUtils";
 import { shuffle } from "../Spawning/utils";
@@ -121,16 +122,17 @@ export const setupSpawns = (container: DependencyContainer) => {
     if (advancedConfig.ActivateSpawnCullingOnServerStart) {
       botSpawnHash[map] = removeClosestSpawnsFromCustomBots(nonBossSpawns, map, configLocations[mapIndex]) || []
     }
+
     nonBossSpawns = cleanClosest(
       AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
-      configLocations[mapIndex]
-    ).map((point, index) =>
+      configLocations[mapIndex],
+    ).map((point) =>
       !!point.Categories.length
         ? {
           ...point,
           BotZoneName: point?.BotZoneName
             ? point.BotZoneName
-            : "open_" + index,
+            : getClosestZone(mapIndex, point.Position.x, point.Position.y, point.Position.z),
           Categories: ["Bot"],
           // Infiltration: "",
           Sides: ["Savage"],
@@ -139,8 +141,9 @@ export const setupSpawns = (container: DependencyContainer) => {
         : point
     );
 
-    // if (map === "sandbox") {
-    //   console.log(nonBossSpawns.map(({ BotZoneName }) => BotZoneName));
+    // if (map === "factory4_day") {
+    //   zoneHash[mapIndex],
+    //     console.log(new Set(nonBossSpawns.map(({ BotZoneName }) => BotZoneName)));
     // }
 
     indexedMapSpawns[mapIndex] = [
@@ -171,6 +174,6 @@ export const setupSpawns = (container: DependencyContainer) => {
   });
 
   advancedConfig.ActivateSpawnCullingOnServerStart && updateAllBotSpawns(botSpawnHash)
-  saveToFile(globalValues.zoneHash, "zoneHash.json");
+  // saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;
 };

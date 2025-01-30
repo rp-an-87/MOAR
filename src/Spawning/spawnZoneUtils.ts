@@ -134,7 +134,7 @@ function uuidv4() {
 export const AddCustomBotSpawnPoints = (
   SpawnPointParams: ISpawnPointParam[],
   map: string,
-  mapIndex: number
+  mapIndex: number,
 ) => {
   const mapConfigMap = configLocations[mapIndex];
 
@@ -148,7 +148,7 @@ export const AddCustomBotSpawnPoints = (
 
   const botSpawns = BotSpawns[map].map((coords: Ixyz, index: number) => ({
     BotZoneName:
-      getClosestZone(mapIndex, coords.x, coords.y, coords.z) || "Added_" + index,
+      getClosestZone(mapIndex, coords.x, coords.y, coords.z) || "",
     Categories: ["Bot"],
     ColliderParams: {
       _parent: "SpawnSphereParams",
@@ -244,6 +244,7 @@ export const AddCustomPlayerSpawnPoints = (
 
 export const getClosestZone = (mapIndex: number, x: number, y: number, z: number) => {
   if (!globalValues.zoneHash[mapIndex]) return "";
+
   let closest = Infinity;
   let selectedZone = Object.keys(globalValues.zoneHash[mapIndex])?.[0];
   Object.keys(globalValues.zoneHash[mapIndex]).forEach((zone) => {
@@ -254,6 +255,7 @@ export const getClosestZone = (mapIndex: number, x: number, y: number, z: number
       selectedZone = zone;
     }
   });
+  // if (mapIndex === 0) console.log(selectedZone)
 
   return selectedZone || "";
 };

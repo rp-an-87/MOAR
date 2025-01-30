@@ -37,7 +37,6 @@ export default function buildPmcs(
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
         ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
-          BotZoneName &&
           index % 3 === 0 &&
           !Categories.includes("Boss") &&
           Categories[0] === "Bot" &&

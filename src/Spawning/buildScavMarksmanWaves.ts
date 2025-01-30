@@ -98,10 +98,10 @@ export default function buildScavMarksmanWaves(
     // );
 
     const {
-      Position: { x, z },
+      Position: { x, y, z },
     } =
       locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
+      locationList[index].base.SpawnPointParams.length - 1
       ];
 
     let sniperLocations = getSortedSpawnPointList(
@@ -113,6 +113,7 @@ export default function buildScavMarksmanWaves(
             DelayToCanSpawnSec > 40)
       ),
       x,
+      y,
       z
     ).map(({ BotZoneName }) => BotZoneName);
 
@@ -129,7 +130,6 @@ export default function buildScavMarksmanWaves(
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
         ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
-          BotZoneName &&
           !Categories.includes("Boss") &&
           index % 3 !== 0 &&
           Categories[0] === "Bot" &&
@@ -139,6 +139,7 @@ export default function buildScavMarksmanWaves(
           )
       ),
       x,
+      y,
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
