@@ -10,16 +10,15 @@ const GlobalValues_1 = require("./GlobalValues");
 const routes_1 = require("./Routes/routes");
 const checkPresets_1 = __importDefault(require("./Tests/checkPresets"));
 const setupSpawn_1 = require("./SpawnZoneChanges/setupSpawn");
-const updateUtils_1 = require("./Spawns/updateUtils");
 class Moar {
     preSptLoad(container) {
         if (config_json_1.enableBotSpawning) {
             (0, routes_1.setupRoutes)(container);
-            (0, updateUtils_1.deleteBotSpawn)("woods", {
-                "x": 138.656036,
-                "y": -1.87674594,
-                "z": 154.9155
-            });
+            // deleteBotSpawn("woods", {
+            //   "x": 138.656036,
+            //   "y": -1.87674594,
+            //   "z": 154.9155
+            // });
         }
     }
     postDBLoad(container) {

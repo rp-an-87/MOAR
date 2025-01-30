@@ -2,7 +2,8 @@
   "customs": {
     "initialSpawnDelay": 15,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValuePlayer": 8,
+    "mapCullingNearPointValue": 15,
     "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 21,
@@ -17,7 +18,8 @@
   "factoryDay": {
     "initialSpawnDelay": 10,
     "smoothingDistribution": 0.4,
-    "mapCullingNearPointValue": 3,
+    "mapCullingNearPointValuePlayer": 2,
+    "mapCullingNearPointValue": 1.5,
     "spawnMinDistance": 15,
     "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 12,
@@ -28,7 +30,8 @@
   "factoryNight": {
     "initialSpawnDelay": 10,
     "smoothingDistribution": 0.4,
-    "mapCullingNearPointValue": 3,
+    "mapCullingNearPointValuePlayer": 2,
+    "mapCullingNearPointValue": 1.5,
     "spawnMinDistance": 15,
     "maxBotCapOverride": 12,
     "maxBotPerZoneOverride": 12,
@@ -39,7 +42,8 @@
   "interchange": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 8,
+    "mapCullingNearPointValuePlayer": 3,
+    "mapCullingNearPointValue": 3,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
@@ -52,7 +56,8 @@
   "laboratory": {
     "initialSpawnDelay": 15,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 3,
+    "mapCullingNearPointValuePlayer": 4,
+    "mapCullingNearPointValue": 0.9,
     "spawnMinDistance": 20,
     "pmcWaveCount": 10,
     "scavWaveCount": 0,
@@ -61,7 +66,8 @@
   "lighthouse": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValuePlayer": 2.5,
+    "mapCullingNearPointValue": 2.5,
     "spawnMinDistance": 40,
     "pmcWaveCount": 12,
     "scavWaveCount": 20,
@@ -74,7 +80,8 @@
   "rezervbase": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValuePlayer": 3,
+    "mapCullingNearPointValue": 2.5,
     "spawnMinDistance": 40,
     "pmcWaveCount": 11,
     "scavWaveCount": 24,
@@ -89,7 +96,8 @@
   "shoreline": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValuePlayer": 5,
+    "mapCullingNearPointValue": 5,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
@@ -104,7 +112,8 @@
   "tarkovstreets": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValuePlayer": 4,
+    "mapCullingNearPointValue": 2,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 26,
@@ -113,6 +122,7 @@
   "woods": {
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
+    "mapCullingNearPointValuePlayer": 6,
     "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
@@ -128,7 +138,8 @@
   "gzLow": {
     "initialSpawnDelay": 10,
     "smoothingDistribution": 1,
-    "mapCullingNearPointValue": 7,
+    "mapCullingNearPointValuePlayer": 4,
+    "mapCullingNearPointValue": 2,
     "spawnMinDistance": 30,
     "pmcWaveCount": 10,
     "scavWaveCount": 18,
@@ -137,7 +148,8 @@
   "gzHigh": {
     "initialSpawnDelay": 10,
     "smoothingDistribution": 1,
-    "mapCullingNearPointValue": 7,
+    "mapCullingNearPointValuePlayer": 4,
+    "mapCullingNearPointValue": 2,
     "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 18,

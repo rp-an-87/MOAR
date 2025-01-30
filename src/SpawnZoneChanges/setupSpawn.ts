@@ -105,9 +105,11 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     globalValues.zoneHash[mapIndex] = zoneHash;
 
+
     coopSpawns = cleanClosest(
       AddCustomPlayerSpawnPoints(coopSpawns, map, configLocations[mapIndex]),
-      configLocations[mapIndex]
+      mapIndex,
+      true
     ).map((point, index) =>
       !!point.Categories.length
         ? {
@@ -120,7 +122,14 @@ export const setupSpawns = (container: DependencyContainer) => {
           Sides: ["Pmc"],
         }
         : point
-    );
+    ).filter((point) => {
+      // Now we transfer the extra spawns to the bots
+      if (!point.Categories.length) {
+        nonBossSpawns.push(point)
+      }
+      return !!point.Categories.length
+    });
+
 
     if (advancedConfig.ActivateSpawnCullingOnServerStart) {
       botSpawnHash[map] = removeClosestSpawnsFromCustomBots(nonBossSpawns, map, configLocations[mapIndex]) || []
@@ -128,20 +137,21 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     nonBossSpawns = cleanClosest(
       AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
-      configLocations[mapIndex],
-    ).map((point) =>
-      !!point.Categories.length
+      mapIndex,
+    ).map((point) => {
+      // console.log(point.BotZoneName)
+      return !!point.Categories.length
         ? {
           ...point,
           BotZoneName: point?.BotZoneName
-            ? point.BotZoneName
-            : getClosestZone(mapIndex, point.Position.x, point.Position.y, point.Position.z),
+          ,
           Categories: ["Bot"],
           // Infiltration: "",
           Sides: ["Savage"],
           CorePointId: 1,
         }
         : point
+    }
     );
 
     // if (map === "factory4_day") {
