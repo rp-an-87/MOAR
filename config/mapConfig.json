@@ -123,7 +123,7 @@
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 6,
-    "mapCullingNearPointValue": 10,
+    "mapCullingNearPointValue": 13,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
