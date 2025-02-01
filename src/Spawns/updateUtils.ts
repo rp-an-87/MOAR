@@ -110,6 +110,23 @@ export const updatePlayerSpawn = (map: string, value: Ixyz) => {
   );
 };
 
+export const updateSniperSpawn = (map: string, value: Ixyz) => {
+  map = map.toLowerCase();
+  updateJsonFile<Ixyz>(
+    currentDirectory +
+      "/user/mods/DewardianDev-MOAR/src/Spawns/sniperSpawns.json",
+    (jsonData) => {
+      value.y = value.y + 0.5;
+      if (jsonData[map]) {
+        jsonData[map].push(value);
+      } else {
+        jsonData[map] = [value];
+      }
+    },
+    "Successfully added one player spawn to " + map
+  );
+};
+
 export const updateAllBotSpawns = (values: Record<string, Ixyz[]>) =>
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",

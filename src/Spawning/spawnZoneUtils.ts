@@ -2,7 +2,7 @@ import _config from "../../config/config.json";
 import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { shuffle } from "./utils";
 import mapConfig from "../../config/mapConfig.json";
-import { BotSpawns, PlayerSpawns } from "../Spawns";
+import { BotSpawns, PlayerSpawns, SniperSpawns } from "../Spawns";
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
 import { globalValues } from "../GlobalValues";
 import { configLocations } from "./constants";
@@ -202,10 +202,44 @@ export const AddCustomBotSpawnPoints = (
   return [...SpawnPointParams, ...botSpawns];
 };
 
+export const AddCustomSniperSpawnPoints = (
+  SpawnPointParams: ISpawnPointParam[],
+  map: string
+) => {
+  if (!SniperSpawns[map] || !SniperSpawns[map].length) {
+    _config.debug && console.log("no custom Player spawns for " + map);
+    return SpawnPointParams;
+  }
+
+  const sniperSpawns = SniperSpawns[map].map((coords: Ixyz, index: number) => ({
+    BotZoneName: "SniperZone_" + index,
+    Categories: ["Bot"],
+    ColliderParams: {
+      _parent: "SpawnSphereParams",
+      _props: {
+        Center: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        Radius: 20,
+      },
+    },
+    CorePointId: 1,
+    DelayToCanSpawnSec: 4,
+    Id: uuidv4(),
+    Infiltration: "",
+    Position: coords,
+    Rotation: 116.208389,
+    Sides: ["Savage"],
+  }));
+
+  return [...SpawnPointParams, ...sniperSpawns];
+};
+
 export const AddCustomPlayerSpawnPoints = (
   SpawnPointParams: ISpawnPointParam[],
-  map: string,
-  mapConfigMap: string
+  map: string
 ) => {
   if (!PlayerSpawns[map] || !PlayerSpawns[map].length) {
     _config.debug && console.log("no custom Player spawns for " + map);
@@ -285,19 +319,6 @@ export const getClosestZone = (
       ({ BotZoneName }) => !!BotZoneName
     )?.BotZoneName || ""
   );
-  // let closest = Infinity;
-  // let selectedZone = Object.keys(globalValues.zoneHash[mapIndex])?.[0];
-  // Object.keys(globalValues.zoneHash[mapIndex]).forEach((zone) => {
-  //   const current = globalValues.zoneHash[mapIndex][zone];
-  //   const dist = getDistance(current.x, current.y, current.z, x, y, z);
-  //   if (dist < closest) {
-  //     closest = dist;
-  //     selectedZone = zone;
-  //   }
-  // });
-  // // if (mapIndex === 0) console.log(selectedZone)
-
-  // return selectedZone || "";
 };
 
 export const removeClosestSpawnsFromCustomBots = (

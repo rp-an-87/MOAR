@@ -8,6 +8,7 @@ import { globalValues } from "../GlobalValues";
 import {
   AddCustomBotSpawnPoints,
   AddCustomPlayerSpawnPoints,
+  AddCustomSniperSpawnPoints,
   cleanClosest,
   removeClosestSpawnsFromCustomBots,
 } from "../Spawning/spawnZoneUtils";
@@ -65,34 +66,21 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
+    sniperSpawnSpawnPoints.map((val, index) => {
+      if (!val.BotZoneName) val.BotZoneName === "ZoneSnipeMoar_" + index;
+      return val;
+    });
+
     const sniperZones = new Set(
       sniperSpawnSpawnPoints
         .map((point) => point.BotZoneName)
         .filter((item) => !!item)
     );
 
-    const zoneHash: Record<string, Ixyz> = {};
-
-    [...coopSpawns, ...nonBossSpawns, ...bossSpawn].forEach((point) => {
-      if (!point.BotZoneName || sniperZones.has(point.BotZoneName)) return;
-      if (!zoneHash[point.BotZoneName]) {
-        zoneHash[point.BotZoneName] = point.Position;
-      } else {
-        zoneHash[point.BotZoneName].x = Math.round(
-          (zoneHash[point.BotZoneName].x + point.Position.x) / 2
-        );
-        zoneHash[point.BotZoneName].z = Math.round(
-          (zoneHash[point.BotZoneName].z + point.Position.z) / 2
-        );
-      }
-    });
-
-    globalValues.zoneHash[mapIndex] = zoneHash;
-
     const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
 
     coopSpawns = cleanClosest(
-      AddCustomPlayerSpawnPoints(coopSpawns, map, configLocations[mapIndex]),
+      AddCustomPlayerSpawnPoints(coopSpawns, map),
       mapIndex,
       true
     )
@@ -148,6 +136,11 @@ export const setupSpawns = (container: DependencyContainer) => {
         : point;
     });
 
+    sniperSpawnSpawnPoints = AddCustomSniperSpawnPoints(
+      sniperSpawnSpawnPoints,
+      map
+    );
+
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints,
       ...bossSpawn,
@@ -176,7 +169,5 @@ export const setupSpawns = (container: DependencyContainer) => {
 
   advancedConfig.ActivateSpawnCullingOnServerStart &&
     updateAllBotSpawns(botSpawnHash);
-  // console.log(globalValues.zoneHash)
-  // saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;
 };

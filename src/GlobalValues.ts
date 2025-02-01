@@ -11,7 +11,6 @@ export class globalValues {
   public static locationsBase: ILocationBase[] = undefined;
   public static currentPreset: string = "";
   public static forcedPreset: string = "random";
-  public static zoneHash: Record<number, Record<string, Ixyz>> = {};
   public static addedMapZones: Record<number, string[]> = {};
   public static indexedMapSpawns: Record<number, ISpawnPointParam[]> = {};
 }
