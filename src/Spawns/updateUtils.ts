@@ -1,5 +1,7 @@
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
-import getSortedSpawnPointList, { getDistance } from "../Spawning/spawnZoneUtils";
+import getSortedSpawnPointList, {
+  getDistance,
+} from "../Spawning/spawnZoneUtils";
 
 const fs = require("fs");
 const path = require("path");
@@ -26,8 +28,7 @@ export const updateJsonFile = <T>(
       return;
     }
 
-
-    callback(jsonData)
+    callback(jsonData);
 
     // Update the JSON object
 
@@ -49,76 +50,71 @@ export const updateJsonFile = <T>(
 };
 
 export const updateBotSpawn = (map: string, value: Ixyz) => {
-  map = map.toLowerCase()
+  map = map.toLowerCase();
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
     (jsonData) => {
-      value.y = value.y + 1
+      value.y = value.y + 0.5;
       if (jsonData[map]) {
-        jsonData[map].push(value)
+        jsonData[map].push(value);
       } else {
         jsonData[map] = [value];
       }
     },
     "Successfully added one bot spawn to " + map
-  )
+  );
 };
 
-
 export const deleteBotSpawn = (map: string, value: Ixyz) => {
-  map = map.toLowerCase()
+  map = map.toLowerCase();
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
     (jsonData) => {
       if (jsonData[map]) {
-        const { x: X, y: Y, z: Z } = value
-        let nearest = undefined
-        let nearDist = Infinity
+        const { x: X, y: Y, z: Z } = value;
+        let nearest = undefined;
+        let nearDist = Infinity;
         jsonData[map].forEach(({ x, y, z }, index) => {
-          const dist = getDistance(x, y, z, X, Y, Z)
+          const dist = getDistance(x, y, z, X, Y, Z);
           if (dist < nearDist) {
-            nearest = index
-            nearDist = dist
+            nearest = index;
+            nearDist = dist;
           }
-        })
+        });
 
         if (nearest) {
-          (jsonData[map] as Ixyz[]).splice(nearest, 1)
+          (jsonData[map] as Ixyz[]).splice(nearest, 1);
         } else {
-          console.log("No nearest spawn on " + map)
+          console.log("No nearest spawn on " + map);
         }
       }
     },
     "Successfully removed one bot spawn from "
-  )
+  );
 };
 
 export const updatePlayerSpawn = (map: string, value: Ixyz) => {
-  map = map.toLowerCase()
+  map = map.toLowerCase();
   updateJsonFile<Ixyz>(
     currentDirectory +
-    "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
+      "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
     (jsonData) => {
-      value.y = value.y + 1
+      value.y = value.y + 0.5;
       if (jsonData[map]) {
-        jsonData[map].push(value)
+        jsonData[map].push(value);
       } else {
         jsonData[map] = [value];
       }
     },
     "Successfully added one player spawn to " + map
   );
-}
-
-
+};
 
 export const updateAllBotSpawns = (values: Record<string, Ixyz[]>) =>
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
     (jsonData) => {
-      Object.keys(jsonData).forEach(map =>
-        jsonData[map] = values[map])
+      Object.keys(jsonData).forEach((map) => (jsonData[map] = values[map]));
     },
     "Successfully updated all Spawns"
-  )
-
+  );

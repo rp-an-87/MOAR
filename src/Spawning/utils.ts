@@ -235,7 +235,7 @@ export const buildBotWaves = (
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
-      BossChance: isMarksman ? 80 : 100,
+      BossChance: isMarksman ? 85 : 100,
       BossDifficult,
       BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: BossDifficult,
@@ -244,9 +244,9 @@ export const buildBotWaves = (
       BossPlayer: false,
       BossZone:
         bossZones[
-        isMarksman
-          ? totalCountThusFar
-          : Math.floor(totalCountThusFar * botToZoneTotal)
+          isMarksman
+            ? totalCountThusFar
+            : Math.floor(totalCountThusFar * botToZoneTotal)
         ] || "",
       Delay: 0,
       DependKarma: false,
@@ -420,7 +420,7 @@ export const setEscapeTimeOverrides = (
     if (
       !override &&
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] >
-      hardcodedEscapeLimitMax
+        hardcodedEscapeLimitMax
     ) {
       const maxLimit = defaultEscapeTimes[map] * hardcodedEscapeLimitMax;
       logger.warning(
@@ -503,8 +503,8 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       const ratio = (index + 1) / notBosses.length;
       // console.log(ratio);
       notBosses[index].Time = start;
-      let inc = Math.round(increment * ratio)
-      if (inc < 10) inc = 5
+      let inc = Math.round(increment * ratio);
+      if (inc < 10) inc = 5;
       start += inc;
     }
 
@@ -516,4 +516,19 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
 
     locationList[index].base.BossLocationSpawn = [...Bosses, ...notBosses];
   }
+};
+
+export const looselyShuffle = <T>(arr: T[], shuffleStep: number = 2): T[] => {
+  const n = arr.length;
+  const halfN = Math.floor(n / 2);
+  for (let i = shuffleStep - 1; i < halfN; i += shuffleStep) {
+    // Pick a random index from the second half of the array to swap with the current index
+    const randomIndex = halfN + Math.floor(Math.random() * (n - halfN));
+    // Swap the elements at the current index and the random index
+    const temp = arr[i];
+    arr[i] = arr[randomIndex];
+    arr[randomIndex] = temp;
+  }
+
+  return arr;
 };

@@ -2,7 +2,7 @@ import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { defaultEscapeTimes, originalMapList } from "./constants";
-import { buildBotWaves, MapSettings, shuffle } from "./utils";
+import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { saveToFile } from "../utils";
@@ -118,6 +118,11 @@ export default function buildScavMarksmanWaves(
       z
     ).map(({ BotZoneName }) => BotZoneName);
 
+    // Prevent too many snipers on streets
+    if (map === "tarkovstreets") {
+      sniperLocations = sniperLocations.filter((_, index) => index % 2 === 0);
+    }
+
     if (sniperLocations.length) {
       locationList[index].base.MinMaxBots = [
         {
@@ -144,6 +149,8 @@ export default function buildScavMarksmanWaves(
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
+
+    looselyShuffle(scavZones);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]

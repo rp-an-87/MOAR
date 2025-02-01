@@ -24,6 +24,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: ${{ steps.versionstep.outputs.version }}
         title: "MOAR ${{ steps.versionstep.outputs.version }}"
-        prerelease: true
+        prerelease: false
         files: |
           ./dist/*.zip

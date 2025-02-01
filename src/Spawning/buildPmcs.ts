@@ -2,7 +2,7 @@ import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { defaultEscapeTimes, defaultHostility } from "./constants";
-import { buildBotWaves, MapSettings, shuffle } from "./utils";
+import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
 import getSortedSpawnPointList from "./spawnZoneUtils";
 
@@ -30,10 +30,9 @@ export default function buildPmcs(
       Position: { x, y, z },
     } =
       locationList[index].base.SpawnPointParams[
-      locationList[index].base.SpawnPointParams.length - 1
+        locationList[index].base.SpawnPointParams.length - 1
       ];
 
-    // console.log(map);
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
         ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
@@ -50,8 +49,8 @@ export default function buildPmcs(
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
+    looselyShuffle(pmcZones);
 
-    // console.log(map, pmcZones);
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }

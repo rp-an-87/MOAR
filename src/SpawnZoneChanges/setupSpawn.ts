@@ -9,7 +9,6 @@ import {
   AddCustomBotSpawnPoints,
   AddCustomPlayerSpawnPoints,
   cleanClosest,
-  getClosestZone,
   removeClosestSpawnsFromCustomBots,
 } from "../Spawning/spawnZoneUtils";
 import { shuffle } from "../Spawning/utils";
@@ -48,8 +47,9 @@ export const setupSpawns = (container: DependencyContainer) => {
           case point.Categories.includes("Boss"):
             bossSpawn.push(point);
             break;
+
           case point.BotZoneName?.toLowerCase().includes("snipe") ||
-            point.DelayToCanSpawnSec > 40:
+            (map !== "lighthouse" && point.DelayToCanSpawnSec > 40):
             sniperSpawnSpawnPoints.push(point);
             break;
 
@@ -70,7 +70,7 @@ export const setupSpawns = (container: DependencyContainer) => {
         .map((point) => point.BotZoneName)
         .filter((item) => !!item)
     );
-    // console.log(sniperZones)
+
     const zoneHash: Record<string, Ixyz> = {};
 
     [...coopSpawns, ...nonBossSpawns, ...bossSpawn].forEach((point) => {
@@ -130,18 +130,18 @@ export const setupSpawns = (container: DependencyContainer) => {
     }
 
     nonBossSpawns = cleanClosest(
-      AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
+      AddCustomBotSpawnPoints(nonBossSpawns, map),
       mapIndex
     ).map((point) => {
       if (point.ColliderParams?._props?.Radius < limit) {
         point.ColliderParams._props.Radius = limit;
       }
+
       return !!point.Categories.length
         ? {
             ...point,
-            BotZoneName: point?.BotZoneName,
+            BotZoneName: point?.BotZoneName || "",
             Categories: ["Bot"],
-            // Infiltration: "",
             Sides: ["Savage"],
             CorePointId: 1,
           }

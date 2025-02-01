@@ -14,15 +14,18 @@ import { saveToFile } from "./utils";
 import { deleteBotSpawn, updateAllBotSpawns } from "./Spawns/updateUtils";
 import { BotSpawns } from "./Spawns";
 
-
 class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   preSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
       setupRoutes(container);
       // Object.keys(BotSpawns).forEach((map) => {
-      //   BotSpawns[map] = BotSpawns[map].map(({ x, y, z }) => ({ x, y: y + 1, z }))
-      // })
-      // updateAllBotSpawns(BotSpawns)
+      //   BotSpawns[map] = BotSpawns[map].map(({ x, y, z }) => ({
+      //     x,
+      //     y: y + 0.4,
+      //     z,
+      //   }));
+      // });
+      // updateAllBotSpawns(BotSpawns);
     }
   }
 

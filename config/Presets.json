@@ -1,5 +1,15 @@
 {
   "live-like": {},
+  "quiet-raids": {
+    "disableCascadingSpawns": true,
+    "scavGroupChance": 0.1,
+    "scavMaxGroupSize": 2,
+    "pmcGroupChance": 0.1,
+    "pmcMaxGroupSize": 2,
+    "scavWaveQuantity": 0.7,
+    "pmcWaveQuantity": 0.6,
+    "mainBossChanceBuff": 0
+  },
   "more-scavs": {
     "scavGroupChance": 0.5,
     "scavMaxGroupSize": 5,
@@ -28,11 +38,11 @@
   },
   "rogue-invasion": {
     "randomRaiderGroup": true,
-    "randomRaiderGroupChance": 50
+    "randomRaiderGroupChance": 100
   },
   "raider-invasion": {
     "randomRaiderGroup": true,
-    "randomRaiderGroupChance": 50
+    "randomRaiderGroupChance": 100
   },
   "insanity": {
     "scavWaveQuantity": 1.3,
