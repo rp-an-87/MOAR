@@ -24,28 +24,9 @@ export const setupSpawns = (container: DependencyContainer) => {
 
   const indexedMapSpawns: Record<number, ISpawnPointParam[]> = {};
 
-  const botSpawnHash = BotSpawns
+  const botSpawnHash = BotSpawns;
 
   originalMapList.forEach((map, mapIndex) => {
-    const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
-
-    locations[map].base.SpawnPointParams.forEach(
-      (
-        { ColliderParams, Categories }: ISpawnPointParam,
-        innerIndex: number
-      ) => {
-        if (
-          !Categories.includes("Boss") &&
-          ColliderParams?._props?.Radius !== undefined &&
-          ColliderParams?._props?.Radius < limit
-        ) {
-          locations[map].base.SpawnPointParams[
-            innerIndex
-          ].ColliderParams._props.Radius = limit;
-        }
-      }
-    );
-
     const allZones = [
       ...new Set(
         locations[map].base.SpawnPointParams.filter(
@@ -84,10 +65,13 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
-    const sniperZones = new Set(sniperSpawnSpawnPoints.map((point) => point.BotZoneName).filter((item) => !!item))
+    const sniperZones = new Set(
+      sniperSpawnSpawnPoints
+        .map((point) => point.BotZoneName)
+        .filter((item) => !!item)
+    );
     // console.log(sniperZones)
     const zoneHash: Record<string, Ixyz> = {};
-
 
     [...coopSpawns, ...nonBossSpawns, ...bossSpawn].forEach((point) => {
       if (!point.BotZoneName || sniperZones.has(point.BotZoneName)) return;
@@ -105,59 +89,64 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     globalValues.zoneHash[mapIndex] = zoneHash;
 
+    const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
 
     coopSpawns = cleanClosest(
       AddCustomPlayerSpawnPoints(coopSpawns, map, configLocations[mapIndex]),
       mapIndex,
       true
-    ).map((point, index) =>
-      !!point.Categories.length
-        ? {
-          ...point,
-          Categories: ["Player"],
-          BotZoneName: point?.BotZoneName
-            ? point.BotZoneName
-            : "coop_" + index,
-          CorePointId: 0,
-          Sides: ["Pmc"],
+    )
+      .map((point, index) => {
+        if (point.ColliderParams?._props?.Radius < limit) {
+          point.ColliderParams._props.Radius = limit;
         }
-        : point
-    ).filter((point) => {
-      // Now we transfer the extra spawns to the bots
-      if (!point.Categories.length) {
-        nonBossSpawns.push(point)
-      }
-      return !!point.Categories.length
-    });
-
+        return !!point.Categories.length
+          ? {
+              ...point,
+              Categories: ["Player"],
+              BotZoneName: point?.BotZoneName
+                ? point.BotZoneName
+                : "coop_" + index,
+              CorePointId: 0,
+              Sides: ["Pmc"],
+            }
+          : point;
+      })
+      .filter((point) => {
+        // Now we transfer the extra spawns to the bots
+        if (!point.Categories.length) {
+          nonBossSpawns.push(point);
+        }
+        return !!point.Categories.length;
+      });
 
     if (advancedConfig.ActivateSpawnCullingOnServerStart) {
-      botSpawnHash[map] = removeClosestSpawnsFromCustomBots(nonBossSpawns, map, configLocations[mapIndex]) || []
+      botSpawnHash[map] =
+        removeClosestSpawnsFromCustomBots(
+          nonBossSpawns,
+          map,
+          configLocations[mapIndex]
+        ) || [];
     }
 
     nonBossSpawns = cleanClosest(
       AddCustomBotSpawnPoints(nonBossSpawns, map, mapIndex),
-      mapIndex,
+      mapIndex
     ).map((point) => {
-      // console.log(point.BotZoneName)
+      if (point.ColliderParams?._props?.Radius < limit) {
+        point.ColliderParams._props.Radius = limit;
+      }
       return !!point.Categories.length
         ? {
-          ...point,
-          BotZoneName: point?.BotZoneName
-          ,
-          Categories: ["Bot"],
-          // Infiltration: "",
-          Sides: ["Savage"],
-          CorePointId: 1,
-        }
-        : point
-    }
-    );
-
-    // if (map === "factory4_day") {
-    //   zoneHash[mapIndex],
-    //     console.log(new Set(nonBossSpawns.map(({ BotZoneName }) => BotZoneName)));
-    // }
+            ...point,
+            BotZoneName: point?.BotZoneName,
+            Categories: ["Bot"],
+            // Infiltration: "",
+            Sides: ["Savage"],
+            CorePointId: 1,
+          }
+        : point;
+    });
 
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints,
@@ -182,11 +171,11 @@ export const setupSpawns = (container: DependencyContainer) => {
     //;
     // console.log(locations[map].base.SpawnPointParams.length, indexedMapSpawns[mapIndex].filter(({ Categories }) => Categories.length).length)
 
-
     locations[map].base.SpawnPointParams = [];
   });
 
-  advancedConfig.ActivateSpawnCullingOnServerStart && updateAllBotSpawns(botSpawnHash)
+  advancedConfig.ActivateSpawnCullingOnServerStart &&
+    updateAllBotSpawns(botSpawnHash);
   // console.log(globalValues.zoneHash)
   // saveToFile(globalValues.zoneHash, "zoneHash.json");
   globalValues.indexedMapSpawns = indexedMapSpawns;

@@ -53,6 +53,7 @@ export const updateBotSpawn = (map: string, value: Ixyz) => {
   updateJsonFile<Ixyz>(
     currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
     (jsonData) => {
+      value.y = value.y + 1
       if (jsonData[map]) {
         jsonData[map].push(value)
       } else {
@@ -98,6 +99,7 @@ export const updatePlayerSpawn = (map: string, value: Ixyz) => {
     currentDirectory +
     "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
     (jsonData) => {
+      value.y = value.y + 1
       if (jsonData[map]) {
         jsonData[map].push(value)
       } else {

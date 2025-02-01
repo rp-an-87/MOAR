@@ -11,17 +11,18 @@ import { setupRoutes } from "./Routes/routes";
 import checkPresetLogic from "./Tests/checkPresets";
 import { setupSpawns } from "./SpawnZoneChanges/setupSpawn";
 import { saveToFile } from "./utils";
-import { deleteBotSpawn, updatePlayerSpawn } from "./Spawns/updateUtils";
+import { deleteBotSpawn, updateAllBotSpawns } from "./Spawns/updateUtils";
+import { BotSpawns } from "./Spawns";
+
 
 class Moar implements IPostSptLoadMod, IPreSptLoadMod, IPostDBLoadMod {
   preSptLoad(container: DependencyContainer): void {
     if (enableBotSpawning) {
       setupRoutes(container);
-      // deleteBotSpawn("woods", {
-      //   "x": 138.656036,
-      //   "y": -1.87674594,
-      //   "z": 154.9155
-      // });
+      // Object.keys(BotSpawns).forEach((map) => {
+      //   BotSpawns[map] = BotSpawns[map].map(({ x, y, z }) => ({ x, y: y + 1, z }))
+      // })
+      // updateAllBotSpawns(BotSpawns)
     }
   }
 

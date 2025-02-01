@@ -252,7 +252,7 @@ export const buildBotWaves = (
       DependKarma: false,
       DependKarmaPVE: false,
       ForceSpawn,
-      IgnoreMaxBots: true,
+      IgnoreMaxBots: ForceSpawn,
       RandomTimeSpawn: false,
       Time: startTime,
       Supports: null,

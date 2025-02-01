@@ -75,6 +75,7 @@ export default function buildScavMarksmanWaves(
       // console.log(map, capToSet, maxBotCapOverride, maxBotCap);
       locationList[index].base.BotMax = capToSet;
       locationList[index].base.BotMaxPvE = capToSet;
+      locationList[index].base.BotMaxPlayer = capToSet;
       botConfig.maxBotCap[originalMapList[index]] = capToSet;
     }
 
@@ -101,7 +102,7 @@ export default function buildScavMarksmanWaves(
       Position: { x, y, z },
     } =
       locationList[index].base.SpawnPointParams[
-      locationList[index].base.SpawnPointParams.length - 1
+        locationList[index].base.SpawnPointParams.length - 1
       ];
 
     let sniperLocations = getSortedSpawnPointList(
