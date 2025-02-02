@@ -51,7 +51,7 @@
     "pmcGroupChance": 0.8,
     "pmcMaxGroupSize": 6,
     "scavMaxGroupSize": 6,
-    "sniperGroupChance": 1,
+    "sniperGroupChance": 0.5,
     "bossOpenZones": true,
     "randomRaiderGroup": true,
     "randomRaiderGroupChance": 50,
@@ -66,7 +66,7 @@
     "mainBossChanceBuff": 35
   },
   "sniper-buddies": {
-    "sniperMaxGroupSize": 2.5,
+    "sniperMaxGroupSize": 2,
     "sniperGroupChance": 1
   }
 }

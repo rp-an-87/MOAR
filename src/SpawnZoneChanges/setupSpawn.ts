@@ -42,10 +42,25 @@ export const setupSpawns = (container: DependencyContainer) => {
     let sniperSpawnSpawnPoints: ISpawnPointParam[] = [];
     let coopSpawns: ISpawnPointParam[] = [];
 
+    const bossZoneList = new Set([
+      "Zone_Blockpost",
+      "Zone_RoofRocks",
+      "Zone_RoofContainers",
+      "Zone_RoofBeach",
+      "Zone_TreatmentRocks",
+      "Zone_TreatmentBeach",
+      "Zone_Hellicopter",
+      "Zone_Island",
+      "BotZoneGate1",
+      "BotZoneGate2",
+      "BotZoneBasement",
+    ]);
+
     shuffle<ISpawnPointParam[]>(locations[map].base.SpawnPointParams).forEach(
       (point) => {
         switch (true) {
-          case point.Categories.includes("Boss"):
+          case point.Categories.includes("Boss") ||
+            bossZoneList.has(point.BotZoneName):
             bossSpawn.push(point);
             break;
 
@@ -70,12 +85,6 @@ export const setupSpawns = (container: DependencyContainer) => {
       if (!val.BotZoneName) val.BotZoneName === "ZoneSnipeMoar_" + index;
       return val;
     });
-
-    const sniperZones = new Set(
-      sniperSpawnSpawnPoints
-        .map((point) => point.BotZoneName)
-        .filter((item) => !!item)
-    );
 
     const limit = mapConfig[configLocations[mapIndex]].spawnMinDistance;
 
@@ -142,10 +151,10 @@ export const setupSpawns = (container: DependencyContainer) => {
     );
 
     indexedMapSpawns[mapIndex] = [
-      ...sniperSpawnSpawnPoints,
-      ...bossSpawn,
-      ...nonBossSpawns,
-      ...coopSpawns,
+      ...sniperSpawnSpawnPoints.map((point) => ({ ...point, type: "sniper" })),
+      ...bossSpawn.map((point) => ({ ...point, type: "boss" })),
+      ...nonBossSpawns.map((point) => ({ ...point, type: "nonBoss" })),
+      ...coopSpawns.map((point) => ({ ...point, type: "coop" })),
     ];
 
     // const added = indexedMapSpawns[mapIndex].filter(

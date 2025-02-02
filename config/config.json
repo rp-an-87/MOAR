@@ -5,7 +5,7 @@
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
 
-  "scavWaveDistribution": 0.8,
+  "scavWaveDistribution": 1,
   "scavWaveQuantity": 1,
 
   "startingPmcs": false,
@@ -28,7 +28,7 @@
   
   "pmcMaxGroupSize": 4,
   "scavMaxGroupSize": 3,
-  "sniperMaxGroupSize": 1.6,
+  "sniperMaxGroupSize": 1,
 
   "bossOpenZones": false,
 

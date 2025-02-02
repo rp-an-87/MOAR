@@ -229,25 +229,20 @@ export const buildBotWaves = (
 
     if (bossEscortAmount < 0) bossEscortAmount = 0;
 
-    const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
+    const totalCountThisWave = bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
 
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
-      BossChance: isMarksman ? 85 : 100,
+      BossChance: 100,
       BossDifficult,
       BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: BossDifficult,
       BossEscortType: botType,
       BossName: botType,
       BossPlayer: false,
-      BossZone:
-        bossZones[
-          isMarksman
-            ? totalCountThusFar
-            : Math.floor(totalCountThusFar * botToZoneTotal)
-        ] || "",
+      BossZone: bossZones[Math.floor(totalCountThusFar * botToZoneTotal)] || "",
       Delay: 0,
       DependKarma: false,
       DependKarmaPVE: false,
@@ -267,12 +262,12 @@ export const buildBotWaves = (
     if (maxSlotsReached <= 0) break;
   }
   // isMarksman &&
-  // console.log(
-  //   // bossZones,
-  //   botType,
-  //   bossZones.length,
-  //   waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
-  // );
+  //   console.log(
+  //     // bossZones,
+  //     botType,
+  //     bossZones.length,
+  //     waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
+  //   );
   return waves;
 };
 
@@ -341,6 +336,7 @@ export const buildZombie = (
 };
 
 export interface MapSettings {
+  sniperQuantity?: number;
   initialSpawnDelay: number;
   smoothingDistribution: number;
   mapCullingNearPointValue: number;
@@ -518,7 +514,7 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
   }
 };
 
-export const looselyShuffle = <T>(arr: T[], shuffleStep: number = 2): T[] => {
+export const looselyShuffle = <T>(arr: T[], shuffleStep: number = 3): T[] => {
   const n = arr.length;
   const halfN = Math.floor(n / 2);
   for (let i = shuffleStep - 1; i < halfN; i += shuffleStep) {

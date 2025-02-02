@@ -35,21 +35,16 @@ export default function buildPmcs(
 
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
-          index % 3 === 0 &&
-          !Categories.includes("Boss") &&
-          Categories[0] === "Bot" &&
-          !(
-            BotZoneName?.toLowerCase().includes("snipe") ||
-            DelayToCanSpawnSec > 40
-          )
-      ),
+        (point) => point["type"] === "nonBoss"
+      ).filter((_, sIndex) => sIndex % 3 === 0),
       x,
       y,
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
     looselyShuffle(pmcZones);
+
+    // console.log(pmcZones);
 
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);

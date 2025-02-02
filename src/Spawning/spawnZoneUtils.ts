@@ -195,7 +195,7 @@ export const AddCustomBotSpawnPoints = (
     Id: uuidv4(),
     Infiltration: "",
     Position: coords,
-    Rotation: 116.208389,
+    Rotation: random360(),
     Sides: ["Savage"],
   }));
 
@@ -212,7 +212,9 @@ export const AddCustomSniperSpawnPoints = (
   }
 
   const sniperSpawns = SniperSpawns[map].map((coords: Ixyz, index: number) => ({
-    BotZoneName: "SniperZone_" + index,
+    BotZoneName:
+      getClosestZone(SpawnPointParams, coords.x, coords.y, coords.z) ||
+      "custom_snipe_" + index,
     Categories: ["Bot"],
     ColliderParams: {
       _parent: "SpawnSphereParams",
@@ -230,13 +232,14 @@ export const AddCustomSniperSpawnPoints = (
     Id: uuidv4(),
     Infiltration: "",
     Position: coords,
-    Rotation: 116.208389,
+    Rotation: random360(),
     Sides: ["Savage"],
   }));
 
   return [...SpawnPointParams, ...sniperSpawns];
 };
 
+export const random360 = () => Math.random() * 360;
 export const AddCustomPlayerSpawnPoints = (
   SpawnPointParams: ISpawnPointParam[],
   map: string
@@ -295,7 +298,7 @@ export const AddCustomPlayerSpawnPoints = (
     Id: uuidv4(),
     Infiltration: getClosestInfil(coords.x, coords.y, coords.z),
     Position: coords,
-    Rotation: 116.208389,
+    Rotation: random360(),
     Sides: ["Pmc"],
   }));
 
@@ -358,14 +361,14 @@ export const removeClosestSpawnsFromCustomBots = (
     return result;
   });
 
-  console.log(
-    map,
-    coords.length,
-    ">",
-    filteredCoords.length,
-    "culled",
-    coords.length - filteredCoords.length,
-    "spawns"
-  );
+  // console.log(
+  //   map,
+  //   coords.length,
+  //   ">",
+  //   filteredCoords.length,
+  //   "culled",
+  //   coords.length - filteredCoords.length,
+  //   "spawns"
+  // );
   return filteredCoords;
 };

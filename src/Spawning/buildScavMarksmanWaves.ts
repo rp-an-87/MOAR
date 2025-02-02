@@ -59,6 +59,7 @@ export default function buildScavMarksmanWaves(
       maxBotCapOverride,
       EscapeTimeLimit,
       scavHotZones = [],
+      sniperQuantity = 1,
       scavWaveCount,
       initialSpawnDelay,
     } = (mapConfig?.[map] as MapSettings) || {};
@@ -105,23 +106,29 @@ export default function buildScavMarksmanWaves(
         locationList[index].base.SpawnPointParams.length - 1
       ];
 
-    let sniperLocations = getSortedSpawnPointList(
-      [...locationList[index].base.SpawnPointParams].filter(
-        ({ Categories, DelayToCanSpawnSec, BotZoneName, Sides }) =>
-          !Categories.includes("Boss") &&
-          Sides[0] === "Savage" &&
-          (BotZoneName?.toLowerCase().includes("snipe") ||
-            DelayToCanSpawnSec > 40)
+    const sniperSpawns = getSortedSpawnPointList(
+      locationList[index].base.SpawnPointParams.filter(
+        (point) => point["type"] === "sniper"
       ),
       x,
       y,
       z
-    ).map(({ BotZoneName }) => BotZoneName);
+    );
 
-    // Prevent too many snipers on streets
-    if (map === "tarkovstreets") {
-      sniperLocations = sniperLocations.filter((_, index) => index % 2 === 0);
-    }
+    let sniperLocations = sniperSpawns.map(({ BotZoneName }) => BotZoneName);
+    // console.log(sniperLocations);
+
+    const sniperDelay = 20;
+    // Make sure that the sniper spawns permit snipers to actually spawn early.
+    const sniperIds = new Set(sniperSpawns.map(({ Id }) => Id));
+
+    locationList[index].base.SpawnPointParams.forEach((point, snipeIndex) => {
+      if (sniperIds.has(point.Id)) {
+        locationList[index].base.SpawnPointParams[
+          snipeIndex
+        ].DelayToCanSpawnSec = 20;
+      }
+    });
 
     if (sniperLocations.length) {
       locationList[index].base.MinMaxBots = [
@@ -135,15 +142,8 @@ export default function buildScavMarksmanWaves(
 
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        ({ Categories, DelayToCanSpawnSec, BotZoneName }, index) =>
-          !Categories.includes("Boss") &&
-          index % 3 !== 0 &&
-          Categories[0] === "Bot" &&
-          !(
-            BotZoneName?.toLowerCase().includes("snipe") ||
-            DelayToCanSpawnSec > 40
-          )
-      ),
+        (point) => point["type"] === "nonBoss"
+      ).filter((_, sIndex) => sIndex % 3 !== 0),
       x,
       y,
       z,
@@ -183,11 +183,13 @@ export default function buildScavMarksmanWaves(
       );
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
+
     if (config.disableCascadingSpawns)
       sniperLocations = shuffle<string[]>(sniperLocations);
+    // console.log(map);
     const snipers = buildBotWaves(
-      sniperLocations.length,
-      timeLimit,
+      Math.min(sniperQuantity, sniperLocations.length),
+      timeLimit / 2, //TODO:
       sniperMaxGroupSize,
       sniperGroupChance,
       sniperLocations,
@@ -195,7 +197,7 @@ export default function buildScavMarksmanWaves(
       WildSpawnType.MARKSMAN,
       true,
       0.3,
-      60
+      sniperDelay
     );
 
     if (config.disableCascadingSpawns) scavZones = shuffle<string[]>(scavZones);
