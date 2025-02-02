@@ -130,7 +130,7 @@
   },
   "woods": {
     "sniperQuantity": 20,
-    "initialSpawnDelay": 20,
+    "initialSpawnDelay": 3,
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 6,
     "mapCullingNearPointValue": 13,
