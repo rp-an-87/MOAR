@@ -36,7 +36,6 @@
   },
   "laboratory": {},
   "lighthouse": {
-    "exUsec": 20,
     "bossKnight": 30,
     "bossPartisan": 30
   },
