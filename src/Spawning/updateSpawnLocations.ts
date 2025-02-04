@@ -25,6 +25,8 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
     const { x, y, z } = playerSpawn.Position;
 
+    // console.log(map, playerSpawn.BotZoneName, playerSpawn.Position);
+
     const sortedSpawnPointList = getSortedSpawnPointList(
       filteredSpawns,
       x,

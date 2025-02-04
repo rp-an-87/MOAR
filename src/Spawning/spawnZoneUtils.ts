@@ -280,7 +280,7 @@ export const AddCustomPlayerSpawnPoints = (
   };
 
   const playerSpawns = PlayerSpawns[map].map((coords: Ixyz, index) => ({
-    BotZoneName: "Added_" + index,
+    BotZoneName: "",
     Categories: ["Player"],
     ColliderParams: {
       _parent: "SpawnSphereParams",
@@ -361,14 +361,14 @@ export const removeClosestSpawnsFromCustomBots = (
     return result;
   });
 
-  // console.log(
-  //   map,
-  //   coords.length,
-  //   ">",
-  //   filteredCoords.length,
-  //   "culled",
-  //   coords.length - filteredCoords.length,
-  //   "spawns"
-  // );
+  console.log(
+    map,
+    coords.length,
+    ">",
+    filteredCoords.length,
+    "culled",
+    coords.length - filteredCoords.length,
+    "spawns"
+  );
   return filteredCoords;
 };

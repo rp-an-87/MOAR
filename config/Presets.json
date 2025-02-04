@@ -21,13 +21,12 @@
     "pmcWaveQuantity": 1.2
   },
   "more-scavs-and-pmcs": {
-    "scavGroupChance": 0.7,
+    "scavGroupChance": 0.5,
     "scavMaxGroupSize": 5,
-    "pmcGroupChance": 0.8,
+    "pmcGroupChance": 0.5,
     "pmcMaxGroupSize": 5,
-    "scavWaveQuantity": 1.2,
-    "pmcWaveQuantity": 1.2,
-    "mainBossChanceBuff": 25
+    "scavWaveQuantity": 1.1,
+    "pmcWaveQuantity": 1.2
   },
   "boss-invasion": {
     "bossOpenZones": true,
@@ -63,7 +62,7 @@
   },
   "main-boss-roaming": {
     "bossOpenZones": true,
-    "mainBossChanceBuff": 35
+    "mainBossChanceBuff": 50
   },
   "sniper-buddies": {
     "sniperMaxGroupSize": 2,

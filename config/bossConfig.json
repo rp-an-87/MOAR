@@ -36,8 +36,10 @@
   },
   "laboratory": {},
   "lighthouse": {
-    "bossKnight": 30,
-    "bossPartisan": 30
+    "exUsec": 35,
+    "bossKnight": 20,
+    "bossPartisan": 20,
+    "bossZryachiy": 30
   },
   "rezervbase": {
     "bossGluhar": 30

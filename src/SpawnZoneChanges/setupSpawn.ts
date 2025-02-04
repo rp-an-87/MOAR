@@ -82,7 +82,7 @@ export const setupSpawns = (container: DependencyContainer) => {
     );
 
     // fix GZ
-    if (isGZ)
+    if (isGZ) {
       sniperSpawnSpawnPoints.map((point, index) => {
         if (index < 2) {
           point.BotZoneName = Math.random()
@@ -95,10 +95,11 @@ export const setupSpawns = (container: DependencyContainer) => {
         }
         return point;
       });
+    }
 
-    // console.log(sniperSpawnSpawnPoints.length);
+    // console.log(map, sniperSpawnSpawnPoints.length);
     sniperSpawnSpawnPoints.map((val, index) => {
-      if (!val.BotZoneName) val.BotZoneName === "ZoneSnipeMoar_" + index;
+      if (!val.BotZoneName) val.BotZoneName = "custom_snipe_" + index; // TODO: Adjusted this watch for sniper weirdness
       return val;
     });
 
@@ -117,9 +118,7 @@ export const setupSpawns = (container: DependencyContainer) => {
           ? {
               ...point,
               Categories: ["Player"],
-              BotZoneName: point?.BotZoneName
-                ? point.BotZoneName
-                : "coop_" + index,
+              BotZoneName: point?.BotZoneName ? point.BotZoneName : "",
               CorePointId: 0,
               Sides: ["Pmc"],
             }
@@ -165,8 +164,6 @@ export const setupSpawns = (container: DependencyContainer) => {
       sniperSpawnSpawnPoints,
       map
     );
-
-    // console.log(coopSpawns.length);
 
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints.map((point) => ({ ...point, type: "sniper" })),
