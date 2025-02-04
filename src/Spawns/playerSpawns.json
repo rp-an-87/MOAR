@@ -68,7 +68,13 @@
   "shoreline": [],
   "tarkovstreets": [],
   "woods": [],
-  "sandbox": [],
+  "sandbox": [
+    {
+      "x": 10.6596689,
+      "y": 23.57817,
+      "z": 157.951584
+    }
+  ],
   "sandbox_high": [
     {
       "x": 10.6596689,

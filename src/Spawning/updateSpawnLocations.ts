@@ -13,33 +13,32 @@ export default function updateSpawnLocations(locationList: ILocation[]) {
     // const addedSpawns: ISpawnPointParam[] = [];
     const mapSpawns = globalValues.indexedMapSpawns[index];
 
-    const filteredSpawns = [...mapSpawns].filter(
-      (point) => {
-        if (point?.Categories[0] === "Player") {
-          playerSpawns.push(point);
-          return false;
-        }
-
-        return true;
+    const filteredSpawns = [...mapSpawns].filter((point) => {
+      if (point?.Categories[0] === "Player") {
+        playerSpawns.push(point);
+        return false;
       }
-    )
 
+      return true;
+    });
 
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
-    const { x, y, z } = playerSpawn.Position
+    const { x, y, z } = playerSpawn.Position;
 
-
-    const sortedSpawnPointList = getSortedSpawnPointList(filteredSpawns, x, y, z)
+    const sortedSpawnPointList = getSortedSpawnPointList(
+      filteredSpawns,
+      x,
+      y,
+      z
+    );
 
     // console.log(map, sortedSpawnPointList.filter((point) => point.CorePointId < 100).map((point) => point.CorePointId))
 
     // console.log(map, hash)
 
-    locationList[index].base.SpawnPointParams = sortedSpawnPointList
-
+    locationList[index].base.SpawnPointParams = sortedSpawnPointList;
 
     playerSpawn.ColliderParams._props.Radius = 1;
-
 
     const listToAddToOpenZones = shuffle<string[]>([
       ...new Set(

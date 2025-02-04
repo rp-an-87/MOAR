@@ -55,7 +55,7 @@ export const setupSpawns = (container: DependencyContainer) => {
       "BotZoneGate2",
       "BotZoneBasement",
     ]);
-
+    const isGZ = map.includes("sandbox");
     shuffle<ISpawnPointParam[]>(locations[map].base.SpawnPointParams).forEach(
       (point) => {
         switch (true) {
@@ -81,6 +81,22 @@ export const setupSpawns = (container: DependencyContainer) => {
       }
     );
 
+    // fix GZ
+    if (isGZ)
+      sniperSpawnSpawnPoints.map((point, index) => {
+        if (index < 2) {
+          point.BotZoneName = Math.random()
+            ? "ZoneSandSnipeCenter"
+            : "ZoneSandSnipeCenter2";
+        } else {
+          point.BotZoneName = ["ZoneSandSnipeCenter", "ZoneSandSnipeCenter2"][
+            index
+          ];
+        }
+        return point;
+      });
+
+    // console.log(sniperSpawnSpawnPoints.length);
     sniperSpawnSpawnPoints.map((val, index) => {
       if (!val.BotZoneName) val.BotZoneName === "ZoneSnipeMoar_" + index;
       return val;
@@ -111,9 +127,9 @@ export const setupSpawns = (container: DependencyContainer) => {
       })
       .filter((point) => {
         // Now we transfer the extra spawns to the bots
-        if (!point.Categories.length) {
-          nonBossSpawns.push(point);
-        }
+        // if (!point.Categories.length) {
+        //   nonBossSpawns.push(point);
+        // }
         return !!point.Categories.length;
       });
 
@@ -137,7 +153,7 @@ export const setupSpawns = (container: DependencyContainer) => {
       return !!point.Categories.length
         ? {
             ...point,
-            BotZoneName: point?.BotZoneName || "",
+            BotZoneName: isGZ ? "ZoneSandbox" : point?.BotZoneName || "",
             Categories: ["Bot"],
             Sides: ["Savage"],
             CorePointId: 1,
@@ -149,6 +165,8 @@ export const setupSpawns = (container: DependencyContainer) => {
       sniperSpawnSpawnPoints,
       map
     );
+
+    // console.log(coopSpawns.length);
 
     indexedMapSpawns[mapIndex] = [
       ...sniperSpawnSpawnPoints.map((point) => ({ ...point, type: "sniper" })),
@@ -162,12 +180,14 @@ export const setupSpawns = (container: DependencyContainer) => {
     // );
     // console.log(
     //   map,
-    //   "total added",
-    //   added.length,
-    //   "player",
-    //   added.filter(({ Categories }) => Categories[0] === "Player").length,
-    //   "bot",
-    //   added.filter(({ Categories }) => Categories[0] === "Bot").length
+    //   "sniperSpawnSpawnPoints",
+    //   sniperSpawnSpawnPoints.length,
+    //   "bossSpawn",
+    //   bossSpawn.length,
+    //   "nonBossSpawns",
+    //   nonBossSpawns.length,
+    //   "coopSpawns",
+    //   coopSpawns.length
     // );
 
     //;

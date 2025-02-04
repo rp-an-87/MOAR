@@ -227,9 +227,14 @@ export const buildBotWaves = (
       ? Math.round(maxGroup * Math.random())
       : 0;
 
-    if (bossEscortAmount < 0) bossEscortAmount = 0;
+    if (
+      bossEscortAmount < 0 ||
+      (bossEscortAmount > 0 && bossEscortAmount + 1 > maxSlotsReached)
+    ) {
+      bossEscortAmount = 0;
+    }
 
-    const totalCountThisWave = bossEscortAmount + 1;
+    const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
 
     const BossDifficult = getDifficulty(difficulty);
@@ -258,7 +263,7 @@ export const buildBotWaves = (
 
     startTime += Math.round(totalCountThisWave * averageTime);
 
-    maxSlotsReached -= 1 + bossEscortAmount;
+    maxSlotsReached -= 1 + (isMarksman ? 0 : bossEscortAmount);
     if (maxSlotsReached <= 0) break;
   }
   // isMarksman &&
