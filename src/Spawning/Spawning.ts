@@ -131,6 +131,17 @@ export const buildWaves = (container: DependencyContainer) => {
     rezervbase: { pmcbot: { min: 0, max: 0 } },
   };
 
+  if (
+    config.startingPmcs &&
+    (!config.disableCascadingSpawns || config.spawnSmoothing)
+  ) {
+    Logger.warning(
+      `[MOAR] Starting pmcs turned on, turning off cascade system and smoothing.\n`
+    );
+    config.spawnSmoothing = false;
+    config.disableCascadingSpawns = true;
+  }
+
   updateSpawnLocations(locationList);
 
   setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
@@ -150,7 +161,7 @@ export const buildWaves = (container: DependencyContainer) => {
 
   // enableSmoothing
   if (config.spawnSmoothing) {
-    enforceSmoothing(locationList)
+    enforceSmoothing(locationList);
   }
 
   // saveToFile(locations.bigmap.base.SpawnPointParams, "spawns.json");
