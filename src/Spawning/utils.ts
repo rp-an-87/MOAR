@@ -4,8 +4,9 @@ import {
   WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
 import _config from "../../config/config.json";
+import mapConfig from "../../config/mapConfig.json";
 import { ILocation } from "@spt/models/eft/common/ILocation";
-import { defaultEscapeTimes } from "./constants";
+import { configLocations, defaultEscapeTimes } from "./constants";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
 export const waveBuilder = (
@@ -69,8 +70,8 @@ export const waveBuilder = (
       isPlayers: isPlayer,
       slots_max: slotMax,
       slots_min: slotMin,
-      time_min: starting || !max ? -1 : min,
-      time_max: starting || !max ? -1 : max,
+      time_min: min,
+      time_max: max,
       WildSpawnType: wildSpawnType as WildSpawnType,
       number: waves.length,
       sptId: wildSpawnType + waves.length,
@@ -204,38 +205,49 @@ export const buildBotWaves = (
   if (!botTotal) return [];
   const pushToEnd = botDistribution > 1;
   const pullFromEnd = botDistribution < 1;
+  const botToZoneTotal = bossZones.length / botTotal;
+  const isMarksman = botType === "marksman";
 
   let startTime = pushToEnd
     ? Math.round((botDistribution - 1) * escapeTimeLimit)
     : spawnDelay;
 
-  escapeTimeLimit = pullFromEnd ? Math.round(escapeTimeLimit * botDistribution) : Math.round(escapeTimeLimit - startTime)
+  escapeTimeLimit = pullFromEnd
+    ? Math.round(escapeTimeLimit * botDistribution)
+    : Math.round(escapeTimeLimit - startTime);
 
   const averageTime = Math.round(escapeTimeLimit / botTotal);
 
   const waves: IBossLocationSpawn[] = [];
   let maxSlotsReached = botTotal;
-  if (maxGroup < 1) maxGroup = 1
+  if (maxGroup < 1) maxGroup = 1;
   while (botTotal > 0) {
-    const allowGroup = groupChance > Math.random()
-    let bossEscortAmount = allowGroup ? Math.round(maxGroup * Math.random()) : 0;
+    const allowGroup = groupChance > Math.random();
+    let bossEscortAmount = allowGroup
+      ? Math.round(maxGroup * Math.random())
+      : 0;
 
     if (bossEscortAmount < 0) bossEscortAmount = 0;
 
-    const totalCountThisWave = bossEscortAmount + 1;
+    const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
 
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
-      BossChance: 100,
+      BossChance: isMarksman ? 80 : 100,
       BossDifficult,
       BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: BossDifficult,
       BossEscortType: botType,
       BossName: botType,
       BossPlayer: false,
-      BossZone: bossZones[totalCountThusFar] || "",
+      BossZone:
+        bossZones[
+        isMarksman
+          ? totalCountThusFar
+          : Math.floor(totalCountThusFar * botToZoneTotal)
+        ] || "",
       Delay: 0,
       DependKarma: false,
       DependKarmaPVE: false,
@@ -254,9 +266,11 @@ export const buildBotWaves = (
     maxSlotsReached -= 1 + bossEscortAmount;
     if (maxSlotsReached <= 0) break;
   }
+  // isMarksman &&
   // console.log(
-  //   escapeTimeLimit,
+  //   // bossZones,
   //   botType,
+  //   bossZones.length,
   //   waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
   // );
   return waves;
@@ -276,7 +290,9 @@ export const buildZombie = (
     ? Math.round((botDistribution - 1) * escapeTimeLimit)
     : 0;
 
-  escapeTimeLimit = pullFromEnd ? Math.round(escapeTimeLimit * botDistribution) : Math.round(escapeTimeLimit - startTime)
+  escapeTimeLimit = pullFromEnd
+    ? Math.round(escapeTimeLimit * botDistribution)
+    : Math.round(escapeTimeLimit - startTime);
 
   const averageTime = Math.round(escapeTimeLimit / botTotal);
 
@@ -284,13 +300,12 @@ export const buildZombie = (
   let maxSlotsReached = botTotal;
 
   while (botTotal > 0) {
-    const allowGroup = 0.2 > Math.random()
+    const allowGroup = 0.2 > Math.random();
     let bossEscortAmount = allowGroup ? Math.round(4 * Math.random()) : 0;
 
     if (bossEscortAmount < 0) bossEscortAmount = 0;
 
     const totalCountThisWave = bossEscortAmount + 1;
-
 
     const main = getRandomZombieType();
     waves.push({
@@ -306,15 +321,11 @@ export const buildZombie = (
       IgnoreMaxBots: false,
       RandomTimeSpawn: false,
       Time: startTime,
-      Supports: new Array(
-        bossEscortAmount
-      )
-        .fill("")
-        .map(() => ({
-          BossEscortType: getRandomZombieType(),
-          BossEscortDifficult: ["normal"],
-          BossEscortAmount: "1",
-        })),
+      Supports: new Array(bossEscortAmount).fill("").map(() => ({
+        BossEscortType: getRandomZombieType(),
+        BossEscortDifficult: ["normal"],
+        BossEscortAmount: "1",
+      })),
       TriggerId: "",
       TriggerName: "",
       spawnMode: ["regular", "pve"],
@@ -330,6 +341,10 @@ export const buildZombie = (
 };
 
 export interface MapSettings {
+  initialSpawnDelay: number;
+  smoothingDistribution: number;
+  mapCullingNearPointValue: number;
+  spawnMinDistance: number;
   EscapeTimeLimit?: number;
   maxBotPerZoneOverride?: number;
   maxBotCapOverride?: number;
@@ -440,7 +455,7 @@ export const getRandomInArray = <T>(arr: T[]): T =>
 
 export const enforceSmoothing = (locationList: ILocation[]) => {
   for (let index = 0; index < locationList.length; index++) {
-    const waves = locationList[index].base.BossLocationSpawn
+    const waves = locationList[index].base.BossLocationSpawn;
 
     const Bosses: IBossLocationSpawn[] = [];
     let notBosses: IBossLocationSpawn[] = [];
@@ -452,39 +467,52 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       WildSpawnType.ASSAULT,
       WildSpawnType.MARKSMAN,
       "pmcBEAR",
-      "pmcUSEC"])
+      "pmcUSEC",
+    ]);
 
     for (const wave of waves) {
       if (notBossesSet.has(wave.BossName)) {
-        notBosses.push(wave)
+        notBosses.push(wave);
       } else {
-        Bosses.push(wave)
+        Bosses.push(wave);
       }
     }
 
-    let first = Infinity, last = -Infinity
+    let first = Infinity,
+      last = -Infinity;
 
-    notBosses.forEach(notBoss => {
-      first = Math.min(notBoss.Time, first)
-      last = Math.max(notBoss.Time, last)
-    })
+    notBosses.forEach((notBoss) => {
+      first = Math.min(notBoss.Time, first);
+      last = Math.max(notBoss.Time, last);
+    });
 
+    // if (first < 15) first = 15;
 
-    notBosses = notBosses.sort((a, b) => a.Time - b.Time)
+    notBosses = notBosses.sort((a, b) => a.Time - b.Time);
 
     // console.log(notBosses.map(({ Time }) => Time))
 
-    let start = first
-    const increment = Math.round((last - first) / (notBosses.length - 1))
+    let start = first;
+    const smoothingDistribution = (mapConfig[configLocations[index]] as any)
+      .smoothingDistribution as number;
+
+    const increment =
+      Math.round((last - first) / notBosses.length) * 2 * smoothingDistribution;
 
     for (let index = 0; index < notBosses.length; index++) {
-      notBosses[index].Time = start
+      const ratio = (index + 1) / notBosses.length;
+      // console.log(ratio);
+      notBosses[index].Time = start;
 
-      start += Math.round(index < notBosses.length / 2 ? increment * (0.5) : increment * 1.5)
+      start += Math.round(increment * ratio);
     }
 
-    // console.log(notBosses.map(({ Time, BossName }) => ({ BossName, Time })))
+    // console.log(
+    //   configLocations[index],
+    //   last,
+    //   notBosses.map(({ Time, BossName }) => ({ BossName, Time }))
+    // );
 
-    locationList[index].base.BossLocationSpawn = [...Bosses, ...notBosses]
+    locationList[index].base.BossLocationSpawn = [...Bosses, ...notBosses];
   }
-}
+};

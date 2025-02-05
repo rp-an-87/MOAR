@@ -1,13 +1,10 @@
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
-import {
-  bossesToRemoveFromPool,
-  defaultEscapeTimes,
-  defaultHostility,
-} from "./constants";
+import { defaultEscapeTimes, defaultHostility } from "./constants";
 import { buildBotWaves, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
+import getSortedSpawnPointList from "./spawnZoneUtils";
 
 export default function buildPmcs(
   config: typeof _config,
@@ -23,44 +20,55 @@ export default function buildPmcs(
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
+    const { pmcHotZones = [], pmcWaveCount, initialSpawnDelay } =
+      (mapConfig?.[map] as MapSettings) || {};
+
     const {
-      pmcHotZones = [],
-      pmcWaveCount,
-    } = (mapConfig?.[map] as MapSettings) || {};
+      Position: { x, z },
+    } =
+      locationList[index].base.SpawnPointParams[
+      locationList[index].base.SpawnPointParams.length - 1
+      ];
 
-    let pmcZones = shuffle<string[]>([
-      ...new Set(
-        [...locationList[index].base.SpawnPointParams]
-          .filter(
-            ({ Categories, BotZoneName }) =>
-              !!BotZoneName &&
-              !BotZoneName.includes("snipe") &&
-              (Categories.includes("Player") || Categories.includes("All")) &&
-              !BotZoneName.includes("BotZoneGate")
-          )
-          .map(({ BotZoneName, ...rest }) => {
-            return BotZoneName;
-          })
-      ), ...pmcHotZones
-    ]);
+    // console.log(map);
+    let pmcZones = getSortedSpawnPointList(
+      locationList[index].base.SpawnPointParams.filter(
+        ({ Categories, Sides }, index) =>
+          (map === "laboratory" || index % 3 === 0) && Categories[0] === "Bot"
+      ),
+      x,
+      z,
+      0.1
+    ).map(({ BotZoneName }) => BotZoneName);
 
-    // Make labs have only named zones
+    // console.log(map, pmcZones.length)
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }
+
+    if (config.disableCascadingSpawns) pmcZones = shuffle<string[]>(pmcZones);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
     );
 
-    const totalWaves = Math.round(
+    let totalWaves = Math.round(
       pmcWaveCount * config.pmcWaveQuantity * escapeTimeLimitRatio
     );
 
-    const numberOfZoneless = totalWaves - pmcZones.length;
-    if (numberOfZoneless > 0) {
-      const addEmpty = new Array(numberOfZoneless).fill("");
-      pmcZones = shuffle<string[]>([...pmcZones, ...addEmpty]);
+    if (!!pmcHotZones.length && totalWaves > 0) {
+      totalWaves = totalWaves + pmcHotZones.length;
+    }
+
+    while (totalWaves - pmcZones.length > 0) {
+      console.log(
+        `${map} ran out of appropriate zones for pmcs, duplicating zones`
+      );
+      // const addEmpty = new Array(numberOfZoneless).fill("");
+      pmcZones = [...pmcZones, ...pmcZones];
+      if (pmcZones.length === 0) {
+        pmcZones = [""];
+      }
     }
 
     if (config.debug) {
@@ -78,19 +86,20 @@ export default function buildPmcs(
       totalWaves % 2 === 0 ? totalWaves / 2 : (totalWaves + 1) / 2
     );
 
-    const start = Math.random() > 0.5
+    const usecSpawns = pmcZones.filter((_, i) => i % 2 === 0);
+    const bearSpawns = pmcZones.filter((_, i) => i % 2 !== 0);
 
     const pmcUSEC = buildBotWaves(
       half,
       config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
-      pmcZones.slice(0, Math.round(pmcZones.length / 2)),
+      usecSpawns,
       config.pmcDifficulty,
       "pmcUSEC",
       false,
       config.pmcWaveDistribution,
-      start ? -1 : 0
+      initialSpawnDelay + Math.round(10 * Math.random())
     );
 
     const pmcBEAR = buildBotWaves(
@@ -98,20 +107,27 @@ export default function buildPmcs(
       config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
-      pmcZones.slice(Math.round(pmcZones.length / 2)),
+      bearSpawns,
       config.pmcDifficulty,
       "pmcBEAR",
       false,
       config.pmcWaveDistribution,
-      start ? 15 : -1
+      initialSpawnDelay + Math.round(10 * Math.random())
     );
 
+    const pmcs = [...pmcUSEC, ...pmcBEAR];
 
-
+    if (pmcs.length) {
+      // Add hotzones if exist
+      pmcHotZones.forEach((hotzone) => {
+        const index = Math.floor(pmcs.length * Math.random());
+        pmcs[index].BossZone = hotzone;
+        // console.log(pmcs[index]);
+      });
+    }
 
     locationList[index].base.BossLocationSpawn = [
-      ...pmcUSEC,
-      ...pmcBEAR,
+      ...pmcs,
       ...locationList[index].base.BossLocationSpawn,
     ];
   }

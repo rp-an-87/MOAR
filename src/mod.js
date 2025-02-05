@@ -9,10 +9,17 @@ const config_json_2 = __importDefault(require("../config/config.json"));
 const GlobalValues_1 = require("./GlobalValues");
 const routes_1 = require("./Routes/routes");
 const checkPresets_1 = __importDefault(require("./Tests/checkPresets"));
+const setupSpawn_1 = require("./SpawnZoneChanges/setupSpawn");
 class Moar {
     preSptLoad(container) {
-        if (config_json_1.enableBotSpawning)
+        if (config_json_1.enableBotSpawning) {
             (0, routes_1.setupRoutes)(container);
+        }
+    }
+    postDBLoad(container) {
+        if (config_json_1.enableBotSpawning) {
+            (0, setupSpawn_1.setupSpawns)(container);
+        }
     }
     postSptLoad(container) {
         if (config_json_1.enableBotSpawning) {

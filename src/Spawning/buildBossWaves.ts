@@ -276,7 +276,7 @@ export function buildBossWaves(
           : { ...boss, ...{ BossChance: 100 } }
       );
 
-      // if (mapName === "rezervbase")
+      // if (mapName === "customs")
       //   console.log(mapName, locationList[index].base.BossLocationSpawn);
     });
 

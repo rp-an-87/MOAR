@@ -1,5 +1,8 @@
 {
   "customs": {
+    "initialSpawnDelay": 15,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 21,
@@ -12,22 +15,31 @@
     ]
   },
   "factoryDay": {
-    "spawnMinDistance": 20,
+    "initialSpawnDelay": 10,
+    "smoothingDistribution": 0.4,
+    "mapCullingNearPointValue": 3,
+    "spawnMinDistance": 15,
     "maxBotCapOverride": 12,
-    "maxBotPerZoneOverride": 10,
+    "maxBotPerZoneOverride": 12,
     "pmcWaveCount": 8,
-    "scavWaveCount": 9,
+    "scavWaveCount": 12,
     "zombieWaveCount": 6
   },
   "factoryNight": {
-    "spawnMinDistance": 20,
+    "initialSpawnDelay": 10,
+    "smoothingDistribution": 0.4,
+    "mapCullingNearPointValue": 3,
+    "spawnMinDistance": 15,
     "maxBotCapOverride": 12,
-    "maxBotPerZoneOverride": 10,
+    "maxBotPerZoneOverride": 12,
     "pmcWaveCount": 8,
-    "scavWaveCount": 9,
+    "scavWaveCount": 12,
     "zombieWaveCount": 6
   },
   "interchange": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 8,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
@@ -38,12 +50,18 @@
     ]
   },
   "laboratory": {
+    "initialSpawnDelay": 15,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 3,
     "spawnMinDistance": 20,
     "pmcWaveCount": 10,
     "scavWaveCount": 0,
     "zombieWaveCount": 12
   },
   "lighthouse": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 12,
     "scavWaveCount": 20,
@@ -54,6 +72,9 @@
     ]
   },
   "rezervbase": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 11,
     "scavWaveCount": 24,
@@ -66,6 +87,9 @@
     ]
   },
   "shoreline": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
@@ -78,12 +102,18 @@
     ]
   },
   "tarkovstreets": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 26,
     "zombieWaveCount": 13
   },
   "woods": {
+    "initialSpawnDelay": 20,
+    "smoothingDistribution": 0.9,
+    "mapCullingNearPointValue": 10,
     "spawnMinDistance": 40,
     "pmcWaveCount": 14,
     "scavWaveCount": 28,
@@ -96,12 +126,18 @@
     ]
   },
   "gzLow": {
+    "initialSpawnDelay": 10,
+    "smoothingDistribution": 1,
+    "mapCullingNearPointValue": 7,
     "spawnMinDistance": 30,
     "pmcWaveCount": 10,
     "scavWaveCount": 18,
     "zombieWaveCount": 9
   },
   "gzHigh": {
+    "initialSpawnDelay": 10,
+    "smoothingDistribution": 1,
+    "mapCullingNearPointValue": 7,
     "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 18,
