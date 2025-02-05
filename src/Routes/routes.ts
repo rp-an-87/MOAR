@@ -5,15 +5,99 @@ import { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRou
 import { globalValues } from "../GlobalValues";
 import { kebabToTitle } from "../utils";
 import PresetWeightingsConfig from "../../config/PresetWeightings.json";
+import { Ixyz } from "@spt/models/eft/common/Ixyz";
+import {
+  deleteBotSpawn,
+  updateBotSpawn,
+  updatePlayerSpawn,
+  updateSniperSpawn,
+} from "../Spawns/updateUtils";
 
 export const setupRoutes = (container: DependencyContainer) => {
   const staticRouterModService = container.resolve<StaticRouterModService>(
     "StaticRouterModService"
   );
 
-  // const dynamicRouterModService = container.resolve<DynamicRouterModService>(
-  //   "DynamicRouterModService"
-  // );
+  interface AddSpawnRequest {
+    map: string;
+    position: Ixyz;
+  }
+
+  staticRouterModService.registerStaticRouter(
+    `moarAddBotSpawn`,
+    [
+      {
+        url: "/moar/addBotSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          updateBotSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarAddBotSpawn"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `moarAddSniperSpawn`,
+    [
+      {
+        url: "/moar/addSniperSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          updateSniperSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarAddSniperSpawn"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `moarDeleteBotSpawn`,
+    [
+      {
+        url: "/moar/deleteBotSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          deleteBotSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarDeleteBotSpawn"
+  );
+
+  staticRouterModService.registerStaticRouter(
+    `moarAddPlayerSpawn`,
+    [
+      {
+        url: "/moar/addPlayerSpawn",
+        action: async (
+          url: string,
+          overrideConfig: AddSpawnRequest,
+          sessionID,
+          output
+        ) => {
+          updatePlayerSpawn(overrideConfig.map, overrideConfig.position);
+          return "success";
+        },
+      },
+    ],
+    "moarAddPlayerSpawn"
+  );
 
   // Make buildwaves run on game end
   staticRouterModService.registerStaticRouter(

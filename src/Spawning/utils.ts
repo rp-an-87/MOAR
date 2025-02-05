@@ -227,7 +227,12 @@ export const buildBotWaves = (
       ? Math.round(maxGroup * Math.random())
       : 0;
 
-    if (bossEscortAmount < 0) bossEscortAmount = 0;
+    if (
+      bossEscortAmount < 0 ||
+      (bossEscortAmount > 0 && bossEscortAmount + 1 > maxSlotsReached)
+    ) {
+      bossEscortAmount = 0;
+    }
 
     const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
@@ -235,24 +240,19 @@ export const buildBotWaves = (
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
-      BossChance: isMarksman ? 80 : 100,
+      BossChance: 100,
       BossDifficult,
       BossEscortAmount: bossEscortAmount.toString(),
       BossEscortDifficult: BossDifficult,
       BossEscortType: botType,
       BossName: botType,
       BossPlayer: false,
-      BossZone:
-        bossZones[
-        isMarksman
-          ? totalCountThusFar
-          : Math.floor(totalCountThusFar * botToZoneTotal)
-        ] || "",
+      BossZone: bossZones[Math.floor(totalCountThusFar * botToZoneTotal)] || "",
       Delay: 0,
       DependKarma: false,
       DependKarmaPVE: false,
       ForceSpawn,
-      IgnoreMaxBots: true,
+      IgnoreMaxBots: ForceSpawn,
       RandomTimeSpawn: false,
       Time: startTime,
       Supports: null,
@@ -263,16 +263,16 @@ export const buildBotWaves = (
 
     startTime += Math.round(totalCountThisWave * averageTime);
 
-    maxSlotsReached -= 1 + bossEscortAmount;
+    maxSlotsReached -= 1 + (isMarksman ? 0 : bossEscortAmount);
     if (maxSlotsReached <= 0) break;
   }
   // isMarksman &&
-  // console.log(
-  //   // bossZones,
-  //   botType,
-  //   bossZones.length,
-  //   waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
-  // );
+  //   console.log(
+  //     // bossZones,
+  //     botType,
+  //     bossZones.length,
+  //     waves.map(({ Time, BossZone }) => ({ Time, BossZone }))
+  //   );
   return waves;
 };
 
@@ -341,6 +341,7 @@ export const buildZombie = (
 };
 
 export interface MapSettings {
+  sniperQuantity?: number;
   initialSpawnDelay: number;
   smoothingDistribution: number;
   mapCullingNearPointValue: number;
@@ -420,7 +421,7 @@ export const setEscapeTimeOverrides = (
     if (
       !override &&
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] >
-      hardcodedEscapeLimitMax
+        hardcodedEscapeLimitMax
     ) {
       const maxLimit = defaultEscapeTimes[map] * hardcodedEscapeLimitMax;
       logger.warning(
@@ -503,8 +504,9 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       const ratio = (index + 1) / notBosses.length;
       // console.log(ratio);
       notBosses[index].Time = start;
-
-      start += Math.round(increment * ratio);
+      let inc = Math.round(increment * ratio);
+      if (inc < 10) inc = 5;
+      start += inc;
     }
 
     // console.log(
@@ -515,4 +517,19 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
 
     locationList[index].base.BossLocationSpawn = [...Bosses, ...notBosses];
   }
+};
+
+export const looselyShuffle = <T>(arr: T[], shuffleStep: number = 3): T[] => {
+  const n = arr.length;
+  const halfN = Math.floor(n / 2);
+  for (let i = shuffleStep - 1; i < halfN; i += shuffleStep) {
+    // Pick a random index from the second half of the array to swap with the current index
+    const randomIndex = halfN + Math.floor(Math.random() * (n - halfN));
+    // Swap the elements at the current index and the random index
+    const temp = arr[i];
+    arr[i] = arr[randomIndex];
+    arr[randomIndex] = temp;
+  }
+
+  return arr;
 };

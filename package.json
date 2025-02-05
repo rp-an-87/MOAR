@@ -1,6 +1,6 @@
 {
   "name": "MOAR",
-  "version": "2.7.0",
+  "version": "3.0.0-alpha.5",
   "main": "src/mod.js",
   "license": "MIT",
   "author": "DewardianDev",

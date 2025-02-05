@@ -2,7 +2,7 @@ import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { defaultEscapeTimes, defaultHostility } from "./constants";
-import { buildBotWaves, MapSettings, shuffle } from "./utils";
+import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
 import getSortedSpawnPointList from "./spawnZoneUtils";
 
@@ -20,33 +20,37 @@ export default function buildPmcs(
     locationList[index].base.BotLocationModifier.AdditionalHostilitySettings =
       defaultHostility;
 
-    const { pmcHotZones = [], pmcWaveCount, initialSpawnDelay } =
-      (mapConfig?.[map] as MapSettings) || {};
+    const {
+      pmcHotZones = [],
+      pmcWaveCount,
+      initialSpawnDelay,
+    } = (mapConfig?.[map] as MapSettings) || {};
 
     const {
-      Position: { x, z },
+      Position: { x, y, z },
     } =
       locationList[index].base.SpawnPointParams[
-      locationList[index].base.SpawnPointParams.length - 1
+        locationList[index].base.SpawnPointParams.length - 1
       ];
 
-    // console.log(map);
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        ({ Categories, Sides }, index) =>
-          (map === "laboratory" || index % 3 === 0) && Categories[0] === "Bot"
-      ),
+        (point) => point["type"] === "nonBoss"
+      ).filter((_, sIndex) => sIndex % 3 === 0),
       x,
+      y,
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
+    looselyShuffle(pmcZones);
 
-    // console.log(map, pmcZones.length)
+    // console.log(pmcZones);
+
     if (map === "laboratory") {
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }
 
-    if (config.disableCascadingSpawns) pmcZones = shuffle<string[]>(pmcZones);
+    if (config.randomSpawns) pmcZones = shuffle<string[]>(pmcZones);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
@@ -104,7 +108,7 @@ export default function buildPmcs(
 
     const pmcBEAR = buildBotWaves(
       half,
-      config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
+      config.startingPmcs ? Math.round(0.1 * timeLimit) : timeLimit,
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
       bearSpawns,
@@ -116,7 +120,7 @@ export default function buildPmcs(
     );
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];
-
+    // console.log(pmcs.map(({ Time }) => Time));
     if (pmcs.length) {
       // Add hotzones if exist
       pmcHotZones.forEach((hotzone) => {
@@ -125,6 +129,11 @@ export default function buildPmcs(
         // console.log(pmcs[index]);
       });
     }
+
+    // console.log(
+    //   map,
+    //   pmcs.map(({ BossZone }) => BossZone)
+    // );
 
     locationList[index].base.BossLocationSpawn = [
       ...pmcs,

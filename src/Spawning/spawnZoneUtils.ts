@@ -2,25 +2,65 @@ import _config from "../../config/config.json";
 import { ISpawnPointParam } from "@spt/models/eft/common/ILocationBase";
 import { shuffle } from "./utils";
 import mapConfig from "../../config/mapConfig.json";
+import { BotSpawns, PlayerSpawns, SniperSpawns } from "../Spawns";
+import { Ixyz } from "@spt/models/eft/common/Ixyz";
+import { globalValues } from "../GlobalValues";
+import { configLocations } from "./constants";
 
-const getDistance = (x: number, z: number, mX: number, mZ: number) => {
-  const pA1 = x - mX;
-  const pB2 = z - mZ;
+// const getDistance = (x: number, z: number, mX: number, mZ: number) => {
+//   const pA1 = x - mX;
+//   const pB2 = z - mZ;
 
-  return Math.sqrt(pA1 * pA1 + pB2 * pB2);
+//   return Math.sqrt(pA1 * pA1 + pB2 * pB2);
+// };
+
+function sq(n: number) {
+  return n * n;
+}
+
+function pt(a: number, b: number) {
+  return Math.sqrt(sq(a) + sq(b));
+}
+
+export const getDistance = (
+  x: number,
+  y: number,
+  z: number,
+  mX: number,
+  mY: number,
+  mZ: number
+) => {
+  (x = Math.abs(x - mX)), (y = Math.abs(y - mY)), (z = Math.abs(z - mZ));
+
+  return pt(pt(x, z), y);
 };
 
 export default function getSortedSpawnPointList(
   SpawnPointParams: ISpawnPointParam[],
   mX: number,
+  my: number,
   mZ: number,
   cull?: number
 ): ISpawnPointParam[] {
   let culledAmount = 0;
 
   const sortedCulledResult = SpawnPointParams.sort((a, b) => {
-    const a1 = getDistance(a.Position.x, a.Position.z, mX, mZ);
-    const b1 = getDistance(b.Position.x, b.Position.z, mX, mZ);
+    const a1 = getDistance(
+      a.Position.x,
+      a.Position.y,
+      a.Position.z,
+      mX,
+      my,
+      mZ
+    );
+    const b1 = getDistance(
+      b.Position.x,
+      b.Position.y,
+      b.Position.z,
+      mX,
+      my,
+      mZ
+    );
     return a1 - b1;
   }).filter((_, index) => {
     if (!cull) return true;
@@ -33,10 +73,10 @@ export default function getSortedSpawnPointList(
   if (_config.debug && culledAmount > 0) {
     console.log(
       "Reduced to " +
-      Math.round(
-        (sortedCulledResult.length / SpawnPointParams.length) * 100
-      ) +
-      "% of original spawns",
+        Math.round(
+          (sortedCulledResult.length / SpawnPointParams.length) * 100
+        ) +
+        "% of original spawns",
       SpawnPointParams.length,
       ">",
       sortedCulledResult.length,
@@ -48,70 +88,287 @@ export default function getSortedSpawnPointList(
 
 export function cleanClosest(
   SpawnPointParams: ISpawnPointParam[],
-  map: string
+  mapIndex: number,
+  player?: boolean
 ): ISpawnPointParam[] {
-  const mapCullingNearPointValue =
-    mapConfig[map as keyof typeof mapConfig].mapCullingNearPointValue;
+  const map = configLocations[mapIndex];
 
-  const sortedSpawnPoints = getSortedSpawnPointList(
-    SpawnPointParams,
-    -100000,
-    -100000
-  );
+  const mapCullingNearPointValue = player
+    ? mapConfig[map].mapCullingNearPointValuePlayer
+    : mapConfig[map].mapCullingNearPointValue;
+  const okayList = new Set();
+  const filteredParams = SpawnPointParams.map((point) => {
+    const {
+      Position: { x: X, y: Y, z: Z },
+    } = point;
+    const result = !SpawnPointParams.some(({ Position: { z, x, y }, Id }) => {
+      const dist = getDistance(X, Y, Z, x, y, z);
+      return mapCullingNearPointValue > dist && dist !== 0 && !okayList.has(Id);
+    });
 
-  let prev = undefined;
-  const culled = sortedSpawnPoints.map(({ Position, ...rest }) => {
-    // const fromMiddle = getDistance(Position.x, Position.z, mX, mZ)
-    if (
-      !!prev &&
-      getDistance(prev.x, prev.z, Position.x, Position.z) <
-      mapCullingNearPointValue
-    ) {
-      return ({ ...rest, Position, DelayToCanSpawnSec: 9999999, CorePointId: 99999, BotZoneName: "_removed", Categories: [], Sides: [], });
+    if (!result) {
+      okayList.add(point.Id);
     }
 
-    prev = Position;
-    return ({ Position, ...rest });
+    return result
+      ? point
+      : {
+          ...point,
+          ...(player
+            ? {}
+            : {
+                DelayToCanSpawnSec: 9999999,
+              }),
+          CorePointId: 99999,
+          Categories: [],
+          Sides: [],
+        };
   });
 
   if (_config.debug) {
-    const actualCulled = culled.filter(({ Categories }) => !!Categories.length)
+    const actualCulled = filteredParams.filter(
+      ({ Categories }) => !!Categories.length
+    );
     console.log(
       map,
-      "Reduced to " +
-      Math.round((actualCulled.length / culled.length) * 100) +
-      "% of original spawns",
-      culled.length,
+      filteredParams.length,
       ">",
       actualCulled.length,
-      // "\n"
+      "Reduced to " +
+        Math.round((actualCulled.length / filteredParams.length) * 100) +
+        "% of original spawns",
+      player ? "player" : "bot"
     ); // high, low}
   }
-  return culled;
+
+  return filteredParams;
+
+  // if (!_config.debug) {
+  //   const actualCulled = culled.filter(({ Categories }) => !!Categories.length);
+  //   console.log(
+  //     map,
+  //     "Reduced to " +
+  //     Math.round((actualCulled.length / culled.length) * 100) +
+  //     "% of original spawns",
+  //     culled.length,
+  //     ">",
+  //     actualCulled.length
+  //     // "\n"
+  //   ); // high, low}
+  // }
 }
 
+function uuidv4() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (
+      +c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))
+    ).toString(16)
+  );
+}
 
-// customs Reduced to 33% of original spawns 160 > 52
-// customs Reduced to 98% of original spawns 81 > 79
-// factoryDay Reduced to 66% of original spawns 126 > 83
-// factoryDay Reduced to 95% of original spawns 19 > 18
-// factoryNight Reduced to 66% of original spawns 126 > 83
-// factoryNight Reduced to 95% of original spawns 19 > 18
-// interchange Reduced to 34% of original spawns 171 > 58
-// interchange Reduced to 77% of original spawns 52 > 40
-// laboratory Reduced to 63% of original spawns 115 > 72
-// laboratory Reduced to NaN% of original spawns 0 > 0
-// lighthouse Reduced to 31% of original spawns 101 > 31
-// lighthouse Reduced to 78% of original spawns 90 > 70
-// rezervbase Reduced to 34% of original spawns 120 > 41
-// rezervbase Reduced to 75% of original spawns 60 > 45
-// shoreline Reduced to 30% of original spawns 171 > 51
-// shoreline Reduced to 94% of original spawns 81 > 76
-// tarkovstreets Reduced to 24% of original spawns 236 > 57
-// tarkovstreets Reduced to 60% of original spawns 186 > 112
-// woods Reduced to 32% of original spawns 181 > 58
-// woods Reduced to 88% of original spawns 129 > 114
-// gzLow Reduced to 34% of original spawns 140 > 47
-// gzLow Reduced to 56% of original spawns 59 > 33
-// gzHigh Reduced to 34% of original spawns 140 > 47
-// gzHigh Reduced to 52% of original spawns 50 > 26
+export const AddCustomBotSpawnPoints = (
+  SpawnPointParams: ISpawnPointParam[],
+  map: string
+) => {
+  if (!BotSpawns[map] || !BotSpawns[map].length) {
+    _config.debug && console.log("no custom Bot spawns for " + map);
+    return SpawnPointParams;
+  }
+
+  const botSpawns = BotSpawns[map].map((coords: Ixyz, index: number) => ({
+    BotZoneName: getClosestZone(SpawnPointParams, coords.x, coords.y, coords.z),
+    Categories: ["Bot"],
+    ColliderParams: {
+      _parent: "SpawnSphereParams",
+      _props: {
+        Center: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        Radius: 20,
+      },
+    },
+    CorePointId: 1,
+    DelayToCanSpawnSec: 4,
+    Id: uuidv4(),
+    Infiltration: "",
+    Position: coords,
+    Rotation: random360(),
+    Sides: ["Savage"],
+  }));
+
+  return [...SpawnPointParams, ...botSpawns];
+};
+
+export const AddCustomSniperSpawnPoints = (
+  SpawnPointParams: ISpawnPointParam[],
+  map: string
+) => {
+  if (!SniperSpawns[map] || !SniperSpawns[map].length) {
+    _config.debug && console.log("no custom Player spawns for " + map);
+    return SpawnPointParams;
+  }
+
+  const sniperSpawns = SniperSpawns[map].map((coords: Ixyz, index: number) => ({
+    BotZoneName:
+      getClosestZone(SpawnPointParams, coords.x, coords.y, coords.z) ||
+      "custom_snipe_" + index,
+    Categories: ["Bot"],
+    ColliderParams: {
+      _parent: "SpawnSphereParams",
+      _props: {
+        Center: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        Radius: 20,
+      },
+    },
+    CorePointId: 1,
+    DelayToCanSpawnSec: 4,
+    Id: uuidv4(),
+    Infiltration: "",
+    Position: coords,
+    Rotation: random360(),
+    Sides: ["Savage"],
+  }));
+
+  return [...SpawnPointParams, ...sniperSpawns];
+};
+
+export const random360 = () => Math.random() * 360;
+export const AddCustomPlayerSpawnPoints = (
+  SpawnPointParams: ISpawnPointParam[],
+  map: string
+) => {
+  if (!PlayerSpawns[map] || !PlayerSpawns[map].length) {
+    _config.debug && console.log("no custom Player spawns for " + map);
+    return SpawnPointParams;
+  }
+
+  const infilHash: Record<string, Ixyz> = {};
+
+  SpawnPointParams.forEach((point) => {
+    if (!infilHash[point.Infiltration]) {
+      infilHash[point.Infiltration] = point.Position;
+    } else {
+      infilHash[point.Infiltration].x = Math.round(
+        (infilHash[point.Infiltration].x + point.Position.x) / 2
+      );
+      infilHash[point.Infiltration].z = Math.round(
+        (infilHash[point.Infiltration].z + point.Position.z) / 2
+      );
+    }
+  });
+
+  const getClosestInfil = (x: number, y: number, z: number) => {
+    let closest = Infinity;
+    let selectedInfil = Object.keys(infilHash)[0];
+    Object.keys(infilHash).forEach((infil) => {
+      const current = infilHash[infil];
+      const dist = getDistance(current.x, current.y, current.z, x, y, z);
+      if (dist < closest) {
+        closest = dist;
+        selectedInfil = infil;
+      }
+    });
+
+    return selectedInfil;
+  };
+
+  const playerSpawns = PlayerSpawns[map].map((coords: Ixyz, index) => ({
+    BotZoneName: "",
+    Categories: ["Player"],
+    ColliderParams: {
+      _parent: "SpawnSphereParams",
+      _props: {
+        Center: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        Radius: 20,
+      },
+    },
+    CorePointId: 0,
+    DelayToCanSpawnSec: 4,
+    Id: uuidv4(),
+    Infiltration: getClosestInfil(coords.x, coords.y, coords.z),
+    Position: coords,
+    Rotation: random360(),
+    Sides: ["Pmc"],
+  }));
+
+  return [...SpawnPointParams, ...playerSpawns];
+};
+
+export const getClosestZone = (
+  params: ISpawnPointParam[],
+  x: number,
+  y: number,
+  z: number
+) => {
+  if (
+    Array.isArray(params) &&
+    !params.filter(({ BotZoneName }) => BotZoneName).length
+  )
+    return "";
+
+  return (
+    getSortedSpawnPointList(params, x, y, z).find(
+      ({ BotZoneName }) => !!BotZoneName
+    )?.BotZoneName || ""
+  );
+};
+
+export const removeClosestSpawnsFromCustomBots = (
+  SpawnPointParams: ISpawnPointParam[],
+  map: string,
+  mapConfigMap: string
+) => {
+  if (!BotSpawns[map] || !BotSpawns[map].length) {
+    console.log("No map called ", map);
+    return;
+  }
+
+  const coords: Ixyz[] = BotSpawns[map];
+
+  const mapCullingNearPointValue =
+    mapConfig[mapConfigMap].mapCullingNearPointValue;
+
+  let filteredCoords = coords.filter(
+    ({ x: X, y: Y, z: Z }) =>
+      !SpawnPointParams.some(({ Position: { z, x, y } }) => {
+        return mapCullingNearPointValue > getDistance(X, Y, Z, x, y, z);
+      })
+  );
+
+  const okayList = new Set();
+
+  filteredCoords = [...coords].filter(({ x: X, y: Y, z: Z }, index) => {
+    const result = !coords.some(({ z, x, y }) => {
+      const dist = getDistance(X, Y, Z, x, y, z);
+      return (
+        mapCullingNearPointValue * 1.3 > dist &&
+        dist !== 0 &&
+        !okayList.has("" + x + y + z)
+      );
+    });
+    if (!result) okayList.add("" + X + Y + Z);
+    return result;
+  });
+
+  console.log(
+    map,
+    coords.length,
+    ">",
+    filteredCoords.length,
+    "culled",
+    coords.length - filteredCoords.length,
+    "spawns"
+  );
+  return filteredCoords;
+};

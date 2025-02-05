@@ -258,7 +258,7 @@ export function buildBossWaves(
       // Apply the percentages on all bosses, cull those that won't spawn, make all bosses 100 chance that remain.
       locationList[index].base.BossLocationSpawn = locationList[
         index
-      ].base.BossLocationSpawn.filter(
+      ].base.BossLocationSpawn.map(
         ({ BossChance, BossName, TriggerId }, bossIndex) => {
           if (
             !TriggerId &&
@@ -266,16 +266,38 @@ export function buildBossWaves(
             BossChance < 100 &&
             BossChance / 100 < Math.random()
           ) {
-            return false;
-          }
-          return true;
-        }
-      ).map((boss) =>
-        bossesToSkip.has(boss.BossName) || !!boss.TriggerId
-          ? boss
-          : { ...boss, ...{ BossChance: 100 } }
-      );
+            locationList[index].base.BossLocationSpawn[
+              bossIndex
+            ].BossChance = 0;
 
+            locationList[index].base.BossLocationSpawn[bossIndex].ForceSpawn =
+              false;
+
+            locationList[index].base.BossLocationSpawn[
+              bossIndex
+            ].IgnoreMaxBots = false;
+          } else {
+            locationList[index].base.BossLocationSpawn[
+              bossIndex
+            ].BossChance = 100;
+          }
+
+          return locationList[index].base.BossLocationSpawn[bossIndex];
+        }
+      );
+      // .map((boss) =>
+      //   bossesToSkip.has(boss.BossName) || !!boss.TriggerId
+      //     ? boss
+      //     : { ...boss, ...{ BossChance: 100 } }
+      // );
+
+      // if (mapName === "lighthouse") {
+      //   console.log(
+      //     locationList[index].base.BossLocationSpawn.map(
+      //       ({ BossName, BossChance }) => ({ BossName, BossChance })
+      //     )
+      //   );
+      // }
       // if (mapName === "customs")
       //   console.log(mapName, locationList[index].base.BossLocationSpawn);
     });
