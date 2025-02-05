@@ -1,4 +1,4 @@
-# **DewardianDevs's MOAR - The lite spawn mod**
+# **[DewardianDevs's MOAR](https://hub.sp-tarkov.com/files/file/1059-moar-bagels-ultra-lite-spawn-mod/#overview) - The lite spawn mod**
 
 === INSTALL STEPS ===
 
@@ -13,7 +13,7 @@ Example order.json
 {
 "order": [
 "ServerValueModifier",
-"DewardianDev-MOAR-2.x.x",
+"DewardianDev-MOAR-3.x.x",
 "Otherstuff"
 ]
 }
