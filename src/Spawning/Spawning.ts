@@ -133,13 +133,13 @@ export const buildWaves = (container: DependencyContainer) => {
 
   if (
     config.startingPmcs &&
-    (!config.disableCascadingSpawns || config.spawnSmoothing)
+    (!config.randomSpawns || config.spawnSmoothing)
   ) {
     Logger.warning(
       `[MOAR] Starting pmcs turned on, turning off cascade system and smoothing.\n`
     );
     config.spawnSmoothing = false;
-    config.disableCascadingSpawns = true;
+    config.randomSpawns = true;
   }
 
   updateSpawnLocations(locationList);

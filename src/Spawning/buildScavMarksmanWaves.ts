@@ -184,8 +184,8 @@ export default function buildScavMarksmanWaves(
 
     const timeLimit = locationList[index].base.EscapeTimeLimit * 60;
 
-    if (config.disableCascadingSpawns)
-      sniperLocations = shuffle<string[]>(sniperLocations);
+    // if (config.randomSpawns)
+    //   sniperLocations = shuffle<string[]>(sniperLocations);
     // console.log(map);
     const snipers = buildBotWaves(
       Math.min(sniperQuantity, sniperLocations.length),
@@ -193,14 +193,14 @@ export default function buildScavMarksmanWaves(
       sniperMaxGroupSize,
       sniperGroupChance,
       sniperLocations,
-      0.7,
+      1.7,
       WildSpawnType.MARKSMAN,
       true,
       0.3,
       sniperDelay
     );
 
-    if (config.disableCascadingSpawns) scavZones = shuffle<string[]>(scavZones);
+    if (config.randomSpawns) scavZones = shuffle<string[]>(scavZones);
     const scavWaves = buildBotWaves(
       scavTotalWaveCount,
       timeLimit,

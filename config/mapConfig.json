@@ -17,7 +17,7 @@
     ]
   },
   "factoryDay": {
-    "sniperQuantity": 3,
+    "sniperQuantity": 0,
     "initialSpawnDelay": 10,
     "smoothingDistribution": 0.6,
     "mapCullingNearPointValuePlayer": 2,
@@ -30,7 +30,7 @@
     "zombieWaveCount": 6
   },
   "factoryNight": {
-    "sniperQuantity": 3,
+    "sniperQuantity": 0,
     "initialSpawnDelay": 10,
     "smoothingDistribution": 0.6,
     "mapCullingNearPointValuePlayer": 2,
@@ -43,7 +43,7 @@
     "zombieWaveCount": 6
   },
   "interchange": {
-    "sniperQuantity": 3,
+    "sniperQuantity": 0,
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 3,
@@ -84,7 +84,7 @@
     ]
   },
   "rezervbase": {
-    "sniperQuantity": 3,
+    "sniperQuantity": 0,
     "initialSpawnDelay": 20,
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 3,
@@ -129,7 +129,7 @@
     "zombieWaveCount": 13
   },
   "woods": {
-    "sniperQuantity": 20,
+    "sniperQuantity": 2,
     "initialSpawnDelay": 3,
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 6,

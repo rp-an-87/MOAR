@@ -12,7 +12,7 @@
   "pmcWaveDistribution": 0.6,
   "pmcWaveQuantity": 1,
 
-  "disableCascadingSpawns": false,
+  "randomSpawns": false,
 
   "zombiesEnabled": false,
   "zombieWaveDistribution": 0.8,

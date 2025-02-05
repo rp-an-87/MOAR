@@ -1,7 +1,7 @@
 {
   "live-like": {},
   "quiet-raids": {
-    "disableCascadingSpawns": true,
+    "randomSpawns": true,
     "scavGroupChance": 0.1,
     "scavMaxGroupSize": 2,
     "pmcGroupChance": 0.1,

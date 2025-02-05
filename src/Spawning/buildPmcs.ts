@@ -50,7 +50,7 @@ export default function buildPmcs(
       pmcZones = new Array(10).fill(pmcZones).flat(1);
     }
 
-    if (config.disableCascadingSpawns) pmcZones = shuffle<string[]>(pmcZones);
+    if (config.randomSpawns) pmcZones = shuffle<string[]>(pmcZones);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
@@ -108,7 +108,7 @@ export default function buildPmcs(
 
     const pmcBEAR = buildBotWaves(
       half,
-      config.startingPmcs ? Math.round(0.2 * timeLimit) : timeLimit,
+      config.startingPmcs ? Math.round(0.1 * timeLimit) : timeLimit,
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
       bearSpawns,
@@ -120,7 +120,7 @@ export default function buildPmcs(
     );
 
     const pmcs = [...pmcUSEC, ...pmcBEAR];
-
+    // console.log(pmcs.map(({ Time }) => Time));
     if (pmcs.length) {
       // Add hotzones if exist
       pmcHotZones.forEach((hotzone) => {
