@@ -4,6 +4,7 @@ import bossConfig from "../../config/bossConfig.json";
 import mapConfig from "../../config/mapConfig.json";
 import {
   bossesToRemoveFromPool,
+  bossPerformanceHash,
   configLocations,
   mainBossNameList,
   originalMapList,
@@ -55,6 +56,17 @@ export function buildBossWaves(
       ].base.BossLocationSpawn.filter(
         (boss) => !bossesToRemoveFromPool.has(boss.BossName)
       );
+
+      // Performance changes
+      locationList[indx].base.BossLocationSpawn.forEach((Boss, bIndex) => {
+        if (!!bossPerformanceHash[Boss.BossName || ""]) {
+          const varsToUpdate = bossPerformanceHash[Boss.BossName];
+          locationList[indx].base.BossLocationSpawn[bIndex] = {
+            ...Boss,
+            ...varsToUpdate,
+          };
+        }
+      });
 
       const location = locationList[indx];
 
