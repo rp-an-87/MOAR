@@ -207,6 +207,7 @@ export const buildBotWaves = (
   const pullFromEnd = botDistribution < 1;
   const botToZoneTotal = bossZones.length / botTotal;
   const isMarksman = botType === "marksman";
+  const isPMC = botType === "pmcUSEC" || botType === "pmcBEAR";
 
   let startTime = pushToEnd
     ? Math.round((botDistribution - 1) * escapeTimeLimit)
@@ -248,17 +249,22 @@ export const buildBotWaves = (
       BossName: botType,
       BossPlayer: false,
       BossZone: bossZones[Math.floor(totalCountThusFar * botToZoneTotal)] || "",
-      Delay: 0,
-      DependKarma: false,
-      DependKarmaPVE: false,
       ForceSpawn,
       IgnoreMaxBots: ForceSpawn,
       RandomTimeSpawn: false,
       Time: startTime,
-      Supports: null,
+      Supports: bossEscortAmount
+        ? [
+            {
+              BossEscortAmount: bossEscortAmount.toString(),
+              BossEscortDifficult: [BossDifficult],
+              BossEscortType: botType,
+            },
+          ]
+        : null,
       TriggerId: "",
       TriggerName: "",
-      spawnMode: ["regular", "pve"],
+      spawnMode: isPMC ? ["pve"] : ["regular", "pve"],
     });
 
     startTime += Math.round(totalCountThisWave * averageTime);
@@ -487,7 +493,7 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       last = Math.max(notBoss.Time, last);
     });
 
-    // if (first < 15) first = 15;
+    if (first < 15) first = 15;
 
     notBosses = notBosses.sort((a, b) => a.Time - b.Time);
 

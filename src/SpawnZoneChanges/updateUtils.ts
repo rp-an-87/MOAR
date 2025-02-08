@@ -1,7 +1,5 @@
 import { Ixyz } from "@spt/models/eft/common/Ixyz";
-import getSortedSpawnPointList, {
-  getDistance,
-} from "../Spawning/spawnZoneUtils";
+import { getDistance } from "../Spawning/spawnZoneUtils";
 
 const fs = require("fs");
 const path = require("path");
@@ -49,10 +47,14 @@ export const updateJsonFile = <T>(
   });
 };
 
-export const updateBotSpawn = (map: string, value: Ixyz) => {
+export const updateBotSpawn = (
+  map: string,
+  value: Ixyz,
+  type: "player" | "pmc" | "scav" | "sniper"
+) => {
   map = map.toLowerCase();
   updateJsonFile<Ixyz>(
-    currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
+    `${currentDirectory}/user/mods/DewardianDev-MOAR/config/Spawns/${type}Spawns.json`,
     (jsonData) => {
       value.y = value.y + 0.5;
       if (jsonData[map]) {
@@ -65,10 +67,14 @@ export const updateBotSpawn = (map: string, value: Ixyz) => {
   );
 };
 
-export const deleteBotSpawn = (map: string, value: Ixyz) => {
+export const deleteBotSpawn = (
+  map: string,
+  value: Ixyz,
+  type: "player" | "pmc" | "scav" | "sniper"
+) => {
   map = map.toLowerCase();
   updateJsonFile<Ixyz>(
-    currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
+    `${currentDirectory}/user/mods/DewardianDev-MOAR/config/Spawns/${type}Spawns.json`,
     (jsonData) => {
       if (jsonData[map]) {
         const { x: X, y: Y, z: Z } = value;
@@ -93,43 +99,12 @@ export const deleteBotSpawn = (map: string, value: Ixyz) => {
   );
 };
 
-export const updatePlayerSpawn = (map: string, value: Ixyz) => {
-  map = map.toLowerCase();
+export const updateAllBotSpawns = (
+  values: Record<string, Ixyz[]>,
+  targetType: string
+) =>
   updateJsonFile<Ixyz>(
-    currentDirectory +
-      "/user/mods/DewardianDev-MOAR/src/Spawns/playerSpawns.json",
-    (jsonData) => {
-      value.y = value.y + 0.5;
-      if (jsonData[map]) {
-        jsonData[map].push(value);
-      } else {
-        jsonData[map] = [value];
-      }
-    },
-    "Successfully added one player spawn to " + map
-  );
-};
-
-export const updateSniperSpawn = (map: string, value: Ixyz) => {
-  map = map.toLowerCase();
-  updateJsonFile<Ixyz>(
-    currentDirectory +
-      "/user/mods/DewardianDev-MOAR/src/Spawns/sniperSpawns.json",
-    (jsonData) => {
-      value.y = value.y + 0.5;
-      if (jsonData[map]) {
-        jsonData[map].push(value);
-      } else {
-        jsonData[map] = [value];
-      }
-    },
-    "Successfully added one player spawn to " + map
-  );
-};
-
-export const updateAllBotSpawns = (values: Record<string, Ixyz[]>) =>
-  updateJsonFile<Ixyz>(
-    currentDirectory + "/user/mods/DewardianDev-MOAR/src/Spawns/botSpawns.json",
+    `${currentDirectory}/user/mods/DewardianDev-MOAR/config/Spawns/${targetType}.json`,
     (jsonData) => {
       Object.keys(jsonData).forEach((map) => (jsonData[map] = values[map]));
     },

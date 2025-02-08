@@ -14,14 +14,6 @@ class Moar {
     preSptLoad(container) {
         if (config_json_1.enableBotSpawning) {
             (0, routes_1.setupRoutes)(container);
-            // Object.keys(BotSpawns).forEach((map) => {
-            //   BotSpawns[map] = BotSpawns[map].map(({ x, y, z }) => ({
-            //     x,
-            //     y: y + 0.4,
-            //     z,
-            //   }));
-            // });
-            // updateAllBotSpawns(BotSpawns);
         }
     }
     postDBLoad(container) {

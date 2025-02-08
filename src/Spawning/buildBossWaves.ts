@@ -1,6 +1,7 @@
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import bossConfig from "../../config/bossConfig.json";
+import advancedConfig from "../../config/advancedConfig.json";
 import mapConfig from "../../config/mapConfig.json";
 import {
   bossesToRemoveFromPool,
@@ -58,15 +59,20 @@ export function buildBossWaves(
       );
 
       // Performance changes
-      locationList[indx].base.BossLocationSpawn.forEach((Boss, bIndex) => {
-        if (!!bossPerformanceHash[Boss.BossName || ""]) {
-          const varsToUpdate = bossPerformanceHash[Boss.BossName];
-          locationList[indx].base.BossLocationSpawn[bIndex] = {
-            ...Boss,
-            ...varsToUpdate,
-          };
-        }
-      });
+      if (advancedConfig.EnableBossPerformanceImprovements) {
+        locationList[indx].base.BossLocationSpawn.forEach((Boss, bIndex) => {
+          if (Boss.BossChance < 1) return;
+          if (!!bossPerformanceHash[Boss.BossName || ""]) {
+            const varsToUpdate: Record<string, any> =
+              bossPerformanceHash[Boss.BossName];
+
+            locationList[indx].base.BossLocationSpawn[bIndex] = {
+              ...Boss,
+              ...varsToUpdate,
+            };
+          }
+        });
+      }
 
       const location = locationList[indx];
 
@@ -272,6 +278,9 @@ export function buildBossWaves(
         index
       ].base.BossLocationSpawn.map(
         ({ BossChance, BossName, TriggerId }, bossIndex) => {
+          if (BossChance < 1) {
+            return locationList[index].base.BossLocationSpawn[bossIndex];
+          }
           if (
             !TriggerId &&
             !bossesToSkip.has(BossName) &&

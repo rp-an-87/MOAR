@@ -118,7 +118,7 @@ export default function buildScavMarksmanWaves(
     let sniperLocations = sniperSpawns.map(({ BotZoneName }) => BotZoneName);
     // console.log(sniperLocations);
 
-    const sniperDelay = 20;
+    const sniperDelay = 25;
     // Make sure that the sniper spawns permit snipers to actually spawn early.
     const sniperIds = new Set(sniperSpawns.map(({ Id }) => Id));
 
@@ -142,15 +142,15 @@ export default function buildScavMarksmanWaves(
 
     let scavZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
-        (point) => point["type"] === "nonBoss"
-      ).filter((_, sIndex) => sIndex % 3 !== 0),
+        (point) => point["type"] === "scav"
+      ),
       x,
       y,
       z,
       0.1
     ).map(({ BotZoneName }) => BotZoneName);
 
-    looselyShuffle(scavZones);
+    looselyShuffle(scavZones, 4);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
@@ -189,11 +189,11 @@ export default function buildScavMarksmanWaves(
     // console.log(map);
     const snipers = buildBotWaves(
       Math.min(sniperQuantity, sniperLocations.length),
-      timeLimit,
+      timeLimit, ///30,
       sniperMaxGroupSize,
       sniperGroupChance,
       sniperLocations,
-      1.7,
+      0.8,
       WildSpawnType.MARKSMAN,
       true,
       0.3,
