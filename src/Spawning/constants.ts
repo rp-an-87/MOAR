@@ -229,6 +229,10 @@ export const bossPerformanceHash = {
   bossPartisan: {
     BossEscortType: "assault",
     BossEscortAmount: "1,1,2",
+    DependKarma: false,
+    TriggerId: "",
+    TriggerName: "",
+    RandomTimeSpawn: true,
   },
   bossSanitar: {
     BossEscortAmount: "1,2,3",

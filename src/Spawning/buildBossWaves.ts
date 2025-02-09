@@ -266,8 +266,7 @@ export function buildBossWaves(
 
       bossesToAdd.length &&
         console.log(
-          `[MOAR] Adding the following bosses to map ${
-            configLocations[index]
+          `[MOAR] Adding the following bosses to map ${configLocations[index]
           }: ${bossesToAdd.map(({ BossName }) => BossName)}`
         );
       // console.log(locationList[index].base.BossLocationSpawn.length);
@@ -305,7 +304,13 @@ export function buildBossWaves(
 
           return locationList[index].base.BossLocationSpawn[bossIndex];
         }
-      );
+      ).filter(({ BossChance, BossName, TriggerId }) => {
+        if (BossChance === 0) {
+          console.log(mapName, BossName)
+          return false;
+        }
+        return true
+      });
       // .map((boss) =>
       //   bossesToSkip.has(boss.BossName) || !!boss.TriggerId
       //     ? boss
