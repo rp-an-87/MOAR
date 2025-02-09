@@ -283,39 +283,34 @@ export function buildBossWaves(
           if (
             !TriggerId &&
             !bossesToSkip.has(BossName) &&
-            BossChance < 100 &&
-            BossChance / 100 < Math.random()
+            BossChance < 100
           ) {
-            locationList[index].base.BossLocationSpawn[
-              bossIndex
-            ].BossChance = 0;
+            if (
+              BossChance / 100 < Math.random()) {
+              locationList[index].base.BossLocationSpawn[
+                bossIndex
+              ].BossChance = 0;
 
-            locationList[index].base.BossLocationSpawn[bossIndex].ForceSpawn =
-              false;
+              locationList[index].base.BossLocationSpawn[bossIndex].ForceSpawn =
+                false;
 
-            locationList[index].base.BossLocationSpawn[
-              bossIndex
-            ].IgnoreMaxBots = false;
-          } else {
-            locationList[index].base.BossLocationSpawn[
-              bossIndex
-            ].BossChance = 100;
+              locationList[index].base.BossLocationSpawn[
+                bossIndex
+              ].IgnoreMaxBots = false;
+            } else {
+              locationList[index].base.BossLocationSpawn[
+                bossIndex
+              ].BossChance = 100;
+            }
           }
-
           return locationList[index].base.BossLocationSpawn[bossIndex];
         }
-      ).filter(({ BossChance, BossName, TriggerId }) => {
-        if (BossChance === 0) {
-          console.log(mapName, BossName)
+      ).filter(({ BossChance, BossName, ...rest }) => {
+        if (BossChance < 1) {
           return false;
         }
         return true
       });
-      // .map((boss) =>
-      //   bossesToSkip.has(boss.BossName) || !!boss.TriggerId
-      //     ? boss
-      //     : { ...boss, ...{ BossChance: 100 } }
-      // );
 
       // if (mapName === "lighthouse") {
       //   console.log(
@@ -324,8 +319,7 @@ export function buildBossWaves(
       //     )
       //   );
       // }
-      // if (mapName === "customs")
-      //   console.log(mapName, locationList[index].base.BossLocationSpawn);
+
     });
 
     if (hasChangedBossSpawns) {
