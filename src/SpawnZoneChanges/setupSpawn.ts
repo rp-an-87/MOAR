@@ -74,12 +74,10 @@ export const setupSpawns = (container: DependencyContainer) => {
             sniperSpawns.push(point);
             break;
 
-          case mapsToExcludeFromPlayerCulling.has(map) &&
-            point.Categories.includes("Player") &&
-            !!point.Infiltration:
+          case point.Categories.includes("Player") && !!point.Infiltration:
             playerSpawns.push(point);
             break;
-          case !!point.Infiltration:
+          case !!point.Infiltration || point.Categories.includes("Coop"):
             pmcSpawns.push(point);
             break;
           default:
@@ -151,12 +149,12 @@ export const setupSpawns = (container: DependencyContainer) => {
         }
         return !!point.Categories.length
           ? {
-              ...point,
-              Categories: ["Player"],
-              BotZoneName: point?.BotZoneName ? point.BotZoneName : "",
-              CorePointId: 0,
-              Sides: ["Pmc"],
-            }
+            ...point,
+            Categories: ["Player"],
+            BotZoneName: point?.BotZoneName ? point.BotZoneName : "",
+            CorePointId: 0,
+            Sides: ["Pmc"],
+          }
           : point;
       })
       .filter((point) => !!point.Categories.length);
@@ -172,12 +170,12 @@ export const setupSpawns = (container: DependencyContainer) => {
 
         return !!point.Categories.length
           ? {
-              ...point,
-              BotZoneName: isGZ ? "ZoneSandbox" : point?.BotZoneName,
-              Categories: ["Bot"],
-              Sides: ["Savage"],
-              CorePointId: 1,
-            }
+            ...point,
+            BotZoneName: isGZ ? "ZoneSandbox" : point?.BotZoneName,
+            Categories: ["Bot"],
+            Sides: ["Savage"],
+            CorePointId: 1,
+          }
           : point;
       })
       .filter(({ Categories }) => !!Categories.length);
@@ -190,19 +188,19 @@ export const setupSpawns = (container: DependencyContainer) => {
 
         return !!point.Categories.length
           ? {
-              ...point,
-              BotZoneName: isGZ
-                ? "ZoneSandbox"
-                : getClosestZone(
-                    scavSpawns,
-                    point.Position.x,
-                    point.Position.y,
-                    point.Position.z
-                  ),
-              Categories: ["Coop", Math.random() ? "Group" : "Opposite"],
-              Sides: ["Pmc"],
-              CorePointId: 0,
-            }
+            ...point,
+            BotZoneName: isGZ
+              ? "ZoneSandbox"
+              : getClosestZone(
+                scavSpawns,
+                point.Position.x,
+                point.Position.y,
+                point.Position.z
+              ),
+            Categories: ["Coop", Math.random() ? "Group" : "Opposite"],
+            Sides: ["Pmc"],
+            CorePointId: 0,
+          }
           : point;
       })
       .filter(({ Categories }) => !!Categories.length);

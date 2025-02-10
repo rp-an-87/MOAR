@@ -13,4 +13,5 @@ export class globalValues {
   public static forcedPreset: string = "random";
   public static addedMapZones: Record<number, string[]> = {};
   public static indexedMapSpawns: Record<number, ISpawnPointParam[]> = {};
+  public static playerSpawn: ISpawnPointParam;
 }

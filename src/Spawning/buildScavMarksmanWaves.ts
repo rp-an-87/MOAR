@@ -7,6 +7,7 @@ import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { saveToFile } from "../utils";
 import getSortedSpawnPointList from "./spawnZoneUtils";
+import { globalValues } from "../GlobalValues";
 
 export default function buildScavMarksmanWaves(
   config: typeof _config,
@@ -101,10 +102,7 @@ export default function buildScavMarksmanWaves(
 
     const {
       Position: { x, y, z },
-    } =
-      locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
-      ];
+    } = globalValues.playerSpawn;
 
     const sniperSpawns = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
@@ -146,8 +144,7 @@ export default function buildScavMarksmanWaves(
       ),
       x,
       y,
-      z,
-      0.1
+      z
     ).map(({ BotZoneName }) => BotZoneName);
 
     looselyShuffle(scavZones, 4);

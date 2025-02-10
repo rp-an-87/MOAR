@@ -36,11 +36,11 @@ export default function getSortedSpawnPointList(
   mX: number,
   my: number,
   mZ: number,
-  cull?: number
+  // cull?: number
 ): ISpawnPointParam[] {
   let culledAmount = 0;
 
-  const sortedCulledResult = SpawnPointParams.sort((a, b) => {
+  const sorted = SpawnPointParams.sort((a, b) => {
     const a1 = getDistance(
       a.Position.x,
       a.Position.y,
@@ -58,28 +58,30 @@ export default function getSortedSpawnPointList(
       mZ
     );
     return a1 - b1;
-  }).filter((_, index) => {
-    if (!cull) return true;
-    const result = index > SpawnPointParams.length * cull;
-    if (!result) culledAmount++;
+  })
 
-    return result;
-  });
+  // .filter((_, index) => {
+  //   if (!cull) return true;
+  //   const result = index > SpawnPointParams.length * cull;
+  //   if (!result) culledAmount++;
+
+  //   return result;
+  // });
 
   if (_config.debug && culledAmount > 0) {
     console.log(
       "Reduced to " +
-        Math.round(
-          (sortedCulledResult.length / SpawnPointParams.length) * 100
-        ) +
-        "% of original spawns",
+      Math.round(
+        (sorted.length / SpawnPointParams.length) * 100
+      ) +
+      "% of original spawns",
       SpawnPointParams.length,
       ">",
-      sortedCulledResult.length,
+      sorted.length,
       "\n"
     );
   }
-  return sortedCulledResult;
+  return sorted;
 }
 
 export function cleanClosest(
@@ -109,16 +111,16 @@ export function cleanClosest(
     return result
       ? point
       : {
-          ...point,
-          ...(player
-            ? {}
-            : {
-                DelayToCanSpawnSec: 9999999,
-              }),
-          CorePointId: 99999,
-          Categories: [],
-          Sides: [],
-        };
+        ...point,
+        ...(player
+          ? {}
+          : {
+            DelayToCanSpawnSec: 9999999,
+          }),
+        CorePointId: 99999,
+        Categories: [],
+        Sides: [],
+      };
   });
 
   if (_config.debug) {
@@ -131,8 +133,8 @@ export function cleanClosest(
       ">",
       actualCulled.length,
       "Reduced to " +
-        Math.round((actualCulled.length / filteredParams.length) * 100) +
-        "% of original spawns",
+      Math.round((actualCulled.length / filteredParams.length) * 100) +
+      "% of original spawns",
       player ? "player" : "bot"
     ); // high, low}
   }

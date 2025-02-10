@@ -73,6 +73,8 @@ export const buildWaves = (container: DependencyContainer) => {
   console.log(
     globalValues.forcedPreset === "custom"
       ? "custom"
+      : globalValues.forcedPreset
+      ? globalValues.forcedPreset
       : globalValues.currentPreset
   );
 

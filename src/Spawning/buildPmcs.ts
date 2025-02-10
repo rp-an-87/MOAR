@@ -5,6 +5,7 @@ import { defaultEscapeTimes, defaultHostility } from "./constants";
 import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
 import getSortedSpawnPointList from "./spawnZoneUtils";
+import { globalValues } from "../GlobalValues";
 
 export default function buildPmcs(
   config: typeof _config,
@@ -28,10 +29,7 @@ export default function buildPmcs(
 
     const {
       Position: { x, y, z },
-    } =
-      locationList[index].base.SpawnPointParams[
-        locationList[index].base.SpawnPointParams.length - 1
-      ];
+    } = globalValues.playerSpawn;
 
     let pmcZones = getSortedSpawnPointList(
       locationList[index].base.SpawnPointParams.filter(
@@ -39,10 +37,10 @@ export default function buildPmcs(
       ),
       x,
       y,
-      z,
-      0.1
+      z
     ).map(({ BotZoneName }) => BotZoneName);
-    looselyShuffle(pmcZones, 2);
+
+    looselyShuffle(pmcZones, 3);
 
     // console.log(pmcZones);
 
