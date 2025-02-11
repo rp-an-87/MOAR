@@ -42,7 +42,7 @@ export default function updateSpawnLocations(
         possibleSpawnList.push({
           ...point,
           Categories: ["Player"],
-          BotZoneName: point?.BotZoneName ? point.BotZoneName : "",
+          BotZoneName: "",
           CorePointId: 0,
           Sides: ["Pmc"],
           Infiltration: playerSpawn.Infiltration,
