@@ -8,6 +8,7 @@ import { globalValues } from "../GlobalValues";
 import getSortedSpawnPointList, {
   getClosestZone,
   getDistance,
+  uuidv4,
 } from "./spawnZoneUtils";
 
 export default function updateSpawnLocations(
@@ -41,6 +42,7 @@ export default function updateSpawnLocations(
       ) {
         possibleSpawnList.push({
           ...point,
+          Id: uuidv4(),
           Categories: ["Player"],
           BotZoneName: "",
           CorePointId: 0,
@@ -67,16 +69,16 @@ export default function updateSpawnLocations(
 
     const isGZ = map.includes("gz");
 
-    const newPMCSpawns = canBeConverted.map((point) => ({
+    const newPMCSpawns = canBeConverted.filter(({ isCustom }: any) => !isCustom).map((point) => ({
       ...point,
       BotZoneName: isGZ
         ? "ZoneSandbox"
         : getClosestZone(
-            mapSpawns,
-            point.Position.x,
-            point.Position.y,
-            point.Position.z
-          ),
+          mapSpawns,
+          point.Position.x,
+          point.Position.y,
+          point.Position.z
+        ),
       Categories: ["Coop", Math.random() ? "Group" : "Opposite"],
       Sides: ["Pmc"],
       CorePointId: 0,

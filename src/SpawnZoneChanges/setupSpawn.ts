@@ -151,7 +151,7 @@ export const setupSpawns = (container: DependencyContainer) => {
           ? {
             ...point,
             Categories: ["Player"],
-            BotZoneName: point?.BotZoneName ? point.BotZoneName : "",
+            BotZoneName: "",
             CorePointId: 0,
             Sides: ["Pmc"],
           }

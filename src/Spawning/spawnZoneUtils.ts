@@ -156,7 +156,7 @@ export function cleanClosest(
   // }
 }
 
-function uuidv4() {
+export function uuidv4() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
     (
       +c ^
@@ -315,6 +315,7 @@ export const AddCustomPlayerSpawnPoints = (
         Radius: 20,
       },
     },
+    isCustom: true,
     CorePointId: 0,
     DelayToCanSpawnSec: 4,
     Id: uuidv4(),
