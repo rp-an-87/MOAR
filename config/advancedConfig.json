@@ -3,5 +3,5 @@
     "ActivateSpawnCullingOnServerStart": false,
     "MarksmanDifficultyChanges": true,
     "EnableBossPerformanceImprovements": true,
-    "SpawnpointAreaTarget": 4
+    "SpawnpointAreaTarget": 2
 }
