@@ -35,8 +35,8 @@ export default function getSortedSpawnPointList(
   SpawnPointParams: ISpawnPointParam[],
   mX: number,
   my: number,
-  mZ: number
-  // cull?: number
+  mZ: number,
+  cull?: number
 ): ISpawnPointParam[] {
   let culledAmount = 0;
 
@@ -58,15 +58,13 @@ export default function getSortedSpawnPointList(
       mZ
     );
     return a1 - b1;
+  }).filter((_, index) => {
+    if (!cull) return true;
+    const result = index > SpawnPointParams.length * cull;
+    if (!result) culledAmount++;
+
+    return result;
   });
-
-  // .filter((_, index) => {
-  //   if (!cull) return true;
-  //   const result = index > SpawnPointParams.length * cull;
-  //   if (!result) culledAmount++;
-
-  //   return result;
-  // });
 
   if (_config.debug && culledAmount > 0) {
     console.log(
@@ -274,13 +272,12 @@ export const random360 = () => Math.random() * 360;
 
 export const BuildCustomPlayerSpawnPoints = (
   map: string,
-  refSpawns: ISpawnPointParam[],
-  limit: number
+  refSpawns: ISpawnPointParam[]
 ) => {
   const playerOnlySpawns = refSpawns
     .filter((item) => !!item.Infiltration && item.Categories[0] === "Player")
     .map((point) => {
-      point.ColliderParams._props.Radius = limit;
+      point.ColliderParams._props.Radius = 1;
       return {
         ...point,
         BotZoneName: "",
@@ -322,7 +319,7 @@ export const BuildCustomPlayerSpawnPoints = (
           y: 0,
           z: 0,
         },
-        Radius: limit,
+        Radius: 1,
       },
     },
     isCustom: true,
@@ -338,9 +335,9 @@ export const BuildCustomPlayerSpawnPoints = (
   // TODO: Check infils
 
   // console.log(
-  //   [...playerOnlySpawns, ...playerSpawns].filter(
-  //     (thung) => !thung?.Infiltration
-  //   ).length
+  //   [...playerOnlySpawns, ...playerSpawns].map(
+  //     (thung) => thung?.Infiltration
+  //   )
   // );
 
   return [...playerOnlySpawns, ...playerSpawns];

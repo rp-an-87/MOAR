@@ -144,7 +144,8 @@ export default function buildScavMarksmanWaves(
       ),
       x,
       y,
-      z
+      z,
+      0.1
     ).map(({ BotZoneName }) => BotZoneName);
 
     looselyShuffle(scavZones, 4);

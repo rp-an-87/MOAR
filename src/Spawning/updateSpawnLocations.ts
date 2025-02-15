@@ -42,18 +42,21 @@ export default function updateSpawnLocations(
       }
     });
 
-    const possibleSpawnListSet = new Set(possibleSpawnList.map(({ Id }) => Id));
+    // const possibleSpawnListSet = new Set(possibleSpawnList.map(({ Id }) => Id));
 
-    locationList[index].base.SpawnPointParams = sortedSpawnPointList.map(
-      (point) => {
-        if (point["type"] === "player" && !possibleSpawnListSet.has(point.Id)) {
-          point.Categories = [];
-          point.Sides = [];
-        }
+    locationList[index].base.SpawnPointParams = [
+      ...possibleSpawnList,
+      ...sortedSpawnPointList.filter((point) => point["type"] !== "player"),
+    ];
 
-        return point;
-      }
-    );
+    //  {
+    // if (point["type"] === "player" && !possibleSpawnListSet.has(point.Id)) {
+    //   point.Categories = [];
+    //   point.Sides = [];
+    // }
+
+    // return point;
+    // }
 
     // console.log(
     //   map,
