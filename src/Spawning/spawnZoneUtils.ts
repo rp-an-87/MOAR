@@ -278,6 +278,7 @@ export const BuildCustomPlayerSpawnPoints = (
     .filter((item) => !!item.Infiltration && item.Categories[0] === "Player")
     .map((point) => {
       point.ColliderParams._props.Radius = 1;
+      point.Position.y = point.Position.y + 0.5;
       return {
         ...point,
         BotZoneName: "",
@@ -287,7 +288,7 @@ export const BuildCustomPlayerSpawnPoints = (
       };
     });
 
-  // console.log(playerOnlySpawns.length)
+  // console.log(map, playerOnlySpawns.length);
   if (!PlayerSpawns[map] || !PlayerSpawns[map].length) {
     _config.debug && console.log("no custom Player spawns for " + map);
     return playerOnlySpawns;
@@ -333,12 +334,8 @@ export const BuildCustomPlayerSpawnPoints = (
   }));
 
   // TODO: Check infils
-
-  // console.log(
-  //   [...playerOnlySpawns, ...playerSpawns].map(
-  //     (thung) => thung?.Infiltration
-  //   )
-  // );
+  // console.log(map);
+  // console.log(playerOnlySpawns[0], playerSpawns[0]);
 
   return [...playerOnlySpawns, ...playerSpawns];
 };

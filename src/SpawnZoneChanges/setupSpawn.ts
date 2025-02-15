@@ -137,8 +137,7 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     let playerSpawns = BuildCustomPlayerSpawnPoints(
       map,
-      locations[map].base.SpawnPointParams,
-      limit
+      locations[map].base.SpawnPointParams
     );
 
     playerSpawns = cleanClosest(playerSpawns, mapIndex, true);
