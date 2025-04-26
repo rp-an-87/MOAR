@@ -166,7 +166,7 @@ export const buildBossBasedWave = (
     Supports: null,
     TriggerId: "",
     TriggerName: "",
-    spawnMode: ["regular", "pve"],
+    SpawnMode: ["regular", "pve"],
   };
 };
 
@@ -264,7 +264,7 @@ export const buildBotWaves = (
         : null,
       TriggerId: "",
       TriggerName: "",
-      spawnMode: isPMC ? ["pve"] : ["regular", "pve"],
+      SpawnMode: isPMC ? ["pve"] : ["regular", "pve"],
     });
 
     startTime += Math.round(totalCountThisWave * averageTime);
@@ -334,7 +334,7 @@ export const buildZombie = (
       })),
       TriggerId: "",
       TriggerName: "",
-      spawnMode: ["regular", "pve"],
+      SpawnMode: ["regular", "pve"],
     });
 
     startTime += Math.round(totalCountThisWave * averageTime);
