@@ -350,7 +350,9 @@ export interface MapSettings {
   sniperQuantity?: number;
   initialSpawnDelay: number;
   smoothingDistribution: number;
-  mapCullingNearPointValue: number;
+  mapCullingNearPointValuePlayer: number;
+  mapCullingNearPointValuePmc: number;
+  mapCullingNearPointValueScav: number;
   spawnMinDistance: number;
   EscapeTimeLimit?: number;
   maxBotPerZoneOverride?: number;

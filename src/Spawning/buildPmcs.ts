@@ -38,10 +38,10 @@ export default function buildPmcs(
       x,
       y,
       z,
-      0.1
+      0.05
     ).map(({ BotZoneName }) => BotZoneName);
 
-    looselyShuffle(pmcZones, 3);
+    looselyShuffle(pmcZones, 5);
 
     // console.log(pmcZones);
 

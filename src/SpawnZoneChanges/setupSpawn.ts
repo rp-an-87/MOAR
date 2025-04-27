@@ -31,6 +31,7 @@ export const setupSpawns = (container: DependencyContainer) => {
   ]);
 
   originalMapList.forEach((map, mapIndex) => {
+    const configMap = configLocations[mapIndex];
     const allZones = [
       ...new Set(
         locations[map].base.SpawnPointParams.filter(
@@ -140,11 +141,16 @@ export const setupSpawns = (container: DependencyContainer) => {
       locations[map].base.SpawnPointParams
     );
 
-    playerSpawns = cleanClosest(playerSpawns, mapIndex, true);
+    playerSpawns = cleanClosest(
+      playerSpawns,
+      mapIndex,
+      mapConfig[configMap].mapCullingNearPointValuePlayer
+    );
 
     scavSpawns = cleanClosest(
       AddCustomBotSpawnPoints(scavSpawns, map),
-      mapIndex
+      mapIndex,
+      mapConfig[configMap].mapCullingNearPointValueScav
     ).map((point, botIndex) => {
       if (point.ColliderParams?._props?.Radius < limit) {
         point.ColliderParams._props.Radius = limit;
@@ -163,7 +169,8 @@ export const setupSpawns = (container: DependencyContainer) => {
 
     pmcSpawns = cleanClosest(
       AddCustomPmcSpawnPoints(pmcSpawns, map),
-      mapIndex
+      mapIndex,
+      mapConfig[configMap].mapCullingNearPointValuePmc
     ).map((point, pmcIndex) => {
       if (point.ColliderParams?._props?.Radius < limit) {
         point.ColliderParams._props.Radius = limit;

@@ -83,13 +83,10 @@ export default function getSortedSpawnPointList(
 export function cleanClosest(
   SpawnPointParams: ISpawnPointParam[],
   mapIndex: number,
-  player?: boolean
+  mapCullingNearPointValue: number
 ): ISpawnPointParam[] {
   const map = configLocations[mapIndex];
 
-  const mapCullingNearPointValue = player
-    ? mapConfig[map].mapCullingNearPointValuePlayer
-    : mapConfig[map].mapCullingNearPointValue;
   const okayList = new Set();
   const filteredParams = SpawnPointParams.map((point) => {
     const {
@@ -108,11 +105,7 @@ export function cleanClosest(
       ? point
       : {
           ...point,
-          ...(player
-            ? {}
-            : {
-                DelayToCanSpawnSec: 9999999,
-              }),
+          DelayToCanSpawnSec: 9999999,
           CorePointId: 99999,
           Categories: [],
           Sides: [],
@@ -131,7 +124,7 @@ export function cleanClosest(
       "Reduced to " +
         Math.round((actualCulled.length / filteredParams.length) * 100) +
         "% of original spawns",
-      player ? "player" : "bot"
+      // player ? "player" : "bot"
     ); // high, low}
   }
 
