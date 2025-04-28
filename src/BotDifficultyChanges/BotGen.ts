@@ -83,7 +83,11 @@ export default class BotGen {
             const selectedMap =
               globalValues.database.locations[globalValues.RaidMap]?.base;
             const raidEndTime =
-              globalValues.RaidStartTime + selectedMap.EscapeTimeLimit * 60000;
+              globalValues.RaidStartTime +
+              (selectedMap?.EscapeTimeLimit
+                ? selectedMap?.EscapeTimeLimit
+                : 60) *
+                60000;
             const timeProgressed = Date.now() - globalValues.RaidStartTime;
             const raidTotalDuration = raidEndTime - globalValues.RaidStartTime;
             const currentlyProgressedPercentage =

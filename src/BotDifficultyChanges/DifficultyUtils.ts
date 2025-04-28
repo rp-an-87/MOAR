@@ -1,4 +1,4 @@
-import { cloneDeep } from "../utils";
+import { cloneDeep, saveToFile } from "../utils";
 import { globalValues } from "./GlobalValues";
 import {
   IDifficulties,
@@ -52,9 +52,10 @@ const generateDifficultyLevels = () => {
         break;
     }
 
-    bots[aiTypes].forEach((botTypeName) => {
+    bots[aiTypes].forEach((botTypeName: string) => {
       const currentBottDifficulty =
         globalValues.database.bots.types[botTypeName].difficulty;
+
       changeForAllDifficulties(
         currentBottDifficulty,
         difficultySet,
@@ -827,8 +828,8 @@ export const changeAI = (
   //Seems to have nothing to do with talking?
   //..Or does it?
   botCat.TALK_WITH_QUERY = true;
-  changeStat("MIN_SHOOTS_TIME", [0, 0, 0, 0, 0, 0], difficulty, botCat);
-  changeStat("MAX_SHOOTS_TIME", [0, 0, 0, 0, 0, 0], difficulty, botCat);
+  // changeStat("MIN_SHOOTS_TIME", [0, 0, 0, 0, 0, 0], difficulty, botCat);
+  // changeStat("MAX_SHOOTS_TIME", [0, 0, 0, 0, 0, 0], difficulty, botCat);
   // botCat.MIN_SHOOTS_TIME = 1
   // botCat.MAX_SHOOTS_TIME = 2
   (botCat.MIN_START_AGGRESION_COEF = 1), //Unsure of what these do. Defaults are 1 and 3.
@@ -883,6 +884,7 @@ export const changeAI = (
     botCat.MAX_AGGRO_BOT_DIST * botCat.MAX_AGGRO_BOT_DIST;
   //botCat.MAX_AGGRO_BOT_DIST = 100
   botCat.TIME_TO_FIND_ENEMY = 60;
+
   changeStat(
     "CHANCE_TO_RUN_CAUSE_DAMAGE_0_100",
     [70, 60, 50, 40, 30, 25],
@@ -894,9 +896,6 @@ export const changeAI = (
   //botCat.DIST_TO_ENEMY_YO_CAN_HEAL = 15.0
   botCat.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 102; //52
   botCat.DEFAULT_ENEMY_USEC = true;
-  botCat.DEFAULT_BEAR_BEHAVIOUR = "Attack";
-  botCat.DEFAULT_SAVAGE_BEHAVIOUR = "Warn";
-  botCat.DEFAULT_USEC_BEHAVIOUR = "Attack";
 
   //BOSS
   botCat = botDiff.Boss;
@@ -995,35 +994,31 @@ export const changeAI = (
   botCat = botDiff.Scattering;
   //SCATTERING
   //Scattering also doesn't affect shoot to the left / cover accuracy. Of course.
-  changeStat(
-    "MinScatter",
-    [1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.09, 0.08],
-    difficulty,
-    botCat
-  );
-  changeStat(
-    "WorkingScatter",
-    [1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2],
-    difficulty,
-    botCat
-  );
+  // console.log(botCat.MinScatter)
+
+  botCat.MinScatter = 0.03;
+
+  // changeStat(
+  //   "WorkingScatter",
+  //   [1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2],
+  //   difficulty,
+  //   botCat
+  // );
   changeStat(
     "MaxScatter",
     [3, 2.5, 2, 1.5, 1.2, 1, 0.9, 0.8, 0.7, 0.6, 0.5],
     difficulty,
     botCat
   );
-  botCat.MinScatter *= 5.04;
-  botCat.WorkingScatter *= 2.5;
-  botCat.MaxScatter *= 0.9;
 
+
+  botCat.MaxScatter *= 0.9;
   botCat.MinScatter *=
     globalValues.difficultyConfig.overallDifficultyMultipliers.aiShotSpreadMult;
   botCat.WorkingScatter *=
     globalValues.difficultyConfig.overallDifficultyMultipliers.aiShotSpreadMult;
   botCat.MaxScatter *=
     globalValues.difficultyConfig.overallDifficultyMultipliers.aiShotSpreadMult;
-
   //Testing
   botCat.SpeedUp = 0.3;
   botCat.SpeedUpAim = 1.4;

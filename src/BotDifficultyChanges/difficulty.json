@@ -2,7 +2,6 @@
   "bots": {
     "lowLevelAIs": ["assault"],
     "midLevelAIs": [
-      "bossbully",
       "marksman",
       "cursedassault",
       "sectantpriest",
@@ -16,9 +15,11 @@
       "followersanitar",
       "followerbully",
       "followertagilla",
-      "skier",
+      "followerbirdeye",
+      "followerbigpipe",
       "followerzryachiy",
-      "arenafighterevent"
+      "arenafighterevent",
+      "bossbully"
     ],
     "highLevelAIs": ["assaultgroup", "bear", "usec", "exusec"],
     "bossLevelAIs": [
@@ -28,9 +29,7 @@
       "bosssanitar",
       "bosstagilla",
       "bossknight",
-      "bosszryachiy",
       "bossboar",
-      "bossboarsniper",
       "bosskolontay",
       "bosspartisan",
       "followerbigpipe",
@@ -43,7 +42,7 @@
   "highLevelDifficultyModifier": 0,
   "bossLevelDifficultyModifier": 0,
   "botGroupDistance": 100,
-  "pmcDifficultyMaxLevel": 79,
+  "pmcDifficultyMaxLevel": 55,
   "overallDifficultyMultipliers": {
     "aiAimSpeedMult": 0.8,
     "aiShotSpreadMult": 1,

@@ -1,15 +1,15 @@
 {
   "enableDifficultyChanges": true,
-  "overallDifficultyModifier": 0.3,
-  "randomScavBrainChance": 0.2,
-  "randomPmcBrainChance": 0.2,
-  "randomMarksmanBrainChance": 0.2,
-  "debug": true,
+  "overallDifficultyModifier": 0,
+  "randomScavBrainChance": 0.1,
+  "randomPmcBrainChance": 0,
+  "randomMarksmanBrainChance": 0.1,
+  "debug": false,
   "easyEXAMPLE": {
     "enableDifficultyChanges": true,
     "overallDifficultyModifier": 0,
-    "randomScavBrainChance": 0.2,
-    "randomPmcBrainChance": 0.2,
+    "randomScavBrainChance": 0.1,
+    "randomPmcBrainChance": 0,
     "randomMarksmanBrainChance": 0.1,
     "debug": false
   },
