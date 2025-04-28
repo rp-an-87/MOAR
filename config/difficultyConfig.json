@@ -1,5 +1,5 @@
 {
-  "enableDifficultyChanges": true,
+  "enableDifficultyChanges": false,
   "overallDifficultyModifier": 0,
   "randomScavBrainChance": 0.1,
   "randomPmcBrainChance": 0,
