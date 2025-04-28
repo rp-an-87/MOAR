@@ -1,7 +1,6 @@
 import { DependencyContainer } from "tsyringe";
 import { buildWaves } from "../Spawning/Spawning";
 import { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRouterModService";
-// import { DynamicRouterModService } from "@spt/services/mod/dynamicRouter/DynamicRouterModService";
 import { globalValues } from "../GlobalValues";
 import { kebabToTitle } from "../utils";
 import PresetWeightingsConfig from "../../config/PresetWeightings.json";
