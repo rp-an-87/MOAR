@@ -74,8 +74,8 @@ export const buildWaves = (container: DependencyContainer) => {
     globalValues.forcedPreset === "custom"
       ? "custom"
       : globalValues.forcedPreset
-      ? globalValues.forcedPreset
-      : globalValues.currentPreset
+        ? globalValues.forcedPreset
+        : globalValues.currentPreset
   );
 
   const {
@@ -122,20 +122,10 @@ export const buildWaves = (container: DependencyContainer) => {
 
   pmcConfig.removeExistingPmcWaves = true;
 
-  // pmcConfig.convertIntoPmcChance = {
-  //   default: {
-  //     assault: { min: 0, max: 0 },
-  //     cursedassault: { min: 0, max: 0 },
-  //     pmcbot: { min: 0, max: 0 },
-  //     exusec: { min: 0, max: 0 },
-  //     arenafighter: { min: 0, max: 0 },
-  //     arenafighterevent: { min: 0, max: 0 },
-  //     crazyassaultevent: { min: 0, max: 0 },
-  //   },
-  //   factory4_day: { assault: { min: 0, max: 0 } },
-  //   laboratory: { pmcbot: { min: 0, max: 0 } },
-  //   rezervbase: { pmcbot: { min: 0, max: 0 } },
-  // };
+  Object.keys(pmcConfig.customPmcWaves).forEach(key => {
+    pmcConfig.customPmcWaves[key] = []
+  })
+
 
   if (config.startingPmcs && (!config.randomSpawns || config.spawnSmoothing)) {
     Logger.warning(
