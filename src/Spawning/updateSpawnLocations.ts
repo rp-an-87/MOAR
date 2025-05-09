@@ -24,7 +24,6 @@ export default function updateSpawnLocations(
     );
 
     const playerSpawn: ISpawnPointParam = getRandomInArray(playerSpawns);
-
     globalValues.playerSpawn = playerSpawn;
 
     const { x, y, z } = playerSpawn.Position;
@@ -35,9 +34,10 @@ export default function updateSpawnLocations(
 
     sortedSpawnPointList.forEach((point) => {
       if (
-        possibleSpawnList.length <= advancedConfig.SpawnpointAreaTarget &&
+        possibleSpawnList.length < advancedConfig.SpawnpointAreaTarget &&
         point?.["type"] === "player"
       ) {
+        point.ColliderParams._props.Radius = 1
         possibleSpawnList.push(point);
       }
     });
