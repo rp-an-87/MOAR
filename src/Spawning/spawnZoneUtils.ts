@@ -9,6 +9,7 @@ import {
   SniperSpawns,
   PmcSpawns,
 } from "../SpawnZoneChanges";
+import { MapConfigType } from "./utils";
 
 function sq(n: number) {
   return n * n;
@@ -69,8 +70,8 @@ export default function getSortedSpawnPointList(
   if (_config.debug && culledAmount > 0) {
     console.log(
       "Reduced to " +
-        Math.round((sorted.length / SpawnPointParams.length) * 100) +
-        "% of original spawns",
+      Math.round((sorted.length / SpawnPointParams.length) * 100) +
+      "% of original spawns",
       SpawnPointParams.length,
       ">",
       sorted.length,
@@ -104,12 +105,12 @@ export function cleanClosest(
     return result
       ? point
       : {
-          ...point,
-          DelayToCanSpawnSec: 9999999,
-          CorePointId: 99999,
-          Categories: [],
-          Sides: [],
-        };
+        ...point,
+        DelayToCanSpawnSec: 9999999,
+        CorePointId: 99999,
+        Categories: [],
+        Sides: [],
+      };
   });
 
   if (_config.debug) {
@@ -122,8 +123,8 @@ export function cleanClosest(
       ">",
       actualCulled.length,
       "Reduced to " +
-        Math.round((actualCulled.length / filteredParams.length) * 100) +
-        "% of original spawns",
+      Math.round((actualCulled.length / filteredParams.length) * 100) +
+      "% of original spawns",
       // player ? "player" : "bot"
     ); // high, low}
   }
@@ -364,10 +365,14 @@ export const removeClosestSpawnsFromCustomBots = (
   }
 
   const coords: Ixyz[] = CustomBots[map];
-
-  const mapCullingNearPointValue =
-    mapConfig[mapConfigMap].mapCullingNearPointValue;
-
+  const { mapCullingNearPointValuePlayer,
+    mapCullingNearPointValuePmc,
+    mapCullingNearPointValueScav } = (mapConfig[mapConfigMap] as MapConfigType)
+  const mapCullingNearPointValue = (mapCullingNearPointValuePlayer +
+    mapCullingNearPointValuePmc +
+    mapCullingNearPointValueScav) / 3
+  
+    
   let filteredCoords = coords.filter(
     ({ x: X, y: Y, z: Z }) =>
       !SpawnPointParams.some(({ Position: { z, x, y } }) => {

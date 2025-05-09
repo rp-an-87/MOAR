@@ -401,6 +401,9 @@ export interface MapConfigType {
   scavHotZones?: string[];
   pmcHotZones?: string[];
   EscapeTimeLimitOverride?: number;
+  mapCullingNearPointValuePlayer: number;
+  mapCullingNearPointValuePmc: number;
+  mapCullingNearPointValueScav: number;
 }
 
 export const setEscapeTimeOverrides = (
@@ -421,7 +424,7 @@ export const setEscapeTimeOverrides = (
     if (
       !override &&
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map] >
-        hardcodedEscapeLimitMax
+      hardcodedEscapeLimitMax
     ) {
       const maxLimit = defaultEscapeTimes[map] * hardcodedEscapeLimitMax;
       logger.warning(

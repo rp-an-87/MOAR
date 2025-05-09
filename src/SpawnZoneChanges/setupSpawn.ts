@@ -17,6 +17,7 @@ import {
 import { shuffle } from "../Spawning/utils";
 import { PlayerSpawns, PmcSpawns, ScavSpawns, SniperSpawns } from ".";
 import { updateAllBotSpawns } from "./updateUtils";
+import { showMapCullingDebug } from "../../config/advancedConfig.json"
 
 export const setupSpawns = (container: DependencyContainer) => {
   const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
@@ -158,12 +159,12 @@ export const setupSpawns = (container: DependencyContainer) => {
 
       return !!point.Categories.length
         ? {
-            ...point,
-            BotZoneName: isGZ ? "ZoneSandbox" : point?.BotZoneName,
-            Categories: ["Bot"],
-            Sides: ["Savage"],
-            CorePointId: 1,
-          }
+          ...point,
+          BotZoneName: isGZ ? "ZoneSandbox" : point?.BotZoneName,
+          Categories: ["Bot"],
+          Sides: ["Savage"],
+          CorePointId: 1,
+        }
         : point;
     });
 
@@ -178,19 +179,19 @@ export const setupSpawns = (container: DependencyContainer) => {
 
       return !!point.Categories.length
         ? {
-            ...point,
-            BotZoneName: isGZ
-              ? "ZoneSandbox"
-              : getClosestZone(
-                  scavSpawns,
-                  point.Position.x,
-                  point.Position.y,
-                  point.Position.z
-                ),
-            Categories: ["Coop", Math.random() ? "Group" : "Opposite"],
-            Sides: ["Pmc"],
-            CorePointId: 0,
-          }
+          ...point,
+          BotZoneName: isGZ
+            ? "ZoneSandbox"
+            : getClosestZone(
+              scavSpawns,
+              point.Position.x,
+              point.Position.y,
+              point.Position.z
+            ),
+          Categories: ["Coop", Math.random() ? "Group" : "Opposite"],
+          Sides: ["Pmc"],
+          CorePointId: 0,
+        }
         : point;
     });
 
@@ -203,20 +204,20 @@ export const setupSpawns = (container: DependencyContainer) => {
       ...pmcSpawns.map((point) => ({ ...point, type: "pmc" })),
       ...playerSpawns.map((point) => ({ ...point, type: "player" })),
     ];
-
-    // console.log(
-    //   "sniperSpawns",
-    //   sniperSpawns.length,
-    //   "bossSpawns",
-    //   bossSpawns.length,
-    //   "scavSpawns",
-    //   scavSpawns.length,
-    //   "pmcSpawns",
-    //   pmcSpawns.length,
-    //   "playerSpawns",
-    //   playerSpawns.length,
-    //   map
-    // );
+    showMapCullingDebug &&
+      console.log(
+        "sniperSpawns",
+        sniperSpawns.length,
+        "bossSpawns",
+        bossSpawns.length,
+        "scavSpawns",
+        scavSpawns.length,
+        "pmcSpawns",
+        pmcSpawns.length,
+        "playerSpawns",
+        playerSpawns.length,
+        map
+      );
 
     locations[map].base.SpawnPointParams = indexedMapSpawns[mapIndex];
 

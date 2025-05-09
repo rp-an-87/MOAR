@@ -1,5 +1,5 @@
 {
-  "live-like": 25,
+  "live-like": 35,
   "more-scavs": 8,
   "more-pmcs": 8,
   "quiet-raids": 5,
@@ -9,5 +9,5 @@
   "boss-invasion": 2,
   "rogue-invasion": 0,
   "raider-invasion": 0,
-  "insanity": 0
+  "insanity": 2
 }

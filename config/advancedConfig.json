@@ -1,7 +1,8 @@
 {
   "-------------JUST LEAVE THESE ALONE---------------": "",
-  "ActivateSpawnCullingOnServerStart": false,
+  "ActivateSpawnCullingOnServerStart": true,
   "MarksmanDifficultyChanges": true,
   "EnableBossPerformanceImprovements": true,
-  "SpawnpointAreaTarget": 5
+  "SpawnpointAreaTarget": 5,
+  "showMapCullingDebug": true
 }
