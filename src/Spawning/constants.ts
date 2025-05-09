@@ -206,14 +206,14 @@ export const bossPerformanceHash = {
   },
   exUsec: {
     BossEscortAmount: "1",
-    BossChance: 35,
+    BossChance: 40,
   },
-  skier: {
-    BossEscortAmount: "2,2,3,3",
-  },
-  sectantPriest: {
-    BossEscortAmount: "1,2,2",
-  },
+  // skier: {
+  //   BossEscortAmount: "2,2,3,5",
+  // },
+  // sectantPriest: {
+  //   BossEscortAmount: "1,2,2",
+  // },
   bossBully: {
     BossEscortAmount: "2,3",
   },
@@ -228,17 +228,17 @@ export const bossPerformanceHash = {
   },
   bossPartisan: {
     BossEscortType: "assault",
-    BossEscortAmount: "1,1,2",
+    BossEscortAmount: "0,1",
     DependKarma: false,
     TriggerId: "",
     TriggerName: "",
     RandomTimeSpawn: true,
   },
-  bossSanitar: {
-    BossEscortAmount: "1,2,3",
-  },
-  peacemaker: {
-    BossChance: 25,
-    BossEscortAmount: "2,2,3,3,3,4",
-  },
+  // bossSanitar: {
+  //   BossEscortAmount: "1,2,3",
+  // },
+  // peacemaker: {
+  //   BossChance: 25,
+  //   BossEscortAmount: "2,2,3,3,3,4",
+  // },
 };

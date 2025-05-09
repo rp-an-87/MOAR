@@ -365,14 +365,16 @@ export const removeClosestSpawnsFromCustomBots = (
   }
 
   const coords: Ixyz[] = CustomBots[map];
+
   const { mapCullingNearPointValuePlayer,
     mapCullingNearPointValuePmc,
     mapCullingNearPointValueScav } = (mapConfig[mapConfigMap] as MapConfigType)
+
   const mapCullingNearPointValue = (mapCullingNearPointValuePlayer +
     mapCullingNearPointValuePmc +
     mapCullingNearPointValueScav) / 3
-  
-    
+
+
   let filteredCoords = coords.filter(
     ({ x: X, y: Y, z: Z }) =>
       !SpawnPointParams.some(({ Position: { z, x, y } }) => {
