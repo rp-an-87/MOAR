@@ -501,7 +501,7 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
       .smoothingDistribution as number;
 
     const increment =
-      Math.round((last - first) / notBosses.length) * 2 * smoothingDistribution;
+      (Math.round((last - first) / notBosses.length) * 2) * smoothingDistribution;
 
     for (let index = 0; index < notBosses.length; index++) {
       const ratio = (index + 1) / notBosses.length;

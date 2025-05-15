@@ -148,7 +148,7 @@ export default function buildScavMarksmanWaves(
       0.05
     ).map(({ BotZoneName }) => BotZoneName);
 
-    looselyShuffle(scavZones, 5);
+    looselyShuffle(scavZones, 3);
 
     const escapeTimeLimitRatio = Math.round(
       locationList[index].base.EscapeTimeLimit / defaultEscapeTimes[map]
@@ -220,8 +220,8 @@ export default function buildScavMarksmanWaves(
         // console.log(scavWaves[index].BossZone);
       });
     }
-
-    // if (map === "laboratory") console.log(snipers, scavWaves)
+    // if (map === "shoreline") console.log(scavWaves.map(({ Time }) => Time));
+    // console.log(snipers, scavWaves)
     locationList[index].base.BossLocationSpawn = [
       ...snipers,
       ...scavWaves,

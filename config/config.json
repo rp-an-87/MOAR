@@ -5,11 +5,11 @@
   "pmcDifficulty": 0.6,
   "scavDifficulty": 0.4,
 
-  "scavWaveDistribution": 1,
+  "scavWaveDistribution": 0.6,
   "scavWaveQuantity": 1,
 
   "startingPmcs": false,
-  "pmcWaveDistribution": 0.6,
+  "pmcWaveDistribution": 0.3,
   "pmcWaveQuantity": 1,
 
   "randomSpawns": false,
@@ -19,12 +19,12 @@
   "zombieWaveQuantity": 1,
   "zombieHealth": 1,
 
-  "maxBotCap": 28,
-  "maxBotPerZone": 6,
+  "maxBotCap": 32,
+  "maxBotPerZone": 7,
 
-  "sniperGroupChance": 0.1,
-  "scavGroupChance": 0.1,
-  "pmcGroupChance": 0.1,
+  "sniperGroupChance": 0.2,
+  "scavGroupChance": 0.2,
+  "pmcGroupChance": 0.2,
   
   "pmcMaxGroupSize": 4,
   "scavMaxGroupSize": 3,
