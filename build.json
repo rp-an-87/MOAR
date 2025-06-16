@@ -4,7 +4,7 @@
   "GitStatus": false,
   "ContainPlugin": true,
   "PluginFileName": "MOAR.dll",
-  "PluginPath": "C:/311/Bepinex/Plugins/",
+  "PluginPath": "D:/311/Bepinex/Plugins/",
   "CopyBundles": false,
   "BuildZip": true,
   "BuildDir": "./dist",

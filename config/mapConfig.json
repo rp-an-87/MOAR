@@ -79,7 +79,8 @@
     "smoothingDistribution": 0.9,
     "mapCullingNearPointValuePlayer": 6,
     "mapCullingNearPointValuePmc": 5,
-    "mapCullingNearPointValueScav": 12,
+    "mapCullingNearPointValueScav": 8,
+    "maxBotCapOverride": 22,
     "spawnMinDistance": 30,
     "pmcWaveCount": 12,
     "scavWaveCount": 24,
@@ -131,9 +132,10 @@
     "mapCullingNearPointValuePlayer": 12,
     "mapCullingNearPointValuePmc": 6,
     "mapCullingNearPointValueScav": 6,
+    "maxBotCapOverride": 18,
     "spawnMinDistance": 30,
-    "pmcWaveCount": 14,
-    "scavWaveCount": 30,
+    "pmcWaveCount": 10,
+    "scavWaveCount": 20,
     "zombieWaveCount": 13
   },
   "woods": {

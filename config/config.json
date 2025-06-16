@@ -19,7 +19,7 @@
   "zombieWaveQuantity": 1,
   "zombieHealth": 1,
 
-  "maxBotCap": 32,
+  "maxBotCap": 28,
   "maxBotPerZone": 7,
 
   "sniperGroupChance": 0.2,

@@ -63,9 +63,19 @@ export function buildBossWaves(
         locationList[indx].base.BossLocationSpawn.forEach((Boss, bIndex) => {
           if (Boss.BossChance < 1) return;
           if (!!bossPerformanceHash[Boss.BossName || ""]) {
+
             const varsToUpdate: Record<string, any> =
               bossPerformanceHash[Boss.BossName];
+            // make it so bossPartisan has a random spawn time
+            if (Boss.BossName === "bossPartisan") {
+              const max = locationList[
+                indx
+              ].base.EscapeTimeLimit
 
+              varsToUpdate.Time = Math.floor(Math.random() * 50 * max)
+              // console.log(varsToUpdate, max * 60)
+            }
+            
             locationList[indx].base.BossLocationSpawn[bIndex] = {
               ...Boss,
               ...varsToUpdate,
@@ -198,7 +208,7 @@ export function buildBossWaves(
           if (BossChance !== mapBossConfig[BossName]) {
             if (!hasChangedBossSpawns) {
               console.log(
-                `\n[MOAR]: --- Adjusting default boss spawn rates --- `
+                `\n[MOAR]: --- Adjusting default boss spawn rates from bossConfig.json --- `
               );
               hasChangedBossSpawns = true;
             }
