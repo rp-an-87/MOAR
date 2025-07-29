@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/indent */
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { defaultEscapeTimes, originalMapList } from "./constants";
-import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
+import { BotDifficultyType, buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { WildSpawnType } from "@spt/models/eft/common/ILocationBase";
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
 import { saveToFile } from "../utils";
@@ -191,7 +192,7 @@ export default function buildScavMarksmanWaves(
       sniperMaxGroupSize,
       sniperGroupChance,
       sniperLocations,
-      0.8,
+      BotDifficultyType.SNIPER,
       WildSpawnType.MARKSMAN,
       true,
       0.3,
@@ -205,7 +206,7 @@ export default function buildScavMarksmanWaves(
       scavMaxGroupSize,
       scavGroupChance,
       scavZones,
-      scavDifficulty,
+      BotDifficultyType.SCAV,
       WildSpawnType.ASSAULT,
       false,
       scavWaveDistribution,

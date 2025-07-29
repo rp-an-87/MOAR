@@ -13,7 +13,7 @@
         "baseUrl": ".",
         "paths": {
             "@spt/*": [
-                "./types/*"
+                "types/*"
             ]
         }
     },
@@ -21,8 +21,7 @@
         "ES2021"
     ],
     "include": [
-        "src/*",
-        "src/**/*"
+        "src/**/*",
+        "types/**/*"
     ],
-    "exclude": ["./types/*"]
 }

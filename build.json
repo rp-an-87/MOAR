@@ -2,7 +2,7 @@
   "FirstRun": false,
   "ShowBuildOptions": true,
   "GitStatus": false,
-  "ContainPlugin": true,
+  "ContainPlugin": false,
   "PluginFileName": "MOAR.dll",
   "PluginPath": "D:/311/Bepinex/Plugins/",
   "CopyBundles": false,

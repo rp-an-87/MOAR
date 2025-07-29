@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 export const defaultHostility = [
   {
     AlwaysEnemies: [
@@ -105,9 +106,9 @@ export const defaultHostility = [
       "spiritSpring",
       "peacemaker",
       "skier",
-      "assault",
       "marksman",
       "pmcBEAR",
+      "assault",
       "exUsec",
       "pmcBot",
       "bossBully",
@@ -209,16 +210,16 @@ export const bossPerformanceHash = {
     BossChance: 40,
   },
   bossBully: {
-    BossEscortAmount: "2,3",
+    BossEscortAmount: "2,2,3,3,4",
   },
   bossBoar: {
-    BossEscortAmount: "1,2,2,2",
+    BossEscortAmount: "1,2,2,2,3",
   },
   bossBoarSniper: {
     BossEscortAmount: "1",
   },
   bossKojaniy: {
-    BossEscortAmount: "1,2,2",
+    BossEscortAmount: "1,1,2,2,3",
   },
   bossPartisan: {
     TriggerId: "",
@@ -226,7 +227,31 @@ export const bossPerformanceHash = {
     RandomTimeSpawn: false,
     Time:120,
   },
-  // bossSanitar: {
-  //   BossEscortAmount: "1,2,3",
-  // },
+  bossSanitar: {
+    BossEscortAmount: "1,1,2,2,3",
+  },
 };
+
+export interface BossConfig {
+  zoneIds?: string;
+  chance?: number;
+  escortAmount?: string;
+  time?: number;
+}
+
+export interface BossConfigByZone {
+  zoneId: string;
+  chance: number;
+  triggerId?: string | "none";
+  escortAmount?: string;
+  time?: number;
+}
+
+export interface BossAdditionConfig {
+  zoneIds: string;
+  type: string;
+  chance: number;
+  triggerId?: string;
+  escortAmount?: string;
+  time?: number;
+}

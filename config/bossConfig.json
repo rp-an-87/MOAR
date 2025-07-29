@@ -1,63 +1,276 @@
 {
-  "ADD_THESE_TO_A_MAP_TO_OVERRIDE_OR_ADD_A_BOSS_TO_A_MAP": {
-    "BOSS_NAME_EXAMPLE": "CHANCE_OF_SPAWNING_PERCENT",
-    "sectantPriest": 0,
-    "arenaFighterEvent": 0,
-    "bossBoarSniper": 0,
-    "pmcBot": 0,
-    "bossZryachiy": 0,
-    "exUsec": 0,
-    "crazyAssaultEvent": 0,
-    "peacemaker": 0,
-    "bossKojaniy": 0,
-    "bossGluhar": 0,
-    "bossSanitar": 0,
-    "bossKilla": 0,
-    "bossTagilla": 0,
-    "bossKnight": 0,
-    "bossBoar": 0,
-    "bossKolontay": 0,
-    "bossPartisan": 0,
-    "bossBully": 0
+  "example": {
+    "bossBully": {
+      "EXPLAINATION": "You can change the chance, the zones and the escort amount the boss spawns with.",
+      "chance": 30,
+      "zoneIds": "ZoneDormitory,ZoneGasStation,ZoneScavBase",
+      "escortAmount": "1,1,2,2,2,3,3"
+    },
+    "pmcBot": [
+      {
+        "EXPLAINATION": "Sometimes, map have more than one of a boss (in this case, raiders), in order to modify these individually, a list (NOT AN OBJECT) is required.",
+        "EXPLAINATION_2": "The boss wave to be modified is selected through the zoneId and the trigger id that generates these bots (i.e: pressing a lever in labs)",
+        "EXPLAINATION_3": "The zone and the trigger must match for the modification to exist, included in this .json are all the known triggers for each map",
+        "EXPLAINATION_4": "Some bots have a time, you can also change this. You can modify individual parameters, as the default will be used if you provide no value."
+      },
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 100,
+        "time": 100,
+        "escortAmount": "1,1,1,1,1,1,1,2"
+      },
+      {
+        "zoneId": "BotZoneBasement",
+        "chance": 45,
+        "triggerId": "autoId_00008_EXFIL"
+      }
+    ]
   },
   "customs": {
-    "bossKnight": 18,
-    "bossPartisan": 8,
-    "bossBully": 30
+    "bossKnight": {
+      "chance": 30,
+      "zoneIds": "ZoneScavBase"
+    },
+    "bossPartisan": {
+      "chance": 30
+    },
+    "bossBully": {
+      "chance": 30,
+      "zoneIds": "ZoneDormitory,ZoneGasStation,ZoneScavBase"
+    },
+    "sectantPriest": {
+      "chance": 15,
+      "zoneIds": "ZoneScavBase"
+    }
   },
   "factoryDay": {
-    "bossTagilla": 30
+    "bossTagilla": {
+      "chance": 30
+    }
   },
   "factoryNight": {
-    "bossTagilla": 30
+    "bossTagilla": {
+      "chance": 30
+    },
+    "sectantPriest": {
+      "chance": 20
+    }
   },
   "interchange": {
-    "bossKilla": 30
+    "bossKilla": {
+      "chance": 30,
+      "zoneIds": "ZoneCenterBot,ZoneCenter,ZoneOLI,ZoneIDEA,ZoneGoshan"
+    }
   },
-  "laboratory": {},
+  "laboratory": {
+    "pmcBot": [
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 100
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 100
+      },
+      {
+        "zoneId": "BotZoneBasement",
+        "chance": 45,
+        "triggerId": "autoId_00008_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneBasement",
+        "chance": 45,
+        "triggerId": "autoId_00010_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneBasement",
+        "chance": 40,
+        "triggerId": "autoId_00007_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 45,
+        "triggerId": "autoId_00007_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 35,
+        "triggerId": "autoId_00632_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 35,
+        "triggerId": "autoId_00632_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 35,
+        "triggerId": "autoId_00012_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 35,
+        "triggerId": "autoId_00012_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 35,
+        "triggerId": "autoId_00014_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 35,
+        "triggerId": "autoId_00014_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor1",
+        "chance": 35,
+        "triggerId": "autoId_00009_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneFloor2",
+        "chance": 35,
+        "triggerId": "autoId_00009_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneGate2",
+        "chance": 35,
+        "triggerId": "autoId_00014_EXFIL"
+      },
+      {
+        "zoneId": "BotZoneGate1",
+        "chance": 45,
+        "triggerId": "autoId_00632_EXFIL"
+      }
+    ]
+  },
   "lighthouse": {
-    "bossKnight": 18,
-    "bossPartisan": 8
+    "bossKnight": {
+      "chance": 30,
+      "zoneIds": "Zone_TreatmentContainers,Zone_Chalet"
+    },
+    "bossPartisan": {
+      "chance": 30
+    },
+    "bossZryachiy": {
+      "chance": 50,
+      "zoneIds": "Zone_Island"
+    },
+    "exUsec": [
+      {
+        "zoneId": "Zone_Blockpost",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_RoofContainers",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_TreatmentRocks",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_TreatmentBeach",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_RoofRocks",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_RoofBeach",
+        "chance": 40
+      },
+      {
+        "zoneId": "Zone_Hellicopter",
+        "chance": 40
+      }      
+    ]
   },
   "rezervbase": {
-    "bossGluhar": 30
+    "bossGluhar": {
+      "chance": 30,
+      "zoneIds": "ZoneRailStrorage,ZonePTOR2,ZoneBarrack,ZoneSubStorage"
+    },
+    "pmcBot": [
+      {
+        "zoneId": "ZoneRailStrorage",
+        "chance": 80
+      },
+      {
+        "zoneId": "ZoneRailStrorage",
+        "triggerId": "autoId_00632_EXFIL",
+        "chance": 90
+      },
+      {
+        "zoneId": "ZoneSubCommand",
+        "triggerId": "autoId_00000_D2_LEVER",
+        "chance": 90
+      },
+      {
+        "zoneId": "ZoneSubCommand",
+        "triggerId": "raider_simple_patroling",
+        "chance": 90
+      }
+    ]
   },
   "shoreline": {
-    "bossKnight": 18,
-    "bossPartisan": 8,
-    "bossSanitar": 30
+    "bossKnight": {
+      "chance": 30,
+      "zoneIds": "ZoneMeteoStation"
+    },
+    "bossPartisan": {
+      "chance": 30
+    },
+    "bossSanitar": {
+      "chance": 30,
+      "zoneIds": "ZoneGreenHouses,ZoneSanatorium1,ZoneGreenHouses,ZoneSanatorium2,ZonePort"
+    },
+    "sectantPriest": {
+      "chance": 15,
+      "zoneIds": "ZoneSanatorium1,ZoneSanatorium2,ZoneForestSpawn,ZoneForestSpawn,ZoneForestSpawn"
+    },
+    "peacemaker": {
+      "chance": 15,
+      "zoneIds": "ZoneGreenHouses,ZonePort,ZoneSanatorium1,ZoneSanatorium2,ZoneSmuglers"
+    }
   },
   "tarkovstreets": {
-    "bossBoar": 30,
-    "bossKolontay": 30
+    "bossBoar": {
+      "chance": 30,
+      "zoneIds": "ZoneCarShowroom"
+    },
+    "bossKolontay": {
+      "chance": 30,
+      "zoneIds": "ZoneClimova,ZoneMvd"
+    }
   },
   "woods": {
-    "bossKojaniy": 30,
-    "bossKnight": 18,
-    "bossPartisan": 8
+    "bossKojaniy": {
+      "chance": 30,
+      "zoneIds": "ZoneWoodCutter"
+    },
+    "bossKnight": {
+      "chance": 30,
+      "zoneIds": "ZoneScavBase2"
+    },
+    "sectantPriest": {
+      "chance": 15,
+      "zoneIds": "ZoneMiniHouse,ZoneBrokenVill"
+    },
+    "bossPartisan": {
+      "chance": 30
+    }
   },
-  "gzLow": {},
+  "gzLow": {
+    
+  },
   "gzHigh": {
-    "bossKolontay": 30
+    "bossKolontay": {
+      "chance": 30
+    },
+    "sectantPriest": {
+      "chance": 44
+    }
   }
 }

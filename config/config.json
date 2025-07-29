@@ -2,9 +2,6 @@
   "enableBotSpawning": true,
   "spawnSmoothing": true,
 
-  "pmcDifficulty": 0.6,
-  "scavDifficulty": 0.4,
-
   "scavWaveDistribution": 0.6,
   "scavWaveQuantity": 1,
 

@@ -1,20 +1,21 @@
+/* eslint-disable @typescript-eslint/indent */
+import { ILocation } from "@spt/models/eft/common/ILocation";
 import {
   IBossLocationSpawn,
   IWave,
   WildSpawnType,
 } from "@spt/models/eft/common/ILocationBase";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
-import { ILocation } from "@spt/models/eft/common/ILocation";
-import { configLocations, defaultEscapeTimes } from "./constants";
-import { ILogger } from "@spt/models/spt/utils/ILogger";
+import { configLocations, defaultEscapeTimes, mainBossNameList } from "./constants";
 
 export const waveBuilder = (
   totalWaves: number,
   timeLimit: number,
   waveDistribution: number,
   wildSpawnType: "marksman" | "assault",
-  difficulty: number,
+  difficulty: BotDifficultyType,
   isPlayer: boolean,
   maxSlots: number,
   combinedZones: string[] = [],
@@ -94,19 +95,120 @@ const getZone = (specialZones, combinedZones, specialOnly) => {
   return "";
 };
 
-export const getDifficulty = (diff: number) => {
-  const randomNumb = Math.random() + diff;
-  switch (true) {
-    case randomNumb < 0.55:
-      return "easy";
-    case randomNumb < 1.4:
-      return "normal";
-    case randomNumb < 1.85:
-      return "hard";
-    default:
-      return "impossible";
+export enum BotDifficultyType {
+  SCAV, PMC, BOSS, SNIPER, ROGUE, RAIDER, RANDOM, BOSS_ESCORT
+}
+
+export const getDifficultyTypeForBossName = (bossName: string): BotDifficultyType => {
+
+  switch (bossName) {
+    case "exUsec": return BotDifficultyType.ROGUE;
+    case "pmcBot": return BotDifficultyType.RAIDER;
   }
+
+  if (mainBossNameList.includes(bossName)) {
+    return BotDifficultyType.BOSS;
+  }
+
+  if (bossName.startsWith("follower")) {
+    return BotDifficultyType.BOSS_ESCORT;
+  }
+
+  // TODO other types
+  return BotDifficultyType.RANDOM;
+}
+
+export const getEscortDifficultyType = (botDifficultyType: BotDifficultyType): BotDifficultyType => {
+  switch (botDifficultyType) {
+    case BotDifficultyType.BOSS: return BotDifficultyType.BOSS_ESCORT;
+    case BotDifficultyType.BOSS_ESCORT: return BotDifficultyType.BOSS_ESCORT;
+    case BotDifficultyType.ROGUE: return BotDifficultyType.ROGUE;
+    case BotDifficultyType.RAIDER: return BotDifficultyType.RAIDER;
+    case BotDifficultyType.SCAV: return BotDifficultyType.SCAV;
+    case BotDifficultyType.PMC: return BotDifficultyType.PMC;
+    case BotDifficultyType.SNIPER: return BotDifficultyType.SNIPER;
+    default: return BotDifficultyType.RANDOM;
+  }
+}
+
+export type Difficulty = "easy" | "normal" | "hard" | "impossible";
+
+// TODO: make this matrix a configurable .json
+const botDifficultyWeights: Record<BotDifficultyType, { difficulty: Difficulty; weight: number }[]> = {
+  [BotDifficultyType.SCAV]: [
+    { difficulty: "easy", weight: 0.20 },
+    { difficulty: "normal", weight: 0.50 },
+    { difficulty: "hard", weight: 0.20 },
+    { difficulty: "impossible", weight: 0.10 }
+  ],
+  [BotDifficultyType.PMC]: [
+    { difficulty: "easy", weight: 0.10 },
+    { difficulty: "normal", weight: 0.20 },
+    { difficulty: "hard", weight: 0.45 },
+    { difficulty: "impossible", weight: 0.25 }
+  ],
+  [BotDifficultyType.BOSS]: [
+    { difficulty: "easy", weight: 0 },
+    { difficulty: "normal", weight: 0.20 },
+    { difficulty: "hard", weight: 0.40 },
+    { difficulty: "impossible", weight: 0.40 }
+  ],
+  [BotDifficultyType.BOSS_ESCORT]: [
+    { difficulty: "easy", weight: 0.05 },
+    { difficulty: "normal", weight: 0.20 },
+    { difficulty: "hard", weight: 0.50 },
+    { difficulty: "impossible", weight: 0.25 }
+  ],
+  [BotDifficultyType.SNIPER]: [
+    { difficulty: "easy", weight: 0.15 },
+    { difficulty: "normal", weight: 0.15 },
+    { difficulty: "hard", weight: 0.50 },
+    { difficulty: "impossible", weight: 0.20 }
+  ],
+  [BotDifficultyType.ROGUE]: [
+    { difficulty: "easy", weight: 0.05 },
+    { difficulty: "normal", weight: 0.20 },
+    { difficulty: "hard", weight: 0.50 },
+    { difficulty: "impossible", weight: 0.25 }
+  ],
+  [BotDifficultyType.RAIDER]: [
+    { difficulty: "easy", weight: 0.05 },
+    { difficulty: "normal", weight: 0.20 },
+    { difficulty: "hard", weight: 0.50 },
+    { difficulty: "impossible", weight: 0.25 }
+  ],
+  [BotDifficultyType.RANDOM]: [
+    { difficulty: "easy", weight: 0.25 },
+    { difficulty: "normal", weight: 0.40 },
+    { difficulty: "hard", weight: 0.25 },
+    { difficulty: "impossible", weight: 0.1 }
+  ]
 };
+
+const weightedRandomSelect = (weights: { difficulty: Difficulty; weight: number }[]): Difficulty => {
+  const rand = Math.random();
+  let cumulative = 0;
+
+  for (const item of weights) {
+    cumulative += item.weight;
+    if (rand < cumulative) {
+      return item.difficulty;
+    }
+  }
+
+  // In case of floating point issues, return last difficulty
+  return weights[weights.length - 1].difficulty;
+}
+
+export const getDifficulty = (botDifficultyType: BotDifficultyType): Difficulty => {
+  const weights = botDifficultyWeights[botDifficultyType];
+  const difficulty = weightedRandomSelect(weights);
+  // if (_config.debug) {
+  //   console.log(`[MOAR DEBUG]: Difficulty: ${difficulty} for type ${BotDifficultyType[botDifficultyType]}`);
+  // }
+  return difficulty;
+};
+
 
 export const shuffle = <n>(array: any): n => {
   let currentIndex = array.length,
@@ -147,13 +249,16 @@ export const buildBossBasedWave = (
   BossEscortType: string,
   BossName: string,
   BossZone: string,
+  difficultyType: BotDifficultyType,
   raidTime?: number
 ): IBossLocationSpawn => {
+
+  const difficulty = getDifficulty(difficultyType);
   return {
     BossChance,
-    BossDifficult: "normal",
+    BossDifficult: difficulty,
     BossEscortAmount,
-    BossEscortDifficult: "normal",
+    BossEscortDifficult: difficulty,
     BossEscortType,
     BossName,
     BossPlayer: false,
@@ -184,11 +289,9 @@ export const zombieTypesCaps = [
   "infectedCivil",
 ];
 
-export const getRandomDifficulty = (num: number = 1.5) =>
-  getDifficulty(Math.round(Math.random() * num * 10) / 10);
+export const getRandomDifficulty = () => getDifficulty(BotDifficultyType.RANDOM);
+export const getRandomZombieType = () => zombieTypesCaps[Math.round((zombieTypesCaps.length - 1) * Math.random())];
 
-export const getRandomZombieType = () =>
-  zombieTypesCaps[Math.round((zombieTypesCaps.length - 1) * Math.random())];
 
 export const buildBotWaves = (
   botTotal: number,
@@ -196,7 +299,7 @@ export const buildBotWaves = (
   maxGroup: number,
   groupChance: number,
   bossZones: string[],
-  difficulty: number,
+  difficulty: BotDifficultyType,
   botType: string,
   ForceSpawn: boolean,
   botDistribution: number,
@@ -237,7 +340,6 @@ export const buildBotWaves = (
 
     const totalCountThisWave = isMarksman ? 1 : bossEscortAmount + 1;
     const totalCountThusFar = botTotal - maxSlotsReached;
-
     const BossDifficult = getDifficulty(difficulty);
 
     waves.push({
@@ -278,7 +380,7 @@ export const buildZombie = (
   botTotal: number,
   escapeTimeLimit: number,
   botDistribution: number,
-  BossChance: number = 100
+  BossChance = 100
 ): IBossLocationSpawn[] => {
   if (!botTotal) return [];
   const pushToEnd = botDistribution > 1;
@@ -522,7 +624,7 @@ export const enforceSmoothing = (locationList: ILocation[]) => {
   }
 };
 
-export const looselyShuffle = <T>(arr: T[], shuffleStep: number = 3): T[] => {
+export const looselyShuffle = <T>(arr: T[], shuffleStep = 3): T[] => {
   const n = arr.length;
   const halfN = Math.floor(n / 2);
   for (let i = shuffleStep - 1; i < halfN; i += shuffleStep) {

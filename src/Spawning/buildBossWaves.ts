@@ -1,24 +1,31 @@
+/* eslint-disable @typescript-eslint/indent */
 import { ILocation } from "@spt/models/eft/common/ILocation";
-import _config from "../../config/config.json";
-import bossConfig from "../../config/bossConfig.json";
+import { IBossLocationSpawn } from "@spt/models/eft/common/ILocationBase";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 import advancedConfig from "../../config/advancedConfig.json";
+import bossConfigJson from "../../config/bossConfig.json";
+import bossAdditionsConfigJson from "../../config/bossAdditionsConfig.json"
+import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
+import { cloneDeep } from "../utils";
 import {
+  BossAdditionConfig,
+  BossConfig,
+  BossConfigByZone,
   bossesToRemoveFromPool,
   bossPerformanceHash,
   configLocations,
   mainBossNameList,
   originalMapList,
 } from "./constants";
-import { buildBossBasedWave, shuffle } from "./utils";
-import { IBossLocationSpawn } from "@spt/models/eft/common/ILocationBase";
-import { cloneDeep } from "../utils";
+import { BotDifficultyType, buildBossBasedWave, getDifficulty, getDifficultyTypeForBossName, getEscortDifficultyType, shuffle } from "./utils";
 
 export function buildBossWaves(
   config: typeof _config,
-  locationList: ILocation[]
+  locationList: ILocation[],
+  Logger: ILogger
 ) {
-  let {
+  const {
     randomRaiderGroup,
     randomRaiderGroupChance,
     randomRogueGroup,
@@ -75,7 +82,7 @@ export function buildBossWaves(
               varsToUpdate.Time = Math.floor(Math.random() * 50 * max)
               // console.log(varsToUpdate, max * 60)
             }
-            
+
             locationList[indx].base.BossLocationSpawn[bIndex] = {
               ...Boss,
               ...varsToUpdate,
@@ -114,10 +121,11 @@ export function buildBossWaves(
       if (randomRaiderGroup) {
         const raiderWave = buildBossBasedWave(
           randomRaiderGroupChance,
-          "1,2,2,2,3",
+          "1,1,2,2,2,3",
           "pmcBot",
           "pmcBot",
           "",
+          BotDifficultyType.RAIDER,
           locationList[indx].base.EscapeTimeLimit
         );
         location.base.BossLocationSpawn.push(raiderWave);
@@ -126,10 +134,11 @@ export function buildBossWaves(
       if (randomRogueGroup) {
         const rogueWave = buildBossBasedWave(
           randomRogueGroupChance,
-          "1,2,2,2,3",
+          "1,1,2,2,2,3",
           "exUsec",
           "exUsec",
           "",
+          BotDifficultyType.ROGUE,
           locationList[indx].base.EscapeTimeLimit
         );
         location.base.BossLocationSpawn.push(rogueWave);
@@ -156,6 +165,7 @@ export function buildBossWaves(
   }
 
   if (!disableBosses) {
+
     // Make boss Invasion
     if (bossInvasion) {
       if (bossInvasionSpawnChance) {
@@ -184,6 +194,8 @@ export function buildBossWaves(
             BossEscortAmount:
               boss.BossEscortAmount === "0" ? boss.BossEscortAmount : "1",
             ...(gradualBossInvasion ? { Time: j * 20 + 1 } : {}),
+            BossDifficult: getDifficulty(BotDifficultyType.BOSS),
+            BossEscortDifficult: getDifficulty(BotDifficultyType.BOSS_ESCORT)
           }));
 
         // UpdateBosses
@@ -193,58 +205,211 @@ export function buildBossWaves(
         ];
       }
     }
-    let hasChangedBossSpawns = false;
-    // console.log(Object.keys(allBosses));
-    configLocations.forEach((mapName, index) => {
-      const bossLocationSpawn = locationList[index].base.BossLocationSpawn;
-      const mapBossConfig: Record<string, number> = cloneDeep(
-        bossConfig[mapName] || {}
-      );
-      // if (Object.keys(mapBossConfig).length === 0) console.log(name, "empty");
-      const adjusted = new Set<string>([]);
 
-      bossLocationSpawn.forEach(({ BossName, BossChance }, bossIndex) => {
-        if (typeof mapBossConfig[BossName] === "number") {
-          if (BossChance !== mapBossConfig[BossName]) {
-            if (!hasChangedBossSpawns) {
-              console.log(
-                `\n[MOAR]: --- Adjusting default boss spawn rates from bossConfig.json --- `
-              );
-              hasChangedBossSpawns = true;
-            }
-            console.log(
-              `[MOAR]: ${mapName} ${BossName}: ${locationList[index].base.BossLocationSpawn[bossIndex].BossChance} => ${mapBossConfig[BossName]}`
-            );
-            locationList[index].base.BossLocationSpawn[bossIndex].BossChance =
-              mapBossConfig[BossName];
-          }
-          adjusted.add(BossName);
+    let hasChangedBossSpawns = false;
+
+    // iterate over all provided config locations
+    configLocations.forEach((mapName, index) => {
+
+      // All Boss Spawns for current map
+      const currMapBossConfigs = locationList[index].base.BossLocationSpawn;
+
+      // Config .json for current map
+      const bossConfigs: Record<string, BossConfig | BossConfigByZone[]> = cloneDeep(
+        bossConfigJson[mapName] || {}
+      );
+
+      // Trigger Ids Sanity Check -----------
+      Logger.debug(`[MOAR]: Beginning sanity checks for unknown triggers on location ${mapName}`);
+      const currMapTriggers = new Set(
+        currMapBossConfigs
+          .map(b => b.TriggerId)
+          .filter(id => id && id.length > 0)
+      );
+
+      // Check mapBossConfig for any unknown triggerIds
+      for (const bossKey in bossConfigs) {
+        const bossConfig = bossConfigs[bossKey];
+
+        // Skip non-array configs (we only care about arrays like pmcBot, exUsec, etc.)
+        if (!Array.isArray(bossConfig)) {
+          continue;
         }
+
+        for (const obj of bossConfig) {
+          if (obj.triggerId && !currMapTriggers.has(obj.triggerId)) {
+            Logger.warning(`[MOAR]: Trigger "${obj.triggerId}" not found in default configuration for map "${mapName}". Possible misconfiguration.`);
+          }
+        }
+      }
+      Logger.debug(`[MOAR]: Finishing sanity checks for unknown triggers on location ${mapName}`);
+
+      // Iterate over the map Actual Boss Spawns in order to adjust already existing spawns with the provided config
+      currMapBossConfigs.forEach(({ BossName, BossChance, BossZone, TriggerId }, bossIndex) => {
+
+        const checkBossConfig = bossConfigs[BossName];
+        // No special config provided in bossConfig.json for this Boss
+        if (!checkBossConfig || (Array.isArray(checkBossConfig) && !checkBossConfig.length)) {
+          Logger.debug(`[MOAR]: No special config for ${BossName} in ${mapName}`);
+          return;
+        }
+
+        if (!hasChangedBossSpawns) {
+          Logger.info(
+            `\n[MOAR]: --- Adjusting default boss spawn rates from bossConfig.json --- `
+          );
+          hasChangedBossSpawns = true;
+        }
+
+
+        const actualBossConfig = locationList[index].base.BossLocationSpawn[bossIndex];
+        if (Array.isArray(bossConfigs[BossName])) {
+          // Is the provided config for current boss and map an array? If so, treat it like as a BossConfigByZone
+
+          // cast to array of BossConfigByZone
+          const config = bossConfigs[BossName] as BossConfigByZone[];
+
+          // Sort the array so the least specific ones (the ones without triggerId) come first
+          // This is done like this because there is a possiblity of repeated ZoneIds spawns, and some have triggers, and some dont
+          // So first edit everything by zoneId
+          // Then afterwards edit everything by zoneId+triggerId
+          const sortByTriggerSpecific = (a: BossConfigByZone, b: BossConfigByZone) => {
+            const hasTriggerA = !!a.triggerId;
+            const hasTriggerB = !!b.triggerId;
+
+            // Entries *without* triggerId should come first
+            if (hasTriggerA === hasTriggerB) return 0;
+            return hasTriggerA ? 1 : -1;
+          };
+
+          config
+            .sort(sortByTriggerSpecific)
+            .forEach((zoneFilter: BossConfigByZone) => {
+
+              // we need to split zones as "ZoneSmuglers,ZoneSanatarium01" should match a boss with "ZoneSanatarium01"
+              const zones = zoneFilter.zoneId.split(",");
+              const zoneMatches = zones.some(zone => BossZone.includes(zone));
+
+              const bossHasTriggers = TriggerId?.length;
+              const triggers = zoneFilter.triggerId?.split(",") ?? [];
+
+              /**  
+               * To match, either of the following things have to happen:
+               * - Boss has no triggers AND Provided config has no triggers
+               * - Any of the provided config triggers matches the boss trigger
+               **/
+              const triggerMatches = (!bossHasTriggers && !triggers.length) /*|| !triggers.length*/ || triggers.some(trigger => TriggerId == trigger);
+
+
+              /**
+               * To change actual boss spawn all have to match:
+               * - Boss and Provided Config zoneId are equal (intersection, boss zone "ZoneSanatarium01" matches to provided "ZoneSmugles,ZoneSanatarium01")
+               * - TriggerId has to match (see previus match explaination)
+               * - The desired chance must be different to the one the boss already has
+               */
+              const desiredChance = zoneFilter.chance;
+              if (zoneMatches && triggerMatches && (desiredChance != BossChance)) {
+                Logger.info(
+                  `[MOAR]: ${mapName} ${BossName} ${BossZone} ${TriggerId}: Chance of spawn [${BossChance}] => [${desiredChance}]`
+                );
+                actualBossConfig.BossChance = desiredChance;
+              }
+
+              const desiredEscortAmount = zoneFilter.escortAmount;
+              if (zoneMatches && triggerMatches && actualBossConfig.BossEscortAmount != desiredEscortAmount && (typeof desiredEscortAmount === "string")) {
+                Logger.info(
+                  `[MOAR]: ${mapName} ${BossName} ${BossZone} ${TriggerId}: Escort amount [${actualBossConfig.BossEscortAmount}] => [${desiredEscortAmount}]`
+                );
+                actualBossConfig.BossEscortAmount = desiredEscortAmount;
+              }
+                
+              const desiredTime = zoneFilter.time;
+              if (zoneMatches && triggerMatches && actualBossConfig.Time != desiredTime && (typeof desiredTime === "number")) {
+                Logger.info(
+                  `[MOAR]: ${mapName} ${BossName} ${BossZone} ${TriggerId}: Time [${actualBossConfig.Time}] => [${desiredTime}]`
+                );
+                actualBossConfig.Time = desiredTime;
+              }
+
+
+            });
+
+        } else {
+          // If the provided config for the current map and boss is not an array, proceed normally
+
+          // cast to normal BossConfig
+          const config = bossConfigs[BossName] as BossConfig;
+          const desiredChance = config.chance;
+          const desiredZones = config.zoneIds;
+          const desiredEscortAmount = config.escortAmount;
+          const desiredTime = config.time;
+
+          // If provided config chance is not the same as the current boss one, change it
+          if (desiredChance != BossChance && (typeof desiredChance === "number")) {
+            Logger.info(
+              `[MOAR]: ${mapName} ${BossName}: Chance of spawn [${BossChance}] => [${desiredChance}]`
+            );
+            actualBossConfig.BossChance = desiredChance;
+          }
+
+          // Zones can also change, as long as the provided zoneId is different to the existing one
+          if (desiredZones != BossZone && (typeof desiredZones === "string")) {
+            Logger.info(
+              `[MOAR]: ${mapName} ${BossName}: Zone of spawn [${BossZone}] => [${desiredZones}]`
+            );
+            actualBossConfig.BossZone = desiredZones;
+          } 
+          
+          // Escorts can also change, as long as the provided escort amount is different to the existing one
+          if (desiredEscortAmount != actualBossConfig.BossEscortAmount && (typeof desiredEscortAmount === "string")) {
+            Logger.info(
+              `[MOAR]: ${mapName} ${BossName}: Escort amount [${actualBossConfig.BossEscortAmount}] => [${desiredEscortAmount}]`
+            );
+            actualBossConfig.BossEscortAmount = desiredEscortAmount;
+          }
+          
+          // Time of spawn can also change, as long as the provided time is different to the existing one
+          if (desiredTime != actualBossConfig.Time && (typeof desiredTime === "number")) {
+            Logger.info(
+              `[MOAR]: ${mapName} ${BossName}: Time [${actualBossConfig.Time}] => [${desiredTime}]`
+            );
+            actualBossConfig.Time = desiredTime;
+          }
+        }
+
       });
 
-      const bossesToAdd = Object.keys(mapBossConfig)
-        .filter(
-          (adjustName) => !adjusted.has(adjustName) && !!allBosses[adjustName]
-        )
-        .map((bossName) => {
-          `[MOAR]: Adding non-default boss ${bossName} to ${originalMapList[index]}`;
+      // bossAdditionsConfig.json for current map
+      const configToAddBosses: BossAdditionConfig[] = cloneDeep(bossAdditionsConfigJson[mapName]);
+      const bossWavesToAdd = [];
 
-          const newBoss: IBossLocationSpawn = cloneDeep(
-            allBosses[bossName] || {}
-          );
-          newBoss.BossChance = mapBossConfig[bossName];
-          // console.log(
-          //   "Adding boss",
-          //   bossName,
-          //   "to ",
-          //   originalMapList[index],
-          //   "spawn chance =>",
-          //   mapBossConfig[bossName]
-          // );
-          return newBoss;
-        });
+      configToAddBosses.forEach((config) => {
+        Logger.info(`[MOAR]: Adding non-default boss [${config.type}] to [${mapName}] => Chance [${config.chance}] Zones [${config.zoneIds}]`);
+        const newBossConfig: IBossLocationSpawn = cloneDeep(allBosses[config.type]);
+    
+        // assign chance and zones
+        newBossConfig.BossChance = config.chance;
+        newBossConfig.BossZone = config.zoneIds;
 
-      // console.log(bossesToAdd);
+        // assign time if provided
+        if (config.time != undefined) {
+          newBossConfig.Time = config.time;
+        }
+
+        // assign escort amount if provided
+        if (config.escortAmount?.length) {
+          newBossConfig.BossEscortAmount = config.escortAmount;
+        }
+
+        // assign trigger id if provided
+        if (config.triggerId?.length) {
+          newBossConfig.TriggerId = config.triggerId;
+          newBossConfig.TriggerName = "interactObject"; // Hardcoded, all triggers have this.
+        }
+
+        bossWavesToAdd.push(newBossConfig);
+      });
+
 
       if (bossOpenZones || mainBossChanceBuff) {
         locationList[index].base?.BossLocationSpawn?.forEach((boss, key) => {
@@ -259,25 +424,24 @@ export function buildBossWaves(
             if (!!boss.BossChance && mainBossChanceBuff > 0) {
               locationList[index].base.BossLocationSpawn[key] = {
                 ...locationList[index].base.BossLocationSpawn[key],
-                BossChance:
-                  boss.BossChance + mainBossChanceBuff > 100
-                    ? 100
-                    : Math.round(boss.BossChance + mainBossChanceBuff),
+                BossChance: Math.max(Math.min( Math.round(boss.BossChance + mainBossChanceBuff), 100 ), 0) // allow negative numbers in the mainBossChanceBuff, with a min of 0 and max of 100 ;)
               };
             }
           }
         });
       }
 
+      Logger.debug(`[MOAR]: Boss waves to add to map [${mapName}]: [${JSON.stringify(bossWavesToAdd) || "None"}]`);
+
       locationList[index].base.BossLocationSpawn = [
         ...locationList[index].base.BossLocationSpawn,
-        ...bossesToAdd,
+        ...bossWavesToAdd
       ];
 
-      bossesToAdd.length &&
-        console.log(
+      bossWavesToAdd.length &&
+        Logger.info(
           `[MOAR] Adding the following bosses to map ${configLocations[index]
-          }: ${bossesToAdd.map(({ BossName }) => BossName)}`
+          }: ${bossWavesToAdd.map(({ BossName }) => BossName)}`
         );
       // console.log(locationList[index].base.BossLocationSpawn.length);
 
@@ -287,6 +451,17 @@ export function buildBossWaves(
         index
       ].base.BossLocationSpawn.map(
         ({ BossChance, BossName, TriggerId }, bossIndex) => {
+
+          // apply dynamic difficulties
+          const difficultyType = getDifficultyTypeForBossName(BossName);
+          const escortDifficultyType = getEscortDifficultyType(difficultyType);
+          const bossDifficulty = getDifficulty(difficultyType);
+          const escortDifficulty = getDifficulty(escortDifficultyType);
+
+          locationList[index].base.BossLocationSpawn[bossIndex].BossDifficult = bossDifficulty;
+          locationList[index].base.BossLocationSpawn[bossIndex].BossEscortDifficult = escortDifficulty;
+          Logger.debug(`[MOAR]: Changed difficulty of boss [${BossName}] on map [${mapName}] to [${bossDifficulty}], with escorts as [${escortDifficulty}]`);
+
           if (BossChance < 1) {
             return locationList[index].base.BossLocationSpawn[bossIndex];
           }

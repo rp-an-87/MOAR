@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/indent */
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import _config from "../../config/config.json";
 import mapConfig from "../../config/mapConfig.json";
 import { defaultEscapeTimes, defaultHostility } from "./constants";
-import { buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
+import { BotDifficultyType, buildBotWaves, looselyShuffle, MapSettings, shuffle } from "./utils";
 import { saveToFile } from "../utils";
 import getSortedSpawnPointList from "./spawnZoneUtils";
 import { globalValues } from "../GlobalValues";
@@ -98,7 +99,7 @@ export default function buildPmcs(
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
       usecSpawns,
-      config.pmcDifficulty,
+      BotDifficultyType.PMC,
       "pmcUSEC",
       false,
       config.pmcWaveDistribution,
@@ -111,7 +112,7 @@ export default function buildPmcs(
       config.pmcMaxGroupSize - 1,
       config.pmcGroupChance,
       bearSpawns,
-      config.pmcDifficulty,
+      BotDifficultyType.PMC,
       "pmcBEAR",
       false,
       config.pmcWaveDistribution,

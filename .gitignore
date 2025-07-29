@@ -1,6 +1,9 @@
 node_modules
 dist/Bepinex
 dist/user
+dist/
+dist/**
+dist/*
 src/refDBS
 
 src/**/**/*.js
@@ -11,3 +14,8 @@ src/**/*.js.map
 src/*.js.map
 src/**/**.js.map
 src/**/**.js
+
+types/
+types/*
+types/**
+types

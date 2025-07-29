@@ -1,0 +1,51 @@
+{
+  "example": [
+    {
+      "EXPLAINATION": "Add Shturman after 5 minutes in fortress, with an equal amount of either 1,2 or 3 escorts",
+      "type": "bossKojaniy",
+      "chance": 100,
+      "escortAmount": "1,1,2,2,3,3",
+      "time": 300,
+      "zoneIds": "ZoneScavBase"
+    },
+    {
+      "EXPLAINATION": "add the goons in Gas station after partisan is deemed to spawn",
+      "zoneIds": "ZoneGasStation",
+      "type": "BossKnight",
+      "triggerId": "TRIGGER_PARTISAN",
+      "chance": 100
+    },
+    {
+      "EXPLAINATION": "Add a group of rogues after 30 minutes in the train area",
+      "time": 1800,
+      "escortAmount": "2",
+      "zoneIds": "Zone_Containers",
+      "type": "exUsec",
+      "chance": 100
+    }
+  ],
+  "customs": [
+  ],
+  "factoryDay": [
+  ],
+  "factoryNight": [
+  ],
+  "interchange": [
+  ],
+  "laboratory": [
+  ],
+  "lighthouse": [
+  ],
+  "rezervbase": [
+  ],
+  "shoreline": [
+  ],
+  "tarkovstreets": [
+  ],
+  "woods": [
+  ],
+  "gzLow": [
+  ],
+  "gzHigh": [
+  ]
+}

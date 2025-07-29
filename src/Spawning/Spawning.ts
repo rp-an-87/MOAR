@@ -144,7 +144,7 @@ export const buildWaves = (container: DependencyContainer) => {
   setEscapeTimeOverrides(locationList, _mapConfig, Logger, config);
 
   // BOSS RELATED STUFF!
-  buildBossWaves(config, locationList);
+  buildBossWaves(config, locationList, Logger);
 
   //Zombies
   if (config.zombiesEnabled) {
